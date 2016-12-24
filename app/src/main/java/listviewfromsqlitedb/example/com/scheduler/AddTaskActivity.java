@@ -1,13 +1,16 @@
 package listviewfromsqlitedb.example.com.scheduler;
 
 import android.app.Activity;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import java.util.Calendar;
 
@@ -24,6 +27,8 @@ public class AddTaskActivity extends Activity {
     private static final int  REQUEST_CODE_END_TIME = 2;
     private String format = "";
     private Calendar calendar;
+    TableRow startTimeRow, endTimeRow;
+    int currentHour;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -31,24 +36,45 @@ public class AddTaskActivity extends Activity {
         setContentView(R.layout.activity_addtask);
         startTime = (TextView) findViewById(R.id.tx_startTime);
         endTime = (TextView) findViewById(R.id.tx_endTime);
+        startTimeRow = (TableRow) findViewById(R.id.startTimeRow);
+        endTimeRow = (TableRow) findViewById(R.id.endTimeRow);
         taskName = (EditText) findViewById(R.id.et_taskName);
         btnSubmit = (Button) findViewById(R.id.btn_submit);
         adapter = new DatabaseManager(this);
 
-        startTime.setOnClickListener(new View.OnClickListener(){
+        startTimeRow.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(AddTaskActivity.this, TimePickerActivity.class);
-                startActivityForResult(intent, REQUEST_CODE_START_TIME);
+                Calendar mcurrentTime = Calendar.getInstance();
+                int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+                int minute = mcurrentTime.get(Calendar.MINUTE);
+                TimePickerDialog mTimePicker;
+                mTimePicker = new TimePickerDialog(AddTaskActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+                        showStartTime(selectedHour, selectedMinute);
+                    }
+                }, hour, minute, false);
+                mTimePicker.setTitle("Select Time");
+                mTimePicker.show();
             }
         });
 
-        endTime.setOnClickListener(new View.OnClickListener(){
-
+        endTimeRow.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(AddTaskActivity.this, TimePickerActivity.class);
-                startActivityForResult(intent, REQUEST_CODE_END_TIME);
+                Calendar mcurrentTime = Calendar.getInstance();
+                int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+                int minute = mcurrentTime.get(Calendar.MINUTE);
+                TimePickerDialog mTimePicker;
+                mTimePicker = new TimePickerDialog(AddTaskActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+                        showEndTime(selectedHour, selectedMinute);
+                    }
+                }, hour, minute, false);
+                mTimePicker.setTitle("Select Time");
+                mTimePicker.show();
             }
         });
 
@@ -65,36 +91,8 @@ public class AddTaskActivity extends Activity {
         });
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == REQUEST_CODE_START_TIME) {
-            if(resultCode == Activity.RESULT_OK) {
-                int result_hour = data.getIntExtra(TimePickerActivity.HOUR, 0);
-                int result_min = data.getIntExtra(TimePickerActivity.HOUR, 0);
-                showStartTime(result_hour, result_min);
-            } else {
-                calendar = Calendar.getInstance();
-                int hour = calendar.get(Calendar.HOUR_OF_DAY);
-                int min = calendar.get(Calendar.MINUTE);
-                showStartTime(hour, min);
-            }
-        }
-        else if (requestCode == REQUEST_CODE_END_TIME){
-            if(resultCode == Activity.RESULT_OK) {
-                int result_hour = data.getIntExtra(TimePickerActivity.HOUR, 0);
-                int result_min = data.getIntExtra(TimePickerActivity.HOUR, 0);
-                showEndTime(result_hour, result_min);
-            } else {
-                calendar = Calendar.getInstance();
-                int hour = calendar.get(Calendar.HOUR_OF_DAY);
-                int min = calendar.get(Calendar.MINUTE);
-                showEndTime(hour, min);
-            }
-        }
-    }
-
     public void showStartTime(int hour, int min) {
+        String minstr;
         if (hour == 0) {
             hour += 12;
             format = "AM";
@@ -107,11 +105,17 @@ public class AddTaskActivity extends Activity {
             format = "AM";
         }
 
-        startTime.setText(new StringBuilder().append(hour).append(" : ").append(min)
+        if(min >= 10){
+            minstr = String.valueOf(min);
+        }else {
+            minstr = "0" + String.valueOf(min);
+        }
+        startTime.setText(new StringBuilder().append(hour).append(" : ").append(minstr)
                 .append(" ").append(format));
     }
 
     public void showEndTime(int hour, int min) {
+        String minstr;
         if (hour == 0) {
             hour += 12;
             format = "AM";
@@ -123,8 +127,12 @@ public class AddTaskActivity extends Activity {
         } else {
             format = "AM";
         }
-
-        endTime.setText(new StringBuilder().append(hour).append(" : ").append(min)
+        if(min >= 10){
+            minstr = String.valueOf(min);
+        }else {
+            minstr = "0" + String.valueOf(min);
+        }
+        endTime.setText(new StringBuilder().append(hour).append(" : ").append(minstr)
                 .append(" ").append(format));
     }
 
