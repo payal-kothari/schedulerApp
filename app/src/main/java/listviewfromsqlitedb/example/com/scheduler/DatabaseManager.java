@@ -44,17 +44,17 @@ public class DatabaseManager{
         long val = database_ob.insert(databaseHelper_ob.TABLE_NAME, null, contentValues);
         Close();
         return val;
-
     }
 
-    public Cursor fetch() {
+    public Cursor fetchAll() {
         String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME };
         opnToWrite();
+        //Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, null, null, null, null,"startTime ASC");
         Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, null, null, null, null, null);
         return c;
     }
 
-    public Cursor fetchAll(int nameId) {
+    public Cursor fetch(int nameId) {
         String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME };
         opnToWrite();
         Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, databaseHelper_ob.KEY_ID + "=" + nameId, null, null, null, null);
@@ -72,7 +72,7 @@ public class DatabaseManager{
         return val;
     }
 
-    public int deletOneRecord(int rowId) {
+    public int deleteOneRecord(int rowId) {
         opnToWrite();
         int val = database_ob.delete(databaseHelper_ob.TABLE_NAME, databaseHelper_ob.KEY_ID + "=" + rowId, null);
         Close();

@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import java.util.Calendar;
 
@@ -41,9 +42,10 @@ public class EditActivity extends Activity {
 
         Bundle showData = getIntent().getExtras();
         rowId = showData.getInt("keyid");
+        //Toast.makeText(EditActivity.this, rowId, Toast.LENGTH_LONG).show();
         regadapter = new DatabaseManager(this);
 
-        c = regadapter.fetchAll(rowId);
+        c = regadapter.fetch(rowId);
 
         if (c.moveToFirst()) {
             do {
@@ -103,7 +105,7 @@ public class EditActivity extends Activity {
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
-                regadapter.deletOneRecord(rowId);
+                regadapter.deleteOneRecord(rowId);
                 finish();
             }
         });
