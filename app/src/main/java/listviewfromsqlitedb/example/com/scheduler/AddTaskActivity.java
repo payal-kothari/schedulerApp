@@ -45,7 +45,7 @@ public class AddTaskActivity extends Activity {
         btnSubmit = (Button) findViewById(R.id.btn_submit);
         adapter = new DatabaseManager(this);
 
-        Cursor c = adapter.fetchAll();
+        Cursor c = adapter.fetchAllCursor();
         int num = c.getCount();
         if(num > 0) {
             c.moveToLast();
