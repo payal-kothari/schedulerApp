@@ -16,6 +16,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.StringTokenizer;
 
@@ -23,9 +24,10 @@ public class MainActivity extends Activity {
     DatabaseManager adapter_ob;
     DatabaseHelper helper_ob;
     ListView scheduleList;
-    Button btnNewTask;
+    Button btnNewTask, btnRefresh;
     Cursor cursor;
     DatabaseManager adapter;
+    CustomAdapter customAdapter;
     DatabaseHelper helper;
     public TextView startTime, endTime, taskName;
     Button btnSubmit, btnReset;
@@ -46,45 +48,23 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         scheduleList = (ListView) findViewById(R.id.list_view);
         btnNewTask = (Button) findViewById(R.id.btn_newTask);
+        btnRefresh = (Button) findViewById(R.id.btn_refresh);
         adapter_ob = new DatabaseManager(this);
 
-        String[] from = { helper_ob.START_TIME, helper_ob.END_TIME, helper_ob.TASK_NAME };
-        int[] to = { R.id.tv_startTime, R.id.tv_endTime, R.id.tv_task };
-        cursor = adapter_ob.fetchAll();
-        SimpleCursorAdapter cursorAdapter = new SimpleCursorAdapter(this, R.layout.row, cursor, from, to);
-        scheduleList.setAdapter(cursorAdapter);
-        scheduleList.setOnItemClickListener(new OnItemClickListener() {
+        showlist();
 
+        btnRefresh.setOnClickListener(new OnClickListener() {
             @Override
-            public void onItemClick(AdapterView arg0, View arg1, int arg2, long arg3) {
-                Bundle passdata = new Bundle();
-                Cursor listCursor = (Cursor) arg0.getItemAtPosition(arg2);
-                int nameId = listCursor.getInt(listCursor
-                        .getColumnIndex(helper_ob.KEY_ID));
-                passdata.putInt("keyid", nameId);
-                Intent passIntent = new Intent(MainActivity.this,
-                        EditActivity.class);
-                passIntent.putExtras(passdata);
-                startActivity(passIntent);
+            public void onClick(View v) {
+                showlist();
             }
         });
-
-//        btnNewTask.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View arg0) {
-//                // TODO Auto-generated method stub
-//                Intent registerIntent = new Intent(MainActivity.this,
-//                        AddTaskActivity.class);
-//
-//                startActivity(registerIntent);
-//            }
-//        });
 
         btnNewTask.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 adapter = new DatabaseManager(MainActivity.this);
-                Cursor c = adapter.fetchAll();
+                Cursor c = adapter.fetchAllCursor();
                 int num = c.getCount();
                 if(num > 0) {
                     c.moveToLast();
@@ -92,22 +72,19 @@ public class MainActivity extends Activity {
                     String tempHr = start.substring(0, 2);
                     String tempMin = start.substring(5, 7);
                     String AmPmFormat = start.substring(8, 10);
-                    Toast.makeText(MainActivity.this, tempMin, Toast.LENGTH_LONG).show();
                     int tempHour = Integer.parseInt(tempHr);
                     int tempMinute = Integer.parseInt(tempMin);
                     setTimeForEnd(tempHour, tempMinute, AmPmFormat);
                     //String end = String.valueOf(tempHour) + start.substring(2,start.length());
                     String task = c.getString(c.getColumnIndex(helper.TASK_NAME));
                     adapter.insertDetails(start, e, task);
-                    refresh();
-                    //finish();
+                    showlist();
                 }else { // when database is empty
                     String AmPmFormat;
                     Calendar mcurrentTime = Calendar.getInstance();
                     int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
                     int minute = mcurrentTime.get(Calendar.MINUTE);
                     setTime(hour, minute, "start");
-                    Toast.makeText(MainActivity.this, String.valueOf(hour), Toast.LENGTH_LONG).show();
                     if(hour <12){
                         AmPmFormat = "AM";
                     }else {
@@ -117,27 +94,49 @@ public class MainActivity extends Activity {
                     setTimeForEnd(hour, minute, AmPmFormat);
                     String task = "None";
                     long val = adapter.insertDetails(s, e, task);
-                    refresh();
-                    //finish();
+                    showlist();
                 }
             }
         });
     }
 
-    private void refresh() {
-        adapter_ob = new DatabaseManager(MainActivity.this);
-        scheduleList = (ListView) findViewById(R.id.list_view);
-        String[] from = { helper_ob.START_TIME, helper_ob.END_TIME, helper_ob.TASK_NAME };
-        int[] to = { R.id.tv_startTime, R.id.tv_endTime, R.id.tv_task };
-        cursor = adapter_ob.fetchAll();
-        SimpleCursorAdapter cursorAdapter = new SimpleCursorAdapter(this, R.layout.row, cursor, from, to);
-        scheduleList.setAdapter(cursorAdapter);
+    public void refresh(){
+        showlist();
     }
 
     @Override
-    public void onResume() {
+    protected void onResume() {
         super.onResume();
-        cursor.requery();
+        Toast.makeText(this, "resumed", Toast.LENGTH_SHORT).show();
+        showlist();
+    }
+
+    public void showlist() {
+        adapter_ob = new DatabaseManager(this);
+        ArrayList<Entry> allEntries = new ArrayList<Entry>();
+        allEntries.clear();
+        Cursor c1 = adapter_ob.fetchAllCursor();
+        if (c1 != null && c1.getCount() != 0) {
+            if (c1.moveToFirst()) {
+                do {
+                    Entry allItems = new Entry();
+
+                    allItems.setID(c1.getInt(c1
+                            .getColumnIndex("_id")));
+                    allItems.setStart(c1.getString(c1
+                            .getColumnIndex("startTime")));
+                    allItems.setEnd(c1.getString(c1
+                            .getColumnIndex("endTime")));
+                    allItems.setTask(c1.getString(c1
+                            .getColumnIndex("taskName")));
+                    allEntries.add(allItems);
+                } while (c1.moveToNext());
+            }
+        }
+        c1.close();
+        CustomAdapter customAdapter = new CustomAdapter(
+                MainActivity.this, allEntries);
+        scheduleList.setAdapter(customAdapter);
     }
 
     public void setTime(int hour, int minute, String blockName) {

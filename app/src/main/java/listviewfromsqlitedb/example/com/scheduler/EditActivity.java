@@ -111,8 +111,9 @@ public class EditActivity extends Activity {
         });
     }
 
-    public void showStartTime(int hour, int min) {
+    public String showStartTime(int hour, int min) {
         String minstr;
+        String hourStr;
         if (hour == 0) {
             hour += 12;
             format = "AM";
@@ -125,17 +126,25 @@ public class EditActivity extends Activity {
             format = "AM";
         }
 
+        if(hour >= 10){
+            hourStr = String.valueOf(hour);
+        }else {
+            hourStr = "0" + String.valueOf(hour);
+        }
+
         if(min >= 10){
             minstr = String.valueOf(min);
         }else {
             minstr = "0" + String.valueOf(min);
         }
-        startTime.setText(new StringBuilder().append(hour).append(" : ").append(minstr)
-                .append(" ").append(format));
+        return (new StringBuilder().append(hourStr).append(" : ").append(minstr)
+                .append(" ").append(format)).toString();
     }
 
-    public void showEndTime(int hour, int min) {
+    public String showEndTime(int hour, int min) {
         String minstr;
+        String hourStr;
+
         if (hour == 0) {
             hour += 12;
             format = "AM";
@@ -147,13 +156,19 @@ public class EditActivity extends Activity {
         } else {
             format = "AM";
         }
+        if(hour >= 10){
+            hourStr = String.valueOf(hour);
+        }else {
+            hourStr = "0" + String.valueOf(hour);
+        }
+
         if(min >= 10){
             minstr = String.valueOf(min);
         }else {
             minstr = "0" + String.valueOf(min);
         }
-        endTime.setText(new StringBuilder().append(hour).append(" : ").append(minstr)
-                .append(" ").append(format));
+        return (new StringBuilder().append(hourStr).append(" : ").append(minstr)
+                .append(" ").append(format)).toString();
     }
 
 }
