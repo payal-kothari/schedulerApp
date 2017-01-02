@@ -45,7 +45,7 @@ public class MainActivity extends Activity {
     StringBuilder stringbuilderStart, stringbuilderEnd;
     static String s, e;
     int year, month, day;
-
+    static String selectedDate;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,9 +55,34 @@ public class MainActivity extends Activity {
         btnNewTask = (Button) findViewById(R.id.btn_newTask);
         btnRefresh = (Button) findViewById(R.id.btn_refresh);
         adapter_ob = new DatabaseManager(this);
+        btnCalendar = (Button) findViewById(R.id.btn_calendar);
+
+        Intent intent = getIntent();
+        selectedDate = intent.getStringExtra("DATE");
 
 
         showlist();
+
+        scheduleList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                adapter_ob = new DatabaseManager(MainActivity.this);
+                adapter_ob.deleteOneRecord((int) id);
+                return true;
+            }
+        });
+
+        calendar = Calendar.getInstance();
+        year = calendar.get(Calendar.YEAR);
+
+        month = calendar.get(Calendar.MONTH);
+        day = calendar.get(Calendar.DAY_OF_MONTH);
+        btnCalendar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog(999);
+            }
+        });
 
         btnRefresh.setOnClickListener(new OnClickListener() {
             @Override
@@ -70,7 +95,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 adapter = new DatabaseManager(MainActivity.this);
-                Cursor c = adapter.fetchAllCursor();
+                Cursor c = adapter.fetchByDate(selectedDate);
                 int num = c.getCount();
                 if(num > 0) {
                     c.moveToLast();
@@ -83,7 +108,7 @@ public class MainActivity extends Activity {
                     setTimeForEnd(tempHour, tempMinute, AmPmFormat);
                     //String end = String.valueOf(tempHour) + start.substring(2,start.length());
                     String task = c.getString(c.getColumnIndex(helper.TASK_NAME));
-                    adapter.insertDetails(start, e, task);
+                    adapter.insertDetails(selectedDate, start, e, task);
                     showlist();
                 }else { // when database is empty
                     String AmPmFormat;
@@ -99,11 +124,41 @@ public class MainActivity extends Activity {
                     }
                     setTimeForEnd(hour, minute, AmPmFormat);
                     String task = "None";
-                    long val = adapter.insertDetails(s, e, task);
+                    long val = adapter.insertDetails(selectedDate, s, e, task);
                     showlist();
                 }
             }
         });
+    }
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        // TODO Auto-generated method stub
+        if (id == 999) {
+            return new DatePickerDialog(this,
+                    myDateListener, year, month, day);
+        }
+        return null;
+    }
+
+    DatePickerDialog.OnDateSetListener myDateListener = new
+            DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker arg0,
+                                      int arg1, int arg2, int arg3) {
+                    // TODO Auto-generated method stub
+                    // arg1 = year
+                    // arg2 = month
+                    // arg3 = day
+                    showDate(arg1, arg2+1, arg3);
+                }
+            };
+
+    private void showDate(int year, int month, int day) {
+        StringBuilder strbuilder = new StringBuilder().append(day).append("/")
+                .append(month).append("/").append(year);
+
+        selectedDate = strbuilder.toString();
     }
 
     public void refresh(){
@@ -121,7 +176,8 @@ public class MainActivity extends Activity {
         adapter_ob = new DatabaseManager(this);
         ArrayList<Entry> allEntries = new ArrayList<Entry>();
         allEntries.clear();
-        Cursor c1 = adapter_ob.fetchAllCursor();
+        Cursor c1 = adapter_ob.fetchByDate(selectedDate);
+        Toast.makeText(MainActivity.this, "got intent in cursor " + c1.getCount(), Toast.LENGTH_SHORT).show();
         if (c1 != null && c1.getCount() != 0) {
             if (c1.moveToFirst()) {
                 do {

@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.widget.Toast;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -38,8 +39,9 @@ public class DatabaseManager{
     }
 
 
-    public long insertDetails(String startTime, String endTime, String task) {
+    public long insertDetails(String date, String startTime, String endTime, String task) {
         ContentValues contentValues = new ContentValues();
+        contentValues.put(databaseHelper_ob.DATE, date);
         contentValues.put(databaseHelper_ob.START_TIME, startTime);
         contentValues.put(databaseHelper_ob.END_TIME, endTime);
         contentValues.put(databaseHelper_ob.TASK_NAME, task);
@@ -68,6 +70,20 @@ public class DatabaseManager{
             } while (c.moveToNext());
         }
         return entryList;
+    }
+
+    public Cursor fetchByDate(String date) {
+//        opnToWrite();
+//        String query = "SELECT * FROM schedule WHERE date='%" + date + "%'";
+//        System.out.println(query);
+//        Cursor c = database_ob.rawQuery(query, null);
+
+        String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME };
+        opnToWrite();
+        int nameId = 1;
+        Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME,
+                null, databaseHelper_ob.DATE + "=?", new String[] { date }, null, null, null, null);
+        return c;
     }
 
     public Cursor fetchAllCursor() {

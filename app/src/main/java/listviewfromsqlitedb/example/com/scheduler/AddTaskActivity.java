@@ -55,54 +55,54 @@ public class AddTaskActivity extends Activity {
             endTime.setText(end);
         }
 
-        startTimeRow.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                Calendar mcurrentTime = Calendar.getInstance();
-                int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
-                int minute = mcurrentTime.get(Calendar.MINUTE);
-                TimePickerDialog mTimePicker;
-                mTimePicker = new TimePickerDialog(AddTaskActivity.this, new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                        startTimeInt = concatIntegers(selectedHour,selectedMinute);
-                        showStartTime(selectedHour, selectedMinute);
-                    }
-                }, hour, minute, false);
-                mTimePicker.setTitle("Select Time");
-                mTimePicker.show();
-            }
-        });
+//        startTimeRow.setOnClickListener(new View.OnClickListener(){
+//            @Override
+//            public void onClick(View v) {
+//                Calendar mcurrentTime = Calendar.getInstance();
+//                int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+//                int minute = mcurrentTime.get(Calendar.MINUTE);
+//                TimePickerDialog mTimePicker;
+//                mTimePicker = new TimePickerDialog(AddTaskActivity.this, new TimePickerDialog.OnTimeSetListener() {
+//                    @Override
+//                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+//                        startTimeInt = concatIntegers(selectedHour,selectedMinute);
+//                        showStartTime(selectedHour, selectedMinute);
+//                    }
+//                }, hour, minute, false);
+//                mTimePicker.setTitle("Select Time");
+//                mTimePicker.show();
+//            }
+//        });
+//
+//        endTimeRow.setOnClickListener(new View.OnClickListener(){
+//            @Override
+//            public void onClick(View v) {
+//                Calendar mcurrentTime = Calendar.getInstance();
+//                int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+//                int minute = mcurrentTime.get(Calendar.MINUTE);
+//                TimePickerDialog mTimePicker;
+//                mTimePicker = new TimePickerDialog(AddTaskActivity.this, new TimePickerDialog.OnTimeSetListener() {
+//                    @Override
+//                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+//                        endTimeInt = concatIntegers(selectedHour,selectedMinute);
+//                        showEndTime(selectedHour, selectedMinute);
+//                    }
+//                }, hour, minute, false);
+//                mTimePicker.setTitle("Select Time");
+//                mTimePicker.show();
+//            }
+//        });
 
-        endTimeRow.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                Calendar mcurrentTime = Calendar.getInstance();
-                int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
-                int minute = mcurrentTime.get(Calendar.MINUTE);
-                TimePickerDialog mTimePicker;
-                mTimePicker = new TimePickerDialog(AddTaskActivity.this, new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                        endTimeInt = concatIntegers(selectedHour,selectedMinute);
-                        showEndTime(selectedHour, selectedMinute);
-                    }
-                }, hour, minute, false);
-                mTimePicker.setTitle("Select Time");
-                mTimePicker.show();
-            }
-        });
-
-        btnSubmit.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                String start = startTime.getText().toString();
-                String end = endTime.getText().toString();
-                String task = taskName.getText().toString();
-                long val = adapter.insertDetails(start, end, task);
-                finish();
-            }
-        });
+//        btnSubmit.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View arg0) {
+//                String start = startTime.getText().toString();
+//                String end = endTime.getText().toString();
+//                String task = taskName.getText().toString();
+//                long val = adapter.insertDetails(start, end, task);
+//                finish();
+//            }
+//        });
     }
 
     public int concatIntegers(int hr, int min){

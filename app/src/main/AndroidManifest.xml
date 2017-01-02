@@ -17,6 +17,7 @@
         </activity>
         <activity android:name=".AddTaskActivity"/>
         <activity android:name=".EditActivity"/>
+        <activity android:name=".FirstActivity"/>
     </application>
 
 </manifest>

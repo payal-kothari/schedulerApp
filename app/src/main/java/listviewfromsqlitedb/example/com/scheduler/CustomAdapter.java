@@ -182,10 +182,5 @@ public class CustomAdapter extends BaseAdapter{
             tx_e = (TextView) base.findViewById(R.id.tv_endTime);
             tx_t = (TextView) base.findViewById(R.id.tv_task);
         }
-
-    }
-
-    public void showDialogBox(){
-
     }
 }

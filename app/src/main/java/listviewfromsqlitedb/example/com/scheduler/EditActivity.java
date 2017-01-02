@@ -45,70 +45,70 @@ public class EditActivity extends Activity {
         //Toast.makeText(EditActivity.this, rowId, Toast.LENGTH_LONG).show();
         regadapter = new DatabaseManager(this);
 
-        c = regadapter.fetch(rowId);
-
-        if (c.moveToFirst()) {
-            do {
-                startTime.setText(c.getString(1));
-                endTime.setText(c.getString(2));
-                taskName.setText(c.getString(3));
-            } while (c.moveToNext());
-        }
-
-        startTimeRow.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                Calendar mcurrentTime = Calendar.getInstance();
-                int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
-                int minute = mcurrentTime.get(Calendar.MINUTE);
-                TimePickerDialog mTimePicker;
-                mTimePicker = new TimePickerDialog(EditActivity.this, new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                        showStartTime(selectedHour, selectedMinute);
-                    }
-                }, hour, minute, false);
-                mTimePicker.setTitle("Select Time");
-                mTimePicker.show();
-            }
-        });
-
-        endTimeRow.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                Calendar mcurrentTime = Calendar.getInstance();
-                int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
-                int minute = mcurrentTime.get(Calendar.MINUTE);
-                TimePickerDialog mTimePicker;
-                mTimePicker = new TimePickerDialog(EditActivity.this, new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                        showEndTime(selectedHour, selectedMinute);
-                    }
-                }, hour, minute, false);
-                mTimePicker.setTitle("Select Time");
-                mTimePicker.show();
-            }
-        });
-
-        btnUpdate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                // TODO Auto-generated method stub
-                regadapter.updateldetail(rowId, startTime.getText().toString(),
-                        endTime.getText().toString(), taskName.getText().toString());
-                finish();
-            }
-        });
-
-        btnDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                regadapter.deleteOneRecord(rowId);
-                finish();
-            }
-        });
+//        c = regadapter.fetch(rowId);
+//
+//        if (c.moveToFirst()) {
+//            do {
+//                startTime.setText(c.getString(1));
+//                endTime.setText(c.getString(2));
+//                taskName.setText(c.getString(3));
+//            } while (c.moveToNext());
+//        }
+//
+//        startTimeRow.setOnClickListener(new View.OnClickListener(){
+//            @Override
+//            public void onClick(View v) {
+//                Calendar mcurrentTime = Calendar.getInstance();
+//                int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+//                int minute = mcurrentTime.get(Calendar.MINUTE);
+//                TimePickerDialog mTimePicker;
+//                mTimePicker = new TimePickerDialog(EditActivity.this, new TimePickerDialog.OnTimeSetListener() {
+//                    @Override
+//                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+//                        showStartTime(selectedHour, selectedMinute);
+//                    }
+//                }, hour, minute, false);
+//                mTimePicker.setTitle("Select Time");
+//                mTimePicker.show();
+//            }
+//        });
+//
+//        endTimeRow.setOnClickListener(new View.OnClickListener(){
+//            @Override
+//            public void onClick(View v) {
+//                Calendar mcurrentTime = Calendar.getInstance();
+//                int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+//                int minute = mcurrentTime.get(Calendar.MINUTE);
+//                TimePickerDialog mTimePicker;
+//                mTimePicker = new TimePickerDialog(EditActivity.this, new TimePickerDialog.OnTimeSetListener() {
+//                    @Override
+//                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+//                        showEndTime(selectedHour, selectedMinute);
+//                    }
+//                }, hour, minute, false);
+//                mTimePicker.setTitle("Select Time");
+//                mTimePicker.show();
+//            }
+//        });
+//
+//        btnUpdate.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View arg0) {
+//                // TODO Auto-generated method stub
+//                regadapter.updateldetail(rowId, startTime.getText().toString(),
+//                        endTime.getText().toString(), taskName.getText().toString());
+//                finish();
+//            }
+//        });
+//
+//        btnDelete.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                // TODO Auto-generated method stub
+//                regadapter.deleteOneRecord(rowId);
+//                finish();
+//            }
+//        });
     }
 
     public String showStartTime(int hour, int min) {

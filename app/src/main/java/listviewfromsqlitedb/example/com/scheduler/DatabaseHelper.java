@@ -16,10 +16,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String START_TIME = "startTime";
     public static final String END_TIME = "endTime";
     public static final String TASK_NAME = "taskName";
-
-    public static final String CREATE_SCHEDULE_TABLE = "create table " + TABLE_NAME + " ("
-            + KEY_ID + " integer primary key autoincrement, " + START_TIME
-            + " text not null, " + END_TIME + " text not null," + TASK_NAME + " text not null" + ");";
+    public static final String DATE = "date";
+    public static final String CREATE_SCHEDULE_TABLE = "create table " + TABLE_NAME + "("
+            + KEY_ID + " integer primary key autoincrement," + DATE + " text not null," + START_TIME
+            + " text not null," + END_TIME + " text not null," + TASK_NAME + " text not null"
+            + ");";
 
     public DatabaseHelper(Context context, String name, CursorFactory factory, int version) {
         super(context, name, factory, version);
