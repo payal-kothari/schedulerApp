@@ -1,5 +1,7 @@
 package listviewfromsqlitedb.example.com.scheduler;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.os.Bundle;
 
 import android.app.Activity;
@@ -10,6 +12,7 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TableRow;
@@ -24,7 +27,7 @@ public class MainActivity extends Activity {
     DatabaseManager adapter_ob;
     DatabaseHelper helper_ob;
     ListView scheduleList;
-    Button btnNewTask, btnRefresh;
+    Button btnNewTask, btnRefresh, btnCalendar;
     Cursor cursor;
     DatabaseManager adapter;
     CustomAdapter customAdapter;
@@ -41,6 +44,8 @@ public class MainActivity extends Activity {
     int startTimeInt, endTimeInt;
     StringBuilder stringbuilderStart, stringbuilderEnd;
     static String s, e;
+    int year, month, day;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,6 +55,7 @@ public class MainActivity extends Activity {
         btnNewTask = (Button) findViewById(R.id.btn_newTask);
         btnRefresh = (Button) findViewById(R.id.btn_refresh);
         adapter_ob = new DatabaseManager(this);
+
 
         showlist();
 
