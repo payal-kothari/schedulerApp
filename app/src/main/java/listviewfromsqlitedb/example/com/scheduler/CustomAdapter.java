@@ -33,6 +33,7 @@ public class CustomAdapter extends BaseAdapter{
     public CustomAdapter(Context c, List<Entry> listE) {
         this.context = c;
         this.list = listE;
+        this.mainActivity = new MainActivity();
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -81,14 +82,14 @@ public class CustomAdapter extends BaseAdapter{
                     public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
                         adapter_ob = new DatabaseManager(context);
                         ArrayList<Entry> allEntries = new ArrayList<Entry>();
-                        allEntries.clear();
-                        allEntries = adapter_ob.fetchAll();
+                        allEntries = adapter_ob.fetchByDateList(MainActivity.selectedDate);
                         Entry currentEntry = allEntries.get(position);
                         int rowID = currentEntry.getID();
+                        String dateForThisEntry = currentEntry.getDate();
                         String endT = currentEntry.getEndTime();
                         String taskN = currentEntry.getTask();
                         String resultS = editActivity.showStartTime(selectedHour, selectedMinute);
-                        adapter_ob.updateldetail(rowID, resultS, endT, taskN);
+                        adapter_ob.updateldetail(rowID, dateForThisEntry, resultS, endT, taskN);
                     }
                 }, hour, minute, false);
                 mTimePicker.setTitle("Select Time");
@@ -108,14 +109,14 @@ public class CustomAdapter extends BaseAdapter{
                     public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
                         adapter_ob = new DatabaseManager(context);
                         ArrayList<Entry> allEntries = new ArrayList<Entry>();
-                        allEntries.clear();
-                        allEntries = adapter_ob.fetchAll();
+                        allEntries = adapter_ob.fetchByDateList(MainActivity.selectedDate);
                         Entry currentEntry = allEntries.get(position);
                         int rowID = currentEntry.getID();
+                        String dateForThisEntry = currentEntry.getDate();
                         String startT = currentEntry.getStartTime();
                         String taskN = currentEntry.getTask();
                         String resultE = editActivity.showEndTime(selectedHour, selectedMinute);
-                        adapter_ob.updateldetail(rowID, startT, resultE, taskN);
+                        adapter_ob.updateldetail(rowID, dateForThisEntry, startT, resultE, taskN);
                     }
                 }, hour, minute, false);
                 mTimePicker.setTitle("Select Time");
@@ -144,15 +145,15 @@ public class CustomAdapter extends BaseAdapter{
                         }
                         adapter_ob = new DatabaseManager(context);
                         ArrayList<Entry> allEntries = new ArrayList<Entry>();
-                        allEntries.clear();
-                        allEntries = adapter_ob.fetchAll();
+                        allEntries = adapter_ob.fetchByDateList(MainActivity.selectedDate);
                         Entry currentEntry = allEntries.get(position);
                         int rowID = currentEntry.getID();
+                        System.out.println("rowIDDDD" + rowID);
+                        String dateForThisEntry = currentEntry.getDate();
                         String startT = currentEntry.getStartTime();
                         String endT = currentEntry.getEndTime();
                         Toast.makeText(context,resultTask,Toast.LENGTH_LONG).show();
-                        adapter_ob.updateldetail(rowID, startT, endT, resultTask);
-
+                        adapter_ob.updateldetail(rowID, dateForThisEntry, startT, endT, resultTask);
                     } // End of onClick(DialogInterface dialog, int whichButton)
                 }); //End of alert.setPositiveButton
                 alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {

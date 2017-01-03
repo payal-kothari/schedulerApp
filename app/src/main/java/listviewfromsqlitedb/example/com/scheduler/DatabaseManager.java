@@ -52,7 +52,7 @@ public class DatabaseManager{
     }
 
     public ArrayList<Entry> fetchAll() {
-        String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME };
+        String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME };
         opnToWrite();
         //Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, null, null, null, null,"startTime ASC");
         Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, null, null, null, null, null);
@@ -62,9 +62,11 @@ public class DatabaseManager{
             do {
                 Entry entry = new Entry();
                 entry.setID(c.getInt(0));
-                entry.setStart(c.getString(1));
-                entry.setEnd(c.getString(2));
-                entry.setTask(c.getString(3));
+                entry.setDate(c.getString(1));
+                System.out.println("********" + c.getString(1));
+                entry.setStart(c.getString(2));
+                entry.setEnd(c.getString(3));
+                entry.setTask(c.getString(4));
                 // Adding contact to list
                 entryList.add(entry);
             } while (c.moveToNext());
@@ -72,12 +74,32 @@ public class DatabaseManager{
         return entryList;
     }
 
-    public Cursor fetchByDate(String date) {
-//        opnToWrite();
-//        String query = "SELECT * FROM schedule WHERE date='%" + date + "%'";
-//        System.out.println(query);
-//        Cursor c = database_ob.rawQuery(query, null);
+    public ArrayList<Entry> fetchByDateList(String date) {
+        String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME };
+        opnToWrite();
+        int nameId = 1;
+        Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME,
+                null, databaseHelper_ob.DATE + "=?", new String[] { date }, null, null, null, null);
+        ArrayList<Entry> entryList = new ArrayList<Entry>();
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                Entry entry = new Entry();
+                entry.setID(c.getInt(0));
+                entry.setDate(c.getString(1));
+                System.out.println("********" + c.getString(1));
+                entry.setStart(c.getString(2));
+                entry.setEnd(c.getString(3));
+                entry.setTask(c.getString(4));
+                // Adding contact to list
+                entryList.add(entry);
+            } while (c.moveToNext());
+        }
+        return entryList;
+    }
 
+
+    public Cursor fetchByDate(String date) {
         String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME };
         opnToWrite();
         int nameId = 1;
@@ -101,8 +123,9 @@ public class DatabaseManager{
         return c;
     }
 
-    public long updateldetail(int rowId, String startTime, String endTime, String task) {
+    public long updateldetail(int rowId, String date, String startTime, String endTime, String task) {
         ContentValues contentValues = new ContentValues();
+        contentValues.put(databaseHelper_ob.DATE, date);
         contentValues.put(databaseHelper_ob.START_TIME, startTime);
         contentValues.put(databaseHelper_ob.END_TIME, endTime);
         contentValues.put(databaseHelper_ob.TASK_NAME, task);

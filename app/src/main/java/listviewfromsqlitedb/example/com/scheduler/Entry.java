@@ -8,10 +8,21 @@ public class Entry {
     String startTime;
     String endTime;
     String taskName;
+    String date;
     int ID;
+    String actualStartTime;
+    String actualEndTime;
 
     public void setStart(String start){
         this.startTime = start;
+    }
+
+    public void setActualStart(String actualStart){
+        this.actualStartTime = actualStart;
+    }
+
+    public void setActualEnd(String actualEnd){
+        this.actualEndTime = actualEnd;
     }
 
     public void setEnd(String end){
@@ -26,8 +37,16 @@ public class Entry {
         this.ID = id;
     }
 
+    public void setDate(String d){
+        this.date = d;
+    }
+
     public int getID(){
         return this.ID;
+    }
+
+    public String getDate(){
+        return this.date;
     }
 
     public String getStartTime(){

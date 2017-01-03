@@ -46,6 +46,7 @@ public class MainActivity extends Activity {
     static String s, e;
     int year, month, day;
     static String selectedDate;
+    TextView txDate;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,10 +57,12 @@ public class MainActivity extends Activity {
         btnRefresh = (Button) findViewById(R.id.btn_refresh);
         adapter_ob = new DatabaseManager(this);
         btnCalendar = (Button) findViewById(R.id.btn_calendar);
+        txDate = (TextView) findViewById(R.id.tx_date);
+
 
         Intent intent = getIntent();
         selectedDate = intent.getStringExtra("DATE");
-
+        txDate.setText(selectedDate);
 
         showlist();
 
@@ -67,14 +70,17 @@ public class MainActivity extends Activity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 adapter_ob = new DatabaseManager(MainActivity.this);
-                adapter_ob.deleteOneRecord((int) id);
+                ArrayList<Entry> allEntries = new ArrayList<Entry>();
+                allEntries = adapter_ob.fetchByDateList(selectedDate);
+                Entry currentEntry = allEntries.get((int) id);
+                int rowID = currentEntry.getID();
+                adapter_ob.deleteOneRecord(rowID);
                 return true;
             }
         });
 
         calendar = Calendar.getInstance();
         year = calendar.get(Calendar.YEAR);
-
         month = calendar.get(Calendar.MONTH);
         day = calendar.get(Calendar.DAY_OF_MONTH);
         btnCalendar.setOnClickListener(new View.OnClickListener() {
@@ -173,16 +179,15 @@ public class MainActivity extends Activity {
     }
 
     public void showlist() {
+        txDate.setText(selectedDate);
         adapter_ob = new DatabaseManager(this);
         ArrayList<Entry> allEntries = new ArrayList<Entry>();
         allEntries.clear();
         Cursor c1 = adapter_ob.fetchByDate(selectedDate);
-        Toast.makeText(MainActivity.this, "got intent in cursor " + c1.getCount(), Toast.LENGTH_SHORT).show();
         if (c1 != null && c1.getCount() != 0) {
             if (c1.moveToFirst()) {
                 do {
                     Entry allItems = new Entry();
-
                     allItems.setID(c1.getInt(c1
                             .getColumnIndex("_id")));
                     allItems.setStart(c1.getString(c1

@@ -4,12 +4,22 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:id="@+id/tx_date"
+        />
+
     <ListView
         android:id="@+id/list_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/tx_date"
         android:longClickable="true">
     </ListView>
+
 
     <Button
         android:id="@+id/btn_newTask"
