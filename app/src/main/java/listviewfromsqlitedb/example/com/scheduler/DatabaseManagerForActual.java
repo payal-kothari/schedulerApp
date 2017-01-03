@@ -13,29 +13,29 @@ import java.util.ArrayList;
 /**
  * Created by payalkothari on 12/22/16.
  */
-public class DatabaseManager{
-    SQLiteDatabase database_ob;
-    DatabaseHelper databaseHelper_ob;
+public class DatabaseManagerForActual{
+    SQLiteDatabase database_ob_for_actual;
+    DatabaseHelperForActual databaseHelper_ob;
     Context context;
 
-    public DatabaseManager(Context c){
+    public DatabaseManagerForActual(Context c){
         context = c;
     }
 
-    public DatabaseManager opnToRead() {
-        databaseHelper_ob = new DatabaseHelper(context, databaseHelper_ob.DATABASE_NAME, null, databaseHelper_ob.DATABASE_VERSION);
-        database_ob = databaseHelper_ob.getReadableDatabase();
+    public DatabaseManagerForActual opnToRead() {
+        databaseHelper_ob = new DatabaseHelperForActual(context, databaseHelper_ob.DATABASE_NAME, null, databaseHelper_ob.DATABASE_VERSION);
+        database_ob_for_actual = databaseHelper_ob.getReadableDatabase();
         return this;
     }
 
-    public DatabaseManager opnToWrite() {
-        databaseHelper_ob = new DatabaseHelper(context, databaseHelper_ob.DATABASE_NAME, null, databaseHelper_ob.DATABASE_VERSION);
-        database_ob = databaseHelper_ob.getWritableDatabase();
+    public DatabaseManagerForActual opnToWrite() {
+        databaseHelper_ob = new DatabaseHelperForActual(context, databaseHelper_ob.DATABASE_NAME, null, databaseHelper_ob.DATABASE_VERSION);
+        database_ob_for_actual = databaseHelper_ob.getWritableDatabase();
         return this;
     }
 
     public void Close() {
-        database_ob.close();
+        database_ob_for_actual.close();
     }
 
 
@@ -46,7 +46,7 @@ public class DatabaseManager{
         contentValues.put(databaseHelper_ob.END_TIME, endTime);
         contentValues.put(databaseHelper_ob.TASK_NAME, task);
         opnToWrite();
-        long val = database_ob.insert(databaseHelper_ob.TABLE_NAME, null, contentValues);
+        long val = database_ob_for_actual.insert(databaseHelper_ob.TABLE_NAME, null, contentValues);
         Close();
         return val;
     }
@@ -55,7 +55,7 @@ public class DatabaseManager{
         String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME };
         opnToWrite();
         //Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, null, null, null, null,"startTime ASC");
-        Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, null, null, null, null, null);
+        Cursor c = database_ob_for_actual.query(databaseHelper_ob.TABLE_NAME, cols, null, null, null, null, null);
         ArrayList<Entry> entryList = new ArrayList<Entry>();
         // looping through all rows and adding to list
         if (c.moveToFirst()) {
@@ -78,7 +78,7 @@ public class DatabaseManager{
         String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME };
         opnToWrite();
         int nameId = 1;
-        Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME,
+        Cursor c = database_ob_for_actual.query(databaseHelper_ob.TABLE_NAME,
                 null, databaseHelper_ob.DATE + "=?", new String[] { date }, null, null, null, null);
         ArrayList<Entry> entryList = new ArrayList<Entry>();
         // looping through all rows and adding to list
@@ -103,7 +103,7 @@ public class DatabaseManager{
         String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME };
         opnToWrite();
         int nameId = 1;
-        Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME,
+        Cursor c = database_ob_for_actual.query(databaseHelper_ob.TABLE_NAME,
                 null, databaseHelper_ob.DATE + "=?", new String[] { date }, null, null, null, null);
         return c;
     }
@@ -112,14 +112,14 @@ public class DatabaseManager{
         String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME };
         opnToWrite();
         //Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, null, null, null, null,"startTime ASC");
-        Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, null, null, null, null, null);
+        Cursor c = database_ob_for_actual.query(databaseHelper_ob.TABLE_NAME, cols, null, null, null, null, null);
         return c;
     }
 
     public Cursor fetch(int nameId) {
         String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME };
         opnToWrite();
-        Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, databaseHelper_ob.KEY_ID + "=" + nameId, null, null, null, null);
+        Cursor c = database_ob_for_actual.query(databaseHelper_ob.TABLE_NAME, cols, databaseHelper_ob.KEY_ID + "=" + nameId, null, null, null, null);
         return c;
     }
 
@@ -130,14 +130,14 @@ public class DatabaseManager{
         contentValues.put(databaseHelper_ob.END_TIME, endTime);
         contentValues.put(databaseHelper_ob.TASK_NAME, task);
         opnToWrite();
-        long val = database_ob.update(databaseHelper_ob.TABLE_NAME, contentValues, databaseHelper_ob.KEY_ID + "=" + rowId, null);
+        long val = database_ob_for_actual.update(databaseHelper_ob.TABLE_NAME, contentValues, databaseHelper_ob.KEY_ID + "=" + rowId, null);
         Close();
         return val;
     }
 
     public int deleteOneRecord(int rowId) {
         opnToWrite();
-        int val = database_ob.delete(databaseHelper_ob.TABLE_NAME, databaseHelper_ob.KEY_ID + "=" + rowId, null);
+        int val = database_ob_for_actual.delete(databaseHelper_ob.TABLE_NAME, databaseHelper_ob.KEY_ID + "=" + rowId, null);
         Close();
         return val;
     }

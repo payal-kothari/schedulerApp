@@ -65,9 +65,7 @@ public class FirstActivity extends Activity{
     private void showDate(int year, int month, int day) {
         StringBuilder strbuilder = new StringBuilder().append(day).append("/")
                 .append(month).append("/").append(year);
-
         String selectedDate = strbuilder.toString();
-
         Toast.makeText(this, strbuilder.toString(), Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(FirstActivity.this, MainActivity.class);
         intent.putExtra("DATE", selectedDate);

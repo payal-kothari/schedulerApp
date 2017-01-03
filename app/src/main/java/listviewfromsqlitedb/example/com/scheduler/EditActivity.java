@@ -31,14 +31,6 @@ public class EditActivity extends Activity {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit);
-        startTimeRow = (TableRow) findViewById(R.id.startTimeRow);
-        endTimeRow = (TableRow) findViewById(R.id.endTimeRow);
-        startTime = (TextView) findViewById(R.id.tx_startTime);
-        endTime = (TextView) findViewById(R.id.tx_endTime);
-        taskName = (EditText) findViewById(R.id.et_taskName);
-        btnUpdate = (Button) findViewById(R.id.btn_update);
-        btnDelete = (Button) findViewById(R.id.btn_delete);
 
         Bundle showData = getIntent().getExtras();
         rowId = showData.getInt("keyid");

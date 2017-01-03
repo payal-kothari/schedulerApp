@@ -36,13 +36,6 @@ public class AddTaskActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_addtask);
-        startTime = (TextView) findViewById(R.id.tx_startTime);
-        endTime = (TextView) findViewById(R.id.tx_endTime);
-        startTimeRow = (TableRow) findViewById(R.id.startTimeRow);
-        endTimeRow = (TableRow) findViewById(R.id.endTimeRow);
-        taskName = (EditText) findViewById(R.id.et_taskName);
-        btnSubmit = (Button) findViewById(R.id.btn_submit);
         adapter = new DatabaseManager(this);
 
         Cursor c = adapter.fetchAllCursor();
