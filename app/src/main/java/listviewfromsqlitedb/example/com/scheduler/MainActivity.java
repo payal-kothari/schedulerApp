@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -25,6 +26,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.StringTokenizer;
 
 public class MainActivity extends Activity {
@@ -48,6 +50,8 @@ public class MainActivity extends Activity {
     static String taskFromUser;
     EditText input;
     static int status = 1;
+    private CharSequence[] Tasks;
+    private String selectedText;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -134,22 +138,76 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if(status == 1) {
-                    AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
-                    alert.setTitle("Enter Task Name "); //Set Alert dialog title here
+                    List<String> allTasks;
+                    DatabaseManager manager = new DatabaseManager(MainActivity.this);
+                    allTasks = manager.fetchAllTasks();
+                    allTasks.add("None");
+                    //Create sequence of items
+                    Tasks = allTasks.toArray(new String[allTasks.size()]);
+                    final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                    dialogBuilder.setTitle("Tasks");
+                    selectedText = Tasks[0].toString();
+                    dialogBuilder.setSingleChoiceItems(Tasks,0, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            selectedText = Tasks[which].toString();  //Selected item in listview
+                            Log.d("Selected", "on redio click: " + selectedText);
+                        }
+                    });
 
-                    // Set an EditText view to get user input
-                    input = new EditText(MainActivity.this);
-                    alert.setView(input);
-
-                    alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            //You will get as string input data in this variable.
-                            // here we convert the input to a string and show in a toast.
-                            taskFromUser = input.getEditableText().toString();
-                            System.out.println("Taskkkkkk from user " + taskFromUser);
-                            if (taskFromUser.equals("")){
-                                taskFromUser = "-";
+                    dialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            Log.d("Selected", "now on click of OK : " + selectedText);
+                            String AmPmFormat;
+                            Calendar mcurrentTime = Calendar.getInstance();
+                            int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+                            int minute = mcurrentTime.get(Calendar.MINUTE);
+                            setTime(hour, minute, "start");
+                            if(hour <12){
+                                AmPmFormat = "AM";
+                            }else {
+                                AmPmFormat = "PM";
                             }
+                            StringBuilder stringbuilder = new StringBuilder();
+                            stringbuilder.append("00").append(":").append("00")
+                                    .append("").append(AmPmFormat);
+                            String e = stringbuilder.toString();
+                            DatabaseManagerForActual manager = new DatabaseManagerForActual(MainActivity.this);
+                            System.out.println("Taskkkkkk " + taskFromUser);
+                            String total = "-:-";
+                            manager.insertDetails(selectedDate, s, e, selectedText, total);
+                            showListForActual();
+                            btnIn.setText("OUT");
+                            status = 0;
+                        }
+                    });
+                    dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+
+                    dialogBuilder.setNeutralButton(Html.fromHtml("<b><i>" + "+" + "</i><b>"), new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+                            alert.setTitle("Enter Task Name "); //Set Alert dialog title here
+
+                            // Set an EditText view to get user input
+                            final EditText input = new EditText(MainActivity.this);
+                            alert.setView(input);
+
+                            alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    //You will get as string input data in this variable.
+                                    // here we convert the input to a string and show in a toast.
+                                    String taskFromUser = input.getEditableText().toString();
+                                    if (taskFromUser.equals("")){
+                                        taskFromUser = "-";
+                                    }
                             String AmPmFormat;
                             Calendar mcurrentTime = Calendar.getInstance();
                             int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
@@ -171,16 +229,69 @@ public class MainActivity extends Activity {
                             showListForActual();
                             btnIn.setText("OUT");
                             status = 0;
-                        } // End of onClick(DialogInterface dialog, int whichButton)
-                    }); //End of alert.setPositiveButton
-                    alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            // Canceled.
-                            dialog.cancel();
+                                } // End of onClick(DialogInterface dialog, int whichButton)
+                            }); //End of alert.setPositiveButton
+                            alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    // Canceled.
+                                    dialog.cancel();
+                                }
+                            }); //End of alert.setNegativeButton
+                            AlertDialog alertDialog = alert.create();
+                            alertDialog.show();
                         }
-                    }); //End of alert.setNegativeButton
-                    AlertDialog alertDialog = alert.create();
-                    alertDialog.show();
+                    });
+                    AlertDialog alertDialogObject = dialogBuilder.create();
+                    //Show the dialog
+                    alertDialogObject.show();
+
+//                    AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+//                    alert.setTitle("Enter Task Name "); //Set Alert dialog title here
+//
+//                    // Set an EditText view to get user input
+//                    input = new EditText(MainActivity.this);
+//                    alert.setView(input);
+//
+//                    alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int whichButton) {
+//                            //You will get as string input data in this variable.
+//                            // here we convert the input to a string and show in a toast.
+//                            taskFromUser = input.getEditableText().toString();
+//                            System.out.println("Taskkkkkk from user " + taskFromUser);
+//                            if (taskFromUser.equals("")){
+//                                taskFromUser = "-";
+//                            }
+//                            String AmPmFormat;
+//                            Calendar mcurrentTime = Calendar.getInstance();
+//                            int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+//                            int minute = mcurrentTime.get(Calendar.MINUTE);
+//                            setTime(hour, minute, "start");
+//                            if(hour <12){
+//                                AmPmFormat = "AM";
+//                            }else {
+//                                AmPmFormat = "PM";
+//                            }
+//                            StringBuilder stringbuilder = new StringBuilder();
+//                            stringbuilder.append("00").append(":").append("00")
+//                                    .append("").append(AmPmFormat);
+//                            String e = stringbuilder.toString();
+//                            DatabaseManagerForActual manager = new DatabaseManagerForActual(MainActivity.this);
+//                            System.out.println("Taskkkkkk " + taskFromUser);
+//                            String total = "-:-";
+//                            manager.insertDetails(selectedDate, s, e, taskFromUser, total);
+//                            showListForActual();
+//                            btnIn.setText("OUT");
+//                            status = 0;
+//                        } // End of onClick(DialogInterface dialog, int whichButton)
+//                    }); //End of alert.setPositiveButton
+//                    alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int whichButton) {
+//                            // Canceled.
+//                            dialog.cancel();
+//                        }
+//                    }); //End of alert.setNegativeButton
+//                    AlertDialog alertDialog = alert.create();
+//                    alertDialog.show();
                 } else {
                     DatabaseManagerForActual manager = new DatabaseManagerForActual(MainActivity.this);
                     Cursor c = manager.fetchAllCursor();
