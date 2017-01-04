@@ -67,6 +67,7 @@ public class CustomAdapterForActual extends BaseAdapter{
             listViewHolder.tx_s = (TextView) v.findViewById(R.id.tv_startTime);
             listViewHolder.tx_e = (TextView) v.findViewById(R.id.tv_endTime);
             listViewHolder.tx_t = (TextView) v.findViewById(R.id.tv_task);
+            listViewHolder.tx_tot = (TextView) v.findViewById(R.id.tv_total);
             v.setTag(listViewHolder);
         }
         else {
@@ -93,7 +94,8 @@ public class CustomAdapterForActual extends BaseAdapter{
                         String endT = currentEntry.getEndTime();
                         String taskN = currentEntry.getTask();
                         String resultS = editActivity.showStartTime(selectedHour, selectedMinute);
-                        adapter_ob.updateldetail(rowID, dateForThisEntry, resultS, endT, taskN);
+                        String total = mainActivity.calculateTotal(resultS, endT);
+                        adapter_ob.updateldetail(rowID, dateForThisEntry, resultS, endT, taskN, total);
                     }
                 }, hour, minute, false);
                 mTimePicker.setTitle("Select Time");
@@ -120,7 +122,8 @@ public class CustomAdapterForActual extends BaseAdapter{
                         String startT = currentEntry.getStartTime();
                         String taskN = currentEntry.getTask();
                         String resultE = editActivity.showEndTime(selectedHour, selectedMinute);
-                        adapter_ob.updateldetail(rowID, dateForThisEntry, startT, resultE, taskN);
+                        String total = mainActivity.calculateTotal(startT, resultE);
+                        adapter_ob.updateldetail(rowID, dateForThisEntry, startT, resultE, taskN, total);
                     }
                 }, hour, minute, false);
                 mTimePicker.setTitle("Select Time");
@@ -134,6 +137,7 @@ public class CustomAdapterForActual extends BaseAdapter{
                 List<String> allTasks;
                 DatabaseManager manager = new DatabaseManager(context);
                 allTasks = manager.fetchAllTasks();
+                allTasks.add("None");
                 //Create sequence of items
                 Tasks = allTasks.toArray(new String[allTasks.size()]);
                 final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
@@ -161,7 +165,8 @@ public class CustomAdapterForActual extends BaseAdapter{
                         String startT = currentEntry.getStartTime();
                         String endT = currentEntry.getEndTime();
                         Toast.makeText(context,selectedText,Toast.LENGTH_LONG).show();
-                        adapter_ob.updateldetail(rowID, dateForThisEntry, startT, endT, selectedText);
+                        String total = mainActivity.calculateTotal(startT, endT);
+                        adapter_ob.updateldetail(rowID, dateForThisEntry, startT, endT, selectedText, total);
                     }
                 });
                 dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -200,7 +205,8 @@ public class CustomAdapterForActual extends BaseAdapter{
                                 String startT = currentEntry.getStartTime();
                                 String endT = currentEntry.getEndTime();
                                 Toast.makeText(context,resultTask,Toast.LENGTH_LONG).show();
-                                adapter_ob.updateldetail(rowID, dateForThisEntry, startT, endT, resultTask);
+                                String total = mainActivity.calculateTotal(startT, endT);
+                                adapter_ob.updateldetail(rowID, dateForThisEntry, startT, endT, resultTask, total);
                             } // End of onClick(DialogInterface dialog, int whichButton)
                         }); //End of alert.setPositiveButton
                         alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -225,17 +231,19 @@ public class CustomAdapterForActual extends BaseAdapter{
         listViewHolder.tx_s.setText(list.get(position).startTime);
         listViewHolder.tx_e.setText(list.get(position).endTime);
         listViewHolder.tx_t.setText(list.get(position).taskName);
+        listViewHolder.tx_tot.setText(list.get(position).total);
 
         return v;
     }
 
     class ListViewHolder{
-        public TextView tx_s, tx_e, tx_t;
+        public TextView tx_s, tx_e, tx_t, tx_tot;
 
         public ListViewHolder(View base) {
             tx_s = (TextView) base.findViewById(R.id.tv_startTime);
             tx_e = (TextView) base.findViewById(R.id.tv_endTime);
             tx_t = (TextView) base.findViewById(R.id.tv_task);
+            tx_tot = (TextView) base.findViewById(R.id.tv_total);
         }
     }
 }

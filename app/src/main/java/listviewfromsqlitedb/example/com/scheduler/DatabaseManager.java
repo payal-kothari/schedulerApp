@@ -39,12 +39,13 @@ public class DatabaseManager{
     }
 
 
-    public long insertDetails(String date, String startTime, String endTime, String task) {
+    public long insertDetails(String date, String startTime, String endTime, String task, String total) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(databaseHelper_ob.DATE, date);
         contentValues.put(databaseHelper_ob.START_TIME, startTime);
         contentValues.put(databaseHelper_ob.END_TIME, endTime);
         contentValues.put(databaseHelper_ob.TASK_NAME, task);
+        contentValues.put(databaseHelper_ob.TOTAL, total);
         opnToWrite();
         long val = database_ob.insert(databaseHelper_ob.TABLE_NAME, null, contentValues);
         Close();
@@ -52,7 +53,7 @@ public class DatabaseManager{
     }
 
     public ArrayList<Entry> fetchAll() {
-        String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME };
+        String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME, databaseHelper_ob.TOTAL };
         opnToWrite();
         //Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, null, null, null, null,"startTime ASC");
         Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, null, null, null, null, null);
@@ -67,6 +68,7 @@ public class DatabaseManager{
                 entry.setStart(c.getString(2));
                 entry.setEnd(c.getString(3));
                 entry.setTask(c.getString(4));
+                entry.setTotal(c.getString(5));
                 // Adding contact to list
                 entryList.add(entry);
             } while (c.moveToNext());
@@ -76,7 +78,7 @@ public class DatabaseManager{
 
     public ArrayList<String> fetchAllTasks(){
         ArrayList<String> tasksList = new ArrayList<>();
-        String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME };
+        String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME, databaseHelper_ob.TOTAL };
         opnToWrite();
         //Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, null, null, null, null,"startTime ASC");
         Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, null, null, null, null, null);
@@ -91,7 +93,7 @@ public class DatabaseManager{
     }
 
     public ArrayList<Entry> fetchByDateList(String date) {
-        String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME };
+        String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME, databaseHelper_ob.TOTAL };
         opnToWrite();
         int nameId = 1;
         Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME,
@@ -107,6 +109,7 @@ public class DatabaseManager{
                 entry.setStart(c.getString(2));
                 entry.setEnd(c.getString(3));
                 entry.setTask(c.getString(4));
+                entry.setTotal(c.getString(5));
                 // Adding contact to list
                 entryList.add(entry);
             } while (c.moveToNext());
@@ -116,7 +119,7 @@ public class DatabaseManager{
 
 
     public Cursor fetchByDate(String date) {
-        String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME };
+        String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME, databaseHelper_ob.TOTAL };
         opnToWrite();
         int nameId = 1;
         Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME,
@@ -125,7 +128,7 @@ public class DatabaseManager{
     }
 
     public Cursor fetchAllCursor() {
-        String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME };
+        String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME, databaseHelper_ob.TOTAL };
         opnToWrite();
         //Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, null, null, null, null,"startTime ASC");
         Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, null, null, null, null, null);
@@ -133,18 +136,19 @@ public class DatabaseManager{
     }
 
     public Cursor fetch(int nameId) {
-        String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME };
+        String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME, databaseHelper_ob.TOTAL };
         opnToWrite();
         Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, databaseHelper_ob.KEY_ID + "=" + nameId, null, null, null, null);
         return c;
     }
 
-    public long updateldetail(int rowId, String date, String startTime, String endTime, String task) {
+    public long updateldetail(int rowId, String date, String startTime, String endTime, String task, String total) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(databaseHelper_ob.DATE, date);
         contentValues.put(databaseHelper_ob.START_TIME, startTime);
         contentValues.put(databaseHelper_ob.END_TIME, endTime);
         contentValues.put(databaseHelper_ob.TASK_NAME, task);
+        contentValues.put(databaseHelper_ob.TOTAL, total);
         opnToWrite();
         long val = database_ob.update(databaseHelper_ob.TABLE_NAME, contentValues, databaseHelper_ob.KEY_ID + "=" + rowId, null);
         Close();

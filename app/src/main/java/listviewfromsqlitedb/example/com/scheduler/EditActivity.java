@@ -129,8 +129,8 @@ public class EditActivity extends Activity {
         }else {
             minstr = "0" + String.valueOf(min);
         }
-        return (new StringBuilder().append(hourStr).append(" : ").append(minstr)
-                .append(" ").append(format)).toString();
+        return (new StringBuilder().append(hourStr).append(":").append(minstr)
+                .append("").append(format)).toString();
     }
 
     public String showEndTime(int hour, int min) {
@@ -159,8 +159,8 @@ public class EditActivity extends Activity {
         }else {
             minstr = "0" + String.valueOf(min);
         }
-        return (new StringBuilder().append(hourStr).append(" : ").append(minstr)
-                .append(" ").append(format)).toString();
+        return (new StringBuilder().append(hourStr).append(":").append(minstr)
+                .append("").append(format)).toString();
     }
 
 }

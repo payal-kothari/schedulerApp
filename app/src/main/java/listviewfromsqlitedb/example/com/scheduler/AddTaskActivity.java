@@ -22,16 +22,9 @@ import java.util.Calendar;
 public class AddTaskActivity extends Activity {
     DatabaseManager adapter;
     DatabaseHelper helper;
-    public TextView startTime, endTime, taskName;
-    Button btnSubmit, btnReset;
-    private static final int  REQUEST_CODE_START_TIME = 1;
-    private static final int  REQUEST_CODE_END_TIME = 2;
+    public TextView startTime, endTime;
     private String format = "";
-    private Calendar calendar;
-    TableRow startTimeRow, endTimeRow;
-    int currentHour;
     int concatedHrAndMinInt;
-    int startTimeInt, endTimeInt;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -123,8 +116,8 @@ public class AddTaskActivity extends Activity {
         }else {
             minstr = "0" + String.valueOf(min);
         }
-        startTime.setText(new StringBuilder().append(hour).append(" : ").append(minstr)
-                .append(" ").append(format));
+        startTime.setText(new StringBuilder().append(hour).append(":").append(minstr)
+                .append("").append(format));
     }
 
     public void showEndTime(int hour, int min) {
@@ -152,8 +145,8 @@ public class AddTaskActivity extends Activity {
             hrStr = String.valueOf(hour);
         }
 
-        endTime.setText(new StringBuilder().append(hrStr).append(" : ").append(minstr)
-                .append(" ").append(format));
+        endTime.setText(new StringBuilder().append(hrStr).append(":").append(minstr)
+                .append("").append(format));
     }
 
 }

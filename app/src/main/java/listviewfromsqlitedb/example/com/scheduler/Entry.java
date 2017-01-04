@@ -12,6 +12,7 @@ public class Entry {
     int ID;
     String actualStartTime;
     String actualEndTime;
+    String total;
 
     public void setStart(String start){
         this.startTime = start;
@@ -31,6 +32,10 @@ public class Entry {
 
     public void setTask(String task){
         this.taskName = task;
+    }
+
+    public void setTotal(String t){
+        this.total = t;
     }
 
     public void setID(int id){
@@ -59,6 +64,10 @@ public class Entry {
 
     public String getTask(){
         return this.taskName;
+    }
+
+    public String getTotal(){
+        return this.total;
     }
 
 }

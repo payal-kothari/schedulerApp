@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -160,14 +161,16 @@ public class MainActivity extends Activity {
                                 AmPmFormat = "PM";
                             }
                             StringBuilder stringbuilder = new StringBuilder();
-                            stringbuilder.append("00").append(" : ").append("00")
-                                    .append(" ").append(AmPmFormat);
+                            stringbuilder.append("00").append(":").append("00")
+                                    .append("").append(AmPmFormat);
                             String e = stringbuilder.toString();
                             DatabaseManagerForActual manager = new DatabaseManagerForActual(MainActivity.this);
                             System.out.println("Taskkkkkk " + taskFromUser);
-                            manager.insertDetails(selectedDate, s, e, taskFromUser);
+                            String total = "-:-";
+                            manager.insertDetails(selectedDate, s, e, taskFromUser, total);
                             showListForActual();
                             btnIn.setText("OUT");
+                            status = 0;
                         } // End of onClick(DialogInterface dialog, int whichButton)
                     }); //End of alert.setPositiveButton
                     alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -178,7 +181,6 @@ public class MainActivity extends Activity {
                     }); //End of alert.setNegativeButton
                     AlertDialog alertDialog = alert.create();
                     alertDialog.show();
-                    status = 0;
                 } else {
                     DatabaseManagerForActual manager = new DatabaseManagerForActual(MainActivity.this);
                     Cursor c = manager.fetchAllCursor();
@@ -190,7 +192,8 @@ public class MainActivity extends Activity {
                     int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
                     int minute = mcurrentTime.get(Calendar.MINUTE);
                     setTime(hour, minute, "start");
-                    manager.updateldetail(ongoingTaskID, selectedDate, ongoingStartTime, s, ongoingTask);
+                    String total = calculateTotal(ongoingStartTime, s);
+                    manager.updateldetail(ongoingTaskID, selectedDate, ongoingStartTime, s, ongoingTask, total);
                     btnIn.setText("IN");
                     status = 1;
                 }
@@ -207,14 +210,16 @@ public class MainActivity extends Activity {
                     c.moveToLast();
                     String start = c.getString(c.getColumnIndex(helper.END_TIME));
                     String tempHr = start.substring(0, 2);
-                    String tempMin = start.substring(5, 7);
-                    String AmPmFormat = start.substring(8, 10);
+                    String tempMin = start.substring(3, 5);
+                    String AmPmFormat = start.substring(5, 7);
                     int tempHour = Integer.parseInt(tempHr);
                     int tempMinute = Integer.parseInt(tempMin);
                     setTimeForEnd(tempHour, tempMinute, AmPmFormat);
                     //String end = String.valueOf(tempHour) + start.substring(2,start.length());
                     String task = c.getString(c.getColumnIndex(helper.TASK_NAME));
-                    adapter.insertDetails(selectedDate, start, e, task);
+                    String total = calculateTotal(start, e);
+                    Log.d("mainActivity", total);
+                    adapter.insertDetails(selectedDate, start, e, task, total);
                     showlist();
                 }else { // when database is empty
                     String AmPmFormat;
@@ -230,11 +235,49 @@ public class MainActivity extends Activity {
                     }
                     setTimeForEnd(hour, minute, AmPmFormat);
                     String task = "None";
-                    long val = adapter.insertDetails(selectedDate, s, e, task);
+                    String total = calculateTotal(s, e);
+                    Log.d("mainActivity 1", total);
+                    long val = adapter.insertDetails(selectedDate, s, e, task, total);
                     showlist();
                 }
             }
         });
+    }
+
+    public String calculateTotal(String s, String e) {
+        int diff = 0;
+        String firstHalfStart = s.substring(0,2);
+        String secondHalfStart = s.substring(3,5);
+        String amPmStart = s.substring(5,7);
+        String firstHalfEnd = e.substring(0,2);
+        String secondHalfEnd = e.substring(3,5);
+        String amPmEnd = e.substring(5,7);
+
+        int start = Integer.parseInt(firstHalfStart) * 60 + Integer.parseInt(secondHalfStart);
+        int end = Integer.parseInt(firstHalfEnd) * 60 + Integer.parseInt(secondHalfEnd);
+
+        Log.d("total ampmstart" , amPmStart);
+        Log.d("total ampmend" , amPmEnd);
+        if(!amPmStart.equals(amPmEnd)){
+            if(start > end){
+                int temp  = (start - end);
+                Log.d("start > end", String.valueOf(temp));
+                diff = 720 - temp;
+            }else {
+                int temp = end - start;
+                diff = 720 + temp;
+            }
+        }else {
+            diff = end - start;
+        }
+
+        int hh = diff / 60;
+        int mm = diff % 60;
+
+        StringBuilder strbuilder = new StringBuilder();
+        strbuilder.append(String.valueOf(hh)).append(":").append(String.valueOf(mm));
+
+        return strbuilder.toString();
     }
 
     private void showListForActual() {
@@ -254,6 +297,8 @@ public class MainActivity extends Activity {
                             .getColumnIndex("endTime")));
                     allItems.setTask(c1.getString(c1
                             .getColumnIndex("taskName")));
+                    allItems.setTotal(c1.getString(c1
+                            .getColumnIndex("total")));
                     allEntries.add(allItems);
                 } while (c1.moveToNext());
             }
@@ -323,6 +368,8 @@ public class MainActivity extends Activity {
                             .getColumnIndex("endTime")));
                     allItems.setTask(c1.getString(c1
                             .getColumnIndex("taskName")));
+                    allItems.setTotal(c1.getString(c1
+                            .getColumnIndex("total")));
                     allEntries.add(allItems);
                 } while (c1.moveToNext());
             }
@@ -363,8 +410,8 @@ public class MainActivity extends Activity {
         }
 
         stringbuilder = new StringBuilder();
-        stringbuilder.append(hrStr).append(" : ").append(minstr)
-                .append(" ").append(format);
+        stringbuilder.append(hrStr).append(":").append(minstr)
+                .append("").append(format);
 
         if(blockName.equals("start")){
             s = stringbuilder.toString();
@@ -398,8 +445,8 @@ public class MainActivity extends Activity {
         }
 
         stringbuilderEnd = new StringBuilder();
-        stringbuilderEnd.append(hrStr).append(" : ").append(minstr)
-                .append(" ").append(format);
+        stringbuilderEnd.append(hrStr).append(":").append(minstr)
+                .append("").append(format);
         e = stringbuilderEnd.toString();
     }
 }
