@@ -5,6 +5,8 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +31,8 @@ public class CustomAdapterForActual extends BaseAdapter{
     LayoutInflater layoutInflater = null;
     EditActivity editActivity = new EditActivity();
     MainActivity mainActivity;
+    static String selectedText;
+    CharSequence[] Tasks;
 
     public CustomAdapterForActual(Context c, List<Entry> listE) {
         this.context = c;
@@ -127,22 +131,26 @@ public class CustomAdapterForActual extends BaseAdapter{
         listViewHolder.tx_t.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                List<String> allTasks;
+                DatabaseManager manager = new DatabaseManager(context);
+                allTasks = manager.fetchAllTasks();
+                //Create sequence of items
+                Tasks = allTasks.toArray(new String[allTasks.size()]);
+                final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+                dialogBuilder.setTitle("Tasks");
+                selectedText = Tasks[0].toString();
+                dialogBuilder.setSingleChoiceItems(Tasks,0, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        selectedText = Tasks[which].toString();  //Selected item in listview
+                        Log.d("Selected", "on redio click: " + selectedText);
+                    }
+                });
 
-                AlertDialog.Builder alert = new AlertDialog.Builder(context);
-                alert.setTitle("Enter Task Name "); //Set Alert dialog title here
-
-                // Set an EditText view to get user input
-                final EditText input = new EditText(context);
-                alert.setView(input);
-
-                alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        //You will get as string input data in this variable.
-                        // here we convert the input to a string and show in a toast.
-                        String resultTask = input.getEditableText().toString();
-                        if (resultTask.equals("")){
-                            resultTask = "-";
-                        }
+                dialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        Log.d("Selected", "now on click of OK : " + selectedText);
                         adapter_ob = new DatabaseManagerForActual(context);
                         ArrayList<Entry> allEntries = new ArrayList<Entry>();
                         allEntries = adapter_ob.fetchByDateList(MainActivity.selectedDate);
@@ -152,18 +160,64 @@ public class CustomAdapterForActual extends BaseAdapter{
                         String dateForThisEntry = currentEntry.getDate();
                         String startT = currentEntry.getStartTime();
                         String endT = currentEntry.getEndTime();
-                        Toast.makeText(context,resultTask,Toast.LENGTH_LONG).show();
-                        adapter_ob.updateldetail(rowID, dateForThisEntry, startT, endT, resultTask);
-                    } // End of onClick(DialogInterface dialog, int whichButton)
-                }); //End of alert.setPositiveButton
-                alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        // Canceled.
-                        dialog.cancel();
+                        Toast.makeText(context,selectedText,Toast.LENGTH_LONG).show();
+                        adapter_ob.updateldetail(rowID, dateForThisEntry, startT, endT, selectedText);
                     }
-                }); //End of alert.setNegativeButton
-                AlertDialog alertDialog = alert.create();
-                alertDialog.show();
+                });
+                dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+
+                    }
+                });
+
+                dialogBuilder.setNeutralButton(Html.fromHtml("<b><i>" + "+" + "</i><b>"), new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        AlertDialog.Builder alert = new AlertDialog.Builder(context);
+                        alert.setTitle("Enter Task Name "); //Set Alert dialog title here
+
+                        // Set an EditText view to get user input
+                        final EditText input = new EditText(context);
+                        alert.setView(input);
+
+                        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                //You will get as string input data in this variable.
+                                // here we convert the input to a string and show in a toast.
+                                String resultTask = input.getEditableText().toString();
+                                if (resultTask.equals("")){
+                                    resultTask = "-";
+                                }
+                                adapter_ob = new DatabaseManagerForActual(context);
+                                ArrayList<Entry> allEntries = new ArrayList<Entry>();
+                                allEntries = adapter_ob.fetchByDateList(MainActivity.selectedDate);
+                                Entry currentEntry = allEntries.get(position);
+                                int rowID = currentEntry.getID();
+                                System.out.println("rowIDDDD" + rowID);
+                                String dateForThisEntry = currentEntry.getDate();
+                                String startT = currentEntry.getStartTime();
+                                String endT = currentEntry.getEndTime();
+                                Toast.makeText(context,resultTask,Toast.LENGTH_LONG).show();
+                                adapter_ob.updateldetail(rowID, dateForThisEntry, startT, endT, resultTask);
+                            } // End of onClick(DialogInterface dialog, int whichButton)
+                        }); //End of alert.setPositiveButton
+                        alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                // Canceled.
+                                dialog.cancel();
+                            }
+                        }); //End of alert.setNegativeButton
+                        AlertDialog alertDialog = alert.create();
+                        alertDialog.show();
+                    }
+                });
+
+                //Create alert dialog object via builder
+                AlertDialog alertDialogObject = dialogBuilder.create();
+                //Show the dialog
+                alertDialogObject.show();
             }
         });
 

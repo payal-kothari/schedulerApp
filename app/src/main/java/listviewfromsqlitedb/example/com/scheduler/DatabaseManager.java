@@ -74,6 +74,22 @@ public class DatabaseManager{
         return entryList;
     }
 
+    public ArrayList<String> fetchAllTasks(){
+        ArrayList<String> tasksList = new ArrayList<>();
+        String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME };
+        opnToWrite();
+        //Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, null, null, null, null,"startTime ASC");
+        Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, null, null, null, null, null);
+        if (c.moveToFirst()) {
+            do {
+                if(!tasksList.contains(c.getString(4))){
+                    tasksList.add(c.getString(4));
+                }
+            } while (c.moveToNext());
+        }
+        return tasksList;
+    }
+
     public ArrayList<Entry> fetchByDateList(String date) {
         String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME };
         opnToWrite();
