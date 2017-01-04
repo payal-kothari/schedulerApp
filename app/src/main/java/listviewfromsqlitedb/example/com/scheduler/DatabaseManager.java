@@ -84,7 +84,7 @@ public class DatabaseManager{
         Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, null, null, null, null, null);
         if (c.moveToFirst()) {
             do {
-                if(!tasksList.contains(c.getString(4))){
+                if(!tasksList.contains(c.getString(4)) && !c.getString(4).equals("None")){
                     tasksList.add(c.getString(4));
                 }
             } while (c.moveToNext());

@@ -123,7 +123,8 @@ public class DatabaseManagerForActual{
     public Cursor fetch(int nameId) {
         String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME, databaseHelper_ob.TOTAL };
         opnToWrite();
-        Cursor c = database_ob_for_actual.query(databaseHelper_ob.TABLE_NAME, cols, databaseHelper_ob.KEY_ID + "=" + nameId, null, null, null, null);
+        Cursor c = database_ob_for_actual.query(databaseHelper_ob.TABLE_NAME,
+                cols, databaseHelper_ob.KEY_ID + "=?", new String[] {String.valueOf(nameId)}, null, null, null);
         return c;
     }
 

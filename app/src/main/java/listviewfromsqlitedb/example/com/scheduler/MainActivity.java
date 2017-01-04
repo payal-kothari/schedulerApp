@@ -52,6 +52,8 @@ public class MainActivity extends Activity {
     static int status = 1;
     private CharSequence[] Tasks;
     private String selectedText;
+    static int ongoingID;
+    static String ongoingDate;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -104,13 +106,24 @@ public class MainActivity extends Activity {
 
         scheduleList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                adapter_ob = new DatabaseManager(MainActivity.this);
-                ArrayList<Entry> allEntries = new ArrayList<Entry>();
-                allEntries = adapter_ob.fetchByDateList(selectedDate);
-                Entry currentEntry = allEntries.get((int) id);
-                int rowID = currentEntry.getID();
-                adapter_ob.deleteOneRecord(rowID);
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position,final long id) {
+                AlertDialog.Builder adb = new AlertDialog.Builder(MainActivity.this);
+                adb.setMessage("Do you want to delete this entry ? ");
+                adb.setIcon(android.R.drawable.ic_dialog_alert);
+                adb.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        adapter_ob = new DatabaseManager(MainActivity.this);
+                        ArrayList<Entry> allEntries = new ArrayList<Entry>();
+                        allEntries = adapter_ob.fetchByDateList(selectedDate);
+                        Entry currentEntry = allEntries.get((int) id);
+                        int rowID = currentEntry.getID();
+                        adapter_ob.deleteOneRecord(rowID);
+                    } });
+                adb.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    } });
+                adb.show();
                 return true;
             }
         });
@@ -178,6 +191,13 @@ public class MainActivity extends Activity {
                             String total = "-:-";
                             manager.insertDetails(selectedDate, s, e, selectedText, total);
                             showListForActual();
+                            DatabaseManagerForActual manager1 = new DatabaseManagerForActual(MainActivity.this);
+                            Cursor c = manager1.fetchAllCursor();
+                            c.moveToLast();
+                            ongoingID = c.getInt(c.getColumnIndex("_id"));
+                            Log.d("rowId ongoign ",  String.valueOf(ongoingID));
+                            ongoingDate = selectedDate;
+                            Log.d("date ongoign ",  ongoingDate);
                             btnIn.setText("OUT");
                             status = 0;
                         }
@@ -227,6 +247,13 @@ public class MainActivity extends Activity {
                             String total = "-:-";
                             manager.insertDetails(selectedDate, s, e, taskFromUser, total);
                             showListForActual();
+                            DatabaseManagerForActual manager1 = new DatabaseManagerForActual(MainActivity.this);
+                            Cursor c = manager1.fetchAllCursor();
+                            c.moveToLast();
+                            ongoingID = c.getInt(c.getColumnIndex("_id"));
+                            Log.d("rowId ongoign ",  String.valueOf(ongoingID));
+                            ongoingDate = selectedDate;
+                            Log.d("date ongoign ",  ongoingDate);
                             btnIn.setText("OUT");
                             status = 0;
                                 } // End of onClick(DialogInterface dialog, int whichButton)
@@ -244,67 +271,25 @@ public class MainActivity extends Activity {
                     AlertDialog alertDialogObject = dialogBuilder.create();
                     //Show the dialog
                     alertDialogObject.show();
-
-//                    AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
-//                    alert.setTitle("Enter Task Name "); //Set Alert dialog title here
-//
-//                    // Set an EditText view to get user input
-//                    input = new EditText(MainActivity.this);
-//                    alert.setView(input);
-//
-//                    alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                        public void onClick(DialogInterface dialog, int whichButton) {
-//                            //You will get as string input data in this variable.
-//                            // here we convert the input to a string and show in a toast.
-//                            taskFromUser = input.getEditableText().toString();
-//                            System.out.println("Taskkkkkk from user " + taskFromUser);
-//                            if (taskFromUser.equals("")){
-//                                taskFromUser = "-";
-//                            }
-//                            String AmPmFormat;
-//                            Calendar mcurrentTime = Calendar.getInstance();
-//                            int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
-//                            int minute = mcurrentTime.get(Calendar.MINUTE);
-//                            setTime(hour, minute, "start");
-//                            if(hour <12){
-//                                AmPmFormat = "AM";
-//                            }else {
-//                                AmPmFormat = "PM";
-//                            }
-//                            StringBuilder stringbuilder = new StringBuilder();
-//                            stringbuilder.append("00").append(":").append("00")
-//                                    .append("").append(AmPmFormat);
-//                            String e = stringbuilder.toString();
-//                            DatabaseManagerForActual manager = new DatabaseManagerForActual(MainActivity.this);
-//                            System.out.println("Taskkkkkk " + taskFromUser);
-//                            String total = "-:-";
-//                            manager.insertDetails(selectedDate, s, e, taskFromUser, total);
-//                            showListForActual();
-//                            btnIn.setText("OUT");
-//                            status = 0;
-//                        } // End of onClick(DialogInterface dialog, int whichButton)
-//                    }); //End of alert.setPositiveButton
-//                    alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-//                        public void onClick(DialogInterface dialog, int whichButton) {
-//                            // Canceled.
-//                            dialog.cancel();
-//                        }
-//                    }); //End of alert.setNegativeButton
-//                    AlertDialog alertDialog = alert.create();
-//                    alertDialog.show();
                 } else {
                     DatabaseManagerForActual manager = new DatabaseManagerForActual(MainActivity.this);
-                    Cursor c = manager.fetchAllCursor();
-                    c.moveToLast();
-                    ongoingTaskID = c.getInt(0);
-                    ongoingStartTime = c.getString(2);
-                    ongoingTask = c.getString(4);
+                    Cursor c = manager.fetchByDate(ongoingDate);
+                    if (c.moveToFirst()) {
+                        do {
+                            int rowId = (c.getInt(c.getColumnIndex("_id")));
+                            if(rowId == ongoingID){
+                                ongoingStartTime = c.getString(c.getColumnIndex("startTime"));
+                                ongoingTask = c.getString(c.getColumnIndex("taskName"));
+                                break;
+                            }
+                        } while (c.moveToNext());
+                    }
                     Calendar mcurrentTime = Calendar.getInstance();
                     int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
                     int minute = mcurrentTime.get(Calendar.MINUTE);
                     setTime(hour, minute, "start");
                     String total = calculateTotal(ongoingStartTime, s);
-                    manager.updateldetail(ongoingTaskID, selectedDate, ongoingStartTime, s, ongoingTask, total);
+                    manager.updateldetail(ongoingID, ongoingDate, ongoingStartTime, s, ongoingTask, total);
                     btnIn.setText("IN");
                     status = 1;
                 }
