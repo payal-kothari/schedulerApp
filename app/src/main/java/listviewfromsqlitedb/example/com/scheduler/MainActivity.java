@@ -34,7 +34,7 @@ public class MainActivity extends Activity {
     DatabaseManagerForActual manager_ob_actual;
     ListView scheduleList;
     ListView actualScheduleList;
-    Button btnNewTask, btnRefresh, btnCalendar, btnIn;
+    Button btnNewTask, btnCalendar, btnIn;
     DatabaseManager adapter;
     DatabaseHelper helper;
     private String format = "";
@@ -62,7 +62,6 @@ public class MainActivity extends Activity {
         scheduleList = (ListView) findViewById(R.id.list_view);
         actualScheduleList = (ListView) findViewById(R.id.list_viewActual);
         btnNewTask = (Button) findViewById(R.id.btn_newTask);
-        btnRefresh = (Button) findViewById(R.id.btn_refresh);
         btnIn = (Button) findViewById(R.id.btn_In);
         btnIn.setTag(1);
         manager_ob_actual = new DatabaseManagerForActual(this);
@@ -139,14 +138,6 @@ public class MainActivity extends Activity {
             }
         });
 
-        btnRefresh.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showlist();
-                showListForActual();
-            }
-        });
-
         btnIn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -164,7 +155,7 @@ public class MainActivity extends Activity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             selectedText = Tasks[which].toString();  //Selected item in listview
-                            Log.d("Selected", "on redio click: " + selectedText);
+                            Log.d("Selected", "on radio click: " + selectedText);
                         }
                     });
 
@@ -199,6 +190,7 @@ public class MainActivity extends Activity {
                             ongoingDate = selectedDate;
                             Log.d("date ongoign ",  ongoingDate);
                             btnIn.setText("OUT");
+                            showListForActual();
                             status = 0;
                         }
                     });
@@ -255,6 +247,7 @@ public class MainActivity extends Activity {
                             ongoingDate = selectedDate;
                             Log.d("date ongoign ",  ongoingDate);
                             btnIn.setText("OUT");
+                                    showListForActual();
                             status = 0;
                                 } // End of onClick(DialogInterface dialog, int whichButton)
                             }); //End of alert.setPositiveButton
@@ -291,6 +284,7 @@ public class MainActivity extends Activity {
                     String total = calculateTotal(ongoingStartTime, s);
                     manager.updateldetail(ongoingID, ongoingDate, ongoingStartTime, s, ongoingTask, total);
                     btnIn.setText("IN");
+                    showListForActual();
                     status = 1;
                 }
             }
@@ -435,7 +429,10 @@ public class MainActivity extends Activity {
         selectedDate = strbuilder.toString();
     }
 
-    public void refresh(){
+    public void onWindowFocusChanged(boolean hasFocus) {
+
+        super.onWindowFocusChanged(hasFocus);
+        showListForActual();
         showlist();
     }
 

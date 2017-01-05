@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/tx_date"
         android:longClickable="true"
-        android:layout_alignEnd="@+id/btn_refresh">
+        android:layout_alignEnd="@+id/btn_calendar">
     </ListView>
 
     <ListView
@@ -37,16 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_margin="2dp"
-        android:text="Add New Task" />
-
-    <Button
-        android:id="@+id/btn_refresh"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="2dp"
-        android:layout_toRightOf="@id/btn_newTask"
-        android:text="Refresh" />
+        android:text="New Task" />
 
     <Button
         android:id="@+id/btn_calendar"
@@ -54,7 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_margin="2dp"
-        android:layout_toRightOf="@id/btn_refresh"
+        android:layout_toRightOf="@id/btn_newTask"
         android:text="Calendar" />
 
     <Button

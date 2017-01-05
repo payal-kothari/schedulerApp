@@ -137,6 +137,7 @@ public class CustomAdapter extends BaseAdapter{
                 List<String> allTasks;
                 DatabaseManager manager = new DatabaseManager(context);
                 allTasks = manager.fetchAllTasks();
+                allTasks.add("None");
                 //Create sequence of items
                 Tasks = allTasks.toArray(new String[allTasks.size()]);
                 final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
