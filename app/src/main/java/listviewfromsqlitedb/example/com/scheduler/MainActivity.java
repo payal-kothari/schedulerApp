@@ -343,23 +343,40 @@ public class MainActivity extends Activity {
         String secondHalfEnd = e.substring(3,5);
         String amPmEnd = e.substring(5,7);
 
+        if(amPmStart.equals("PM") && !firstHalfStart.equals("12")){
+            firstHalfStart = firstHalfStart + 12;
+        }
+        if(amPmStart.equals("AM") && firstHalfStart.equals("12")){
+            firstHalfStart = firstHalfStart + 12;
+        }
+        if(amPmEnd.equals("PM") && !firstHalfEnd.equals("12")){
+            firstHalfEnd = firstHalfEnd + 12;
+        }
+        if(amPmStart.equals("AM") && firstHalfEnd.equals("12")){
+            firstHalfEnd = firstHalfEnd + 12;
+        }
+
         int start = Integer.parseInt(firstHalfStart) * 60 + Integer.parseInt(secondHalfStart);
         int end = Integer.parseInt(firstHalfEnd) * 60 + Integer.parseInt(secondHalfEnd);
 
-        Log.d("total ampmstart" , amPmStart);
-        Log.d("total ampmend" , amPmEnd);
-        if(!amPmStart.equals(amPmEnd)){
-            if(start > end){
-                int temp  = (start - end);
-                Log.d("start > end", String.valueOf(temp));
-                diff = 720 - temp;
-            }else {
-                int temp = end - start;
-                diff = 720 + temp;
-            }
-        }else {
-            diff = end - start;
-        }
+        diff = end - start;
+
+
+//        Log.d("total ampmstart" , amPmStart);
+//        Log.d("total ampmend" , amPmEnd);
+//        if(!amPmStart.equals(amPmEnd)){
+//            if(start > end){
+//                int temp  = (start - end);
+//                Log.d("start > end", String.valueOf(temp));
+//                diff = 720 - temp;
+//            }else {
+//
+//                int temp = end - start;
+//                diff = 720 + temp;
+//            }
+//        }else {
+//            diff = end - start;
+//        }
 
         int hh = diff / 60;
         int mm = diff % 60;
