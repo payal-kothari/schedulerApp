@@ -343,17 +343,25 @@ public class MainActivity extends Activity {
         String secondHalfEnd = e.substring(3,5);
         String amPmEnd = e.substring(5,7);
 
-        if(amPmStart.equals("PM") && !firstHalfStart.equals("12")){
-            firstHalfStart = firstHalfStart + 12;
+        if(amPmEnd.equals("AM") && amPmStart.equals("AM") && firstHalfStart.equals("12")){
+            firstHalfStart = String.valueOf(0);
         }
-        if(amPmStart.equals("AM") && firstHalfStart.equals("12")){
-            firstHalfStart = firstHalfStart + 12;
+
+        if(amPmStart.equals("PM") && !firstHalfStart.equals("12")){
+            int x = Integer.parseInt(firstHalfStart) + 12;
+            firstHalfStart = String.valueOf(x);
+        }
+        if(amPmStart.equals("AM") && firstHalfStart.equals("12") && !amPmEnd.equals("AM")){
+            int x = Integer.parseInt(firstHalfStart) + 12;
+            firstHalfStart = String.valueOf(x);
         }
         if(amPmEnd.equals("PM") && !firstHalfEnd.equals("12")){
-            firstHalfEnd = firstHalfEnd + 12;
+            int x = Integer.parseInt(firstHalfEnd) + 12;
+            firstHalfEnd = String.valueOf(x);
         }
-        if(amPmStart.equals("AM") && firstHalfEnd.equals("12")){
-            firstHalfEnd = firstHalfEnd + 12;
+        if(amPmEnd.equals("AM") && firstHalfEnd.equals("12")){
+            int x = Integer.parseInt(firstHalfEnd) + 12;
+            firstHalfEnd = String.valueOf(x);
         }
 
         int start = Integer.parseInt(firstHalfStart) * 60 + Integer.parseInt(secondHalfStart);
