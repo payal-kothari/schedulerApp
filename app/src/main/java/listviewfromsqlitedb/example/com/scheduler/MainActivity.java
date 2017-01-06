@@ -30,7 +30,7 @@ public class MainActivity extends Activity {
     DatabaseManagerForActual manager_ob_actual;
     ListView scheduleList;
     ListView actualScheduleList;
-    Button btnNewTask, btnCalendar, btnIn;
+    Button btnNewTask, btnCalendar, btnIn, btnCopyFromPrevious;
     DatabaseManager adapter;
     DatabaseHelper helper;
     private String format = "";
@@ -54,6 +54,8 @@ public class MainActivity extends Activity {
     static String formatedDate;
     public static final String[] MONTHS = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
     static final String[] DAYS = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"};
+    private boolean copyFromPrevious;
+    static String selectedOldDateStr;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -67,6 +69,7 @@ public class MainActivity extends Activity {
         manager_ob_actual = new DatabaseManagerForActual(this);
         adapter_ob = new DatabaseManager(this);
         btnCalendar = (Button) findViewById(R.id.btn_calendar);
+        btnCopyFromPrevious = (Button) findViewById(R.id.btn_copyFromPreviousSchedule);
         txDate = (TextView) findViewById(R.id.tx_date);
 
         Intent intent = getIntent();
@@ -77,6 +80,14 @@ public class MainActivity extends Activity {
 
         showlist();
         showListForActual();
+
+        btnCopyFromPrevious.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                copyFromPrevious = true;
+                showDialog(999);
+            }
+        });
 
         actualScheduleList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -458,7 +469,16 @@ public class MainActivity extends Activity {
                     // arg1 = year
                     // arg2 = month
                     // arg3 = day
-                    showDate(arg1, arg2+1, arg3);
+                    if(!copyFromPrevious){
+                        showDate(arg1, arg2+1, arg3);
+                    }else {
+                        copyFromPrevious = false;
+                        StringBuilder selectedOldDate = new StringBuilder();
+                        int month = arg2+1;
+                        selectedOldDate.append(arg3).append("/").append(month).append("/").append(arg1);
+                        selectedOldDateStr = selectedOldDate.toString();
+                        setToOldSchedule(selectedOldDateStr);
+                    }
                 }
             };
 
@@ -587,5 +607,21 @@ public class MainActivity extends Activity {
         stringbuilderEnd.append(hrStr).append(":").append(minstr)
                 .append("").append(format);
         e = stringbuilderEnd.toString();
+    }
+
+    public void setToOldSchedule(String selectedOldDateStr) {
+        adapter_ob = new DatabaseManager(MainActivity.this);
+        Cursor c1 = adapter_ob.fetchByDate(selectedOldDateStr);
+
+        if (c1.moveToFirst()) {
+            do {
+                String start = c1.getString(2);
+                String end = c1.getString(3);
+                String task = c1.getString(4);
+                String total = c1.getString(5);
+                adapter_ob.insertDetails(selectedDate, start, end, task, total);
+            } while (c1.moveToNext());
+        }
+        showlist();
     }
 }
