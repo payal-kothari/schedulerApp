@@ -204,7 +204,6 @@ public class CustomAdapterForActual extends BaseAdapter{
                                 String dateForThisEntry = currentEntry.getDate();
                                 String startT = currentEntry.getStartTime();
                                 String endT = currentEntry.getEndTime();
-                                Toast.makeText(context,resultTask,Toast.LENGTH_LONG).show();
                                 String total = mainActivity.calculateTotal(startT, endT);
                                 adapter_ob.updateldetail(rowID, dateForThisEntry, startT, endT, resultTask, total);
                             } // End of onClick(DialogInterface dialog, int whichButton)

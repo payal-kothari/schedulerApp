@@ -77,7 +77,6 @@ public class CustomAdapter extends BaseAdapter{
         listViewHolder.tx_s.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Toast.makeText(context, "you clicked start" , Toast.LENGTH_SHORT).show();
                 Calendar mcurrentTime = Calendar.getInstance();
                 int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
                 int minute = mcurrentTime.get(Calendar.MINUTE);
@@ -204,7 +203,6 @@ public class CustomAdapter extends BaseAdapter{
                                 String dateForThisEntry = currentEntry.getDate();
                                 String startT = currentEntry.getStartTime();
                                 String endT = currentEntry.getEndTime();
-                                Toast.makeText(context,resultTask,Toast.LENGTH_LONG).show();
                                 String total = mainActivity.calculateTotal(startT, endT);
                                 adapter_ob.updateldetail(rowID, dateForThisEntry, startT, endT, resultTask, total);
                             } // End of onClick(DialogInterface dialog, int whichButton)

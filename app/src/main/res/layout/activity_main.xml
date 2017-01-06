@@ -10,7 +10,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:id="@+id/tx_date"
-        />
+        android:gravity="center"
+        android:text="Date" />
 
     <ListView
         android:id="@+id/list_view"

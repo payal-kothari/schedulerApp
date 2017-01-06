@@ -5,12 +5,15 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by payalkothari on 1/2/17.
@@ -58,6 +61,7 @@ public class FirstActivity extends Activity{
                     // arg1 = year
                     // arg2 = month
                     // arg3 = day
+
                     showDate(arg1, arg2+1, arg3);
                 }
             };
@@ -66,9 +70,14 @@ public class FirstActivity extends Activity{
         StringBuilder strbuilder = new StringBuilder().append(day).append("/")
                 .append(month).append("/").append(year);
         String selectedDate = strbuilder.toString();
-        Toast.makeText(this, strbuilder.toString(), Toast.LENGTH_SHORT).show();
+        Calendar c = Calendar.getInstance();
+        Date d = new Date(year, month, day+3);
+        c.setTime(d);
+        int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
         Intent intent = new Intent(FirstActivity.this, MainActivity.class);
         intent.putExtra("DATE", selectedDate);
+        intent.putExtra("DAY", dayOfWeek);
         startActivity(intent);
     }
 }

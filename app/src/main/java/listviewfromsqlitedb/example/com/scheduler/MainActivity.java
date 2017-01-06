@@ -14,20 +14,18 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
-import java.util.StringTokenizer;
 
 public class MainActivity extends Activity {
     DatabaseManager adapter_ob;
@@ -54,6 +52,10 @@ public class MainActivity extends Activity {
     private String selectedText;
     static int ongoingID;
     static String ongoingDate;
+    static int selectedDay;
+    static String formatedDate;
+    public static final String[] MONTHS = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+    static final String[] DAYS = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"};
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -71,7 +73,9 @@ public class MainActivity extends Activity {
 
         Intent intent = getIntent();
         selectedDate = intent.getStringExtra("DATE");
-        txDate.setText(selectedDate);
+        selectedDay = intent.getIntExtra("DAY",0);
+        formatDate(selectedDate, selectedDay);
+        txDate.setText(formatedDate);
 
         showlist();
         showListForActual();
@@ -214,8 +218,6 @@ public class MainActivity extends Activity {
 
                             alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
-                                    //You will get as string input data in this variable.
-                                    // here we convert the input to a string and show in a toast.
                                     String taskFromUser = input.getEditableText().toString();
                                     if (taskFromUser.equals("")){
                                         taskFromUser = "-";
@@ -332,6 +334,21 @@ public class MainActivity extends Activity {
                 }
             }
         });
+    }
+
+    private void formatDate(String selectedDate, int selectedDay) {
+        String s = selectedDate.substring(selectedDate.indexOf("/") + 1);
+        s = s.substring(0, s.indexOf("/"));
+        String monthInStr = MONTHS[Integer.parseInt(s)-1];
+        String dayStr = DAYS[selectedDay-1];
+
+        String day = selectedDate.substring(0,selectedDate.indexOf("/"));
+        String year = selectedDate.substring(selectedDate.length()-4,selectedDate.length());
+
+        StringBuilder strb = new StringBuilder();
+        strb.append(day).append(" ").append(monthInStr).append(" ").append(year);
+
+        formatedDate = strb.toString();
     }
 
     public String calculateTotal(String s, String e) {
@@ -452,6 +469,13 @@ public class MainActivity extends Activity {
                 .append(month).append("/").append(year);
 
         selectedDate = strbuilder.toString();
+        Calendar c = Calendar.getInstance();
+        Date d = new Date(year, month, day+3);
+        c.setTime(d);
+        int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
+        selectedDay = dayOfWeek;
+        formatDate(selectedDate, selectedDay);
     }
 
     public void onWindowFocusChanged(boolean hasFocus) {
@@ -464,12 +488,11 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        Toast.makeText(this, "resumed", Toast.LENGTH_SHORT).show();
         showlist();
     }
 
     public void showlist() {
-        txDate.setText(selectedDate);
+        txDate.setText(formatedDate);
         adapter_ob = new DatabaseManager(this);
         ArrayList<Entry> allEntries = new ArrayList<Entry>();
         allEntries.clear();

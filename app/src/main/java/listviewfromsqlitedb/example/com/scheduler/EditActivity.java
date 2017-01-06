@@ -34,7 +34,6 @@ public class EditActivity extends Activity {
 
         Bundle showData = getIntent().getExtras();
         rowId = showData.getInt("keyid");
-        //Toast.makeText(EditActivity.this, rowId, Toast.LENGTH_LONG).show();
         regadapter = new DatabaseManager(this);
 
 //        c = regadapter.fetch(rowId);
