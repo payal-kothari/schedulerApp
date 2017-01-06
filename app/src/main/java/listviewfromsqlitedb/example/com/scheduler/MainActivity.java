@@ -1,14 +1,13 @@
 package listviewfromsqlitedb.example.com.scheduler;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.os.Bundle;
-
-import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -19,7 +18,6 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

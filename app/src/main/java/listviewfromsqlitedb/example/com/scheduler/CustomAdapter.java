@@ -4,13 +4,11 @@ import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.database.Cursor;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -77,6 +75,7 @@ public class CustomAdapter extends BaseAdapter{
         listViewHolder.tx_s.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Calendar mcurrentTime = Calendar.getInstance();
                 int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
                 int minute = mcurrentTime.get(Calendar.MINUTE);
