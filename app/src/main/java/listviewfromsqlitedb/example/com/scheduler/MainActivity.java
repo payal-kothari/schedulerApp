@@ -72,10 +72,14 @@ public class MainActivity extends Activity {
         btnCopyFromPrevious = (Button) findViewById(R.id.btn_copyFromPreviousSchedule);
         txDate = (TextView) findViewById(R.id.tx_date);
 
-        Intent intent = getIntent();
-        selectedDate = intent.getStringExtra("DATE");
-        selectedDay = intent.getIntExtra("DAY",0);
-        formatDate(selectedDate, selectedDay);
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        selectedDate = df.format(c.getTime());
+
+        //Intent intent = getIntent();
+        //selectedDate = intent.getStringExtra("DATE");
+        //selectedDay = intent.getIntExtra("DAY",0);
+        formatDate(selectedDate, 3);
         txDate.setText(formatedDate);
 
         showlist();
