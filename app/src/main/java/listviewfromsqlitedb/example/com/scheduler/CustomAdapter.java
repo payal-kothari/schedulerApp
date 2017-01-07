@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,6 +32,8 @@ public class CustomAdapter extends BaseAdapter{
     EditActivity editActivity = new EditActivity();
     MainActivity mainActivity;
     CharSequence[] Tasks;
+    static String newStart;
+    static String newEnd;
 
     public CustomAdapter(Context c, List<Entry> listE) {
         this.context = c;
@@ -118,8 +121,12 @@ public class CustomAdapter extends BaseAdapter{
                         int rowID = currentEntry.getID();
                         String dateForThisEntry = currentEntry.getDate();
                         String startT = currentEntry.getStartTime();
+                        String oldEndTime = currentEntry.getEndTime();
+                        Log.d("CustomeAdapter", oldEndTime);
                         String taskN = currentEntry.getTask();
                         String resultE = editActivity.showEndTime(selectedHour, selectedMinute);
+                        String diffInOldAndNewEndTimeHr =  mainActivity.calculateTotal(oldEndTime, resultE);
+                        shiftOtherEntries(diffInOldAndNewEndTimeHr, rowID, dateForThisEntry);
                         String total = mainActivity.calculateTotal(startT, resultE);
                         adapter_ob.updateldetail(rowID, dateForThisEntry, startT, resultE, taskN, total);
                     }
@@ -214,6 +221,7 @@ public class CustomAdapter extends BaseAdapter{
                         }); //End of alert.setNegativeButton
                         AlertDialog alertDialog = alert.create();
                         alertDialog.show();
+
                     }
                 });
 
@@ -221,6 +229,7 @@ public class CustomAdapter extends BaseAdapter{
                 AlertDialog alertDialogObject = dialogBuilder.create();
                 //Show the dialog
                 alertDialogObject.show();
+                alertDialogObject.getButton(DialogInterface.BUTTON_NEUTRAL).setTextSize(40);
             }
         });
 
@@ -232,6 +241,85 @@ public class CustomAdapter extends BaseAdapter{
 
         return v;
     }
+
+    private void shiftOtherEntries(String diffInOldAndNewEndTimeHr, int rowID, String dateForThisEntry) {
+        adapter_ob = new DatabaseManager(context);
+        Cursor c1 = adapter_ob.fetchByDate(dateForThisEntry);
+        if (c1 != null && c1.getCount() != 0) {
+            if (c1.moveToFirst()) {
+                do {
+                    int currentId = c1.getInt(c1.getColumnIndex("_id"));
+                    if( currentId > rowID){
+                        String task = c1.getString(c1.getColumnIndex("taskName"));
+                        changeTime(diffInOldAndNewEndTimeHr, c1.getString(c1.getColumnIndex("startTime")), c1.getString(c1.getColumnIndex("endTime")));
+                        String total = mainActivity.calculateTotal(newStart, newEnd);
+                        adapter_ob.updateldetail(currentId, dateForThisEntry, newStart, newEnd, task, total);
+                    }
+                } while (c1.moveToNext());
+            }
+        }
+
+    }
+
+    private void changeTime(String diffInOldAndNewEndTimeHr, String startTime, String endTime) {
+        String firstHalfStart = startTime.substring(0,2);
+        String secondHalfStart = startTime.substring(3,5);
+        String amPmStart = startTime.substring(5,7);
+        String firstHalfEnd = endTime.substring(0,2);
+        String secondHalfEnd = endTime.substring(3,5);
+        String amPmEnd = endTime.substring(5,7);
+        String firstHalfDiff = diffInOldAndNewEndTimeHr.substring(0,diffInOldAndNewEndTimeHr.indexOf(":"));
+        String secondHalfDiff = diffInOldAndNewEndTimeHr.substring(diffInOldAndNewEndTimeHr.indexOf(":")+1, diffInOldAndNewEndTimeHr.length());
+
+
+
+        int newFirstHalfStart = Integer.parseInt(firstHalfStart) + Integer.parseInt(firstHalfDiff);
+        int newSecondHalfStart = Integer.parseInt(secondHalfStart) + Integer.parseInt(secondHalfDiff);
+        int newFirstHalfEnd = Integer.parseInt(firstHalfEnd) + Integer.parseInt(firstHalfDiff);
+        int newSecondHalfEnd = Integer.parseInt(secondHalfEnd) + Integer.parseInt(secondHalfDiff);
+
+        String newHrStrStart;
+        String newMinstrStart;
+        String newHrStrEnd;
+        String newMinstrEnd;
+        if(newFirstHalfStart < 10){
+            newHrStrStart = "0" + String.valueOf(newFirstHalfStart);
+        }else {
+            newHrStrStart = String.valueOf(newFirstHalfStart);
+        }
+
+        if(newSecondHalfStart >= 10){
+            newMinstrStart = String.valueOf(newSecondHalfStart);
+        }else {
+            newMinstrStart = "0" + String.valueOf(newSecondHalfStart);
+        }
+
+
+        if(newFirstHalfEnd < 10){
+            newHrStrEnd = "0" + String.valueOf(newFirstHalfEnd);
+        }else {
+            newHrStrEnd = String.valueOf(newFirstHalfEnd);
+        }
+
+
+        if(newSecondHalfEnd >= 10){
+            newMinstrEnd = String.valueOf(newSecondHalfEnd);
+        }else {
+            newMinstrEnd = "0" + String.valueOf(newSecondHalfEnd);
+        }
+
+
+
+        StringBuilder strbStart = new StringBuilder();
+        strbStart.append(newHrStrStart).append(":").append(newMinstrStart).append(amPmStart);
+        StringBuilder strbEnd = new StringBuilder();
+        strbEnd.append(newHrStrEnd).append(":").append(newMinstrEnd).append(amPmEnd);
+
+        newStart = strbStart.toString();
+        newEnd = strbEnd.toString();
+
+    }
+
 
     class ListViewHolder{
         public TextView tx_s, tx_e, tx_t,tx_tot;
