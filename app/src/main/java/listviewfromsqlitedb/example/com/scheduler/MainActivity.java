@@ -395,6 +395,11 @@ public class MainActivity extends Activity {
         }
 
         int start = Integer.parseInt(firstHalfStart) * 60 + Integer.parseInt(secondHalfStart);
+        if(firstHalfEnd.contains("-")){
+            firstHalfEnd = String.valueOf(0);
+        }else if(secondHalfEnd.contains("-")){
+            secondHalfEnd = String.valueOf(0);
+        }
         int end = Integer.parseInt(firstHalfEnd) * 60 + Integer.parseInt(secondHalfEnd);
 
         diff = end - start;

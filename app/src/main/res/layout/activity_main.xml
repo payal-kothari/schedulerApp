@@ -10,15 +10,115 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:id="@+id/tx_date"
+        android:textColor="@android:color/black"
         android:gravity="center"
+        android:textStyle="bold"
         android:text="Date" />
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/title_linearLayout"
+        android:layout_below="@+id/tx_date"
+        android:layout_alignEnd="@+id/btn_calendar"
+        android:background="@android:color/holo_orange_light"
+        android:weightSum="1">
+
+        <TextView
+            android:id="@+id/tv_startTime"
+            android:layout_width="42dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            android:text="Start"/>
+
+        <TextView
+            android:id="@+id/tv_endTime"
+            android:layout_width="45dp"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:gravity="right"
+            android:text="End"/>
+
+        <TextView
+            android:id="@+id/tv_task"
+            android:layout_width="52dp"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:gravity="right"
+            android:text="Task" />
+
+        <TextView
+            android:id="@+id/tv_total"
+            android:layout_width="50dp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Total"/>
+    </LinearLayout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/title_linearLayout2"
+        android:layout_below="@+id/tx_date"
+        android:background="@android:color/holo_green_light"
+        android:layout_toRightOf="@+id/title_linearLayout"
+        android:layout_marginLeft="5dp"
+        android:weightSum="1">
+
+        <TextView
+            android:id="@+id/tv_startTime2"
+            android:layout_width="42dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:text="Start"/>
+
+        <TextView
+            android:id="@+id/tv_endTime2"
+            android:layout_width="45dp"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:gravity="right"
+            android:text="End"/>
+
+        <TextView
+            android:id="@+id/tv_task2"
+            android:layout_width="52dp"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:gravity="right"
+            android:text="Task" />
+
+        <TextView
+            android:id="@+id/tv_total2"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:gravity="center"
+            android:text="Total"/>
+    </LinearLayout>
 
     <ListView
         android:id="@+id/list_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tx_date"
+        android:layout_below="@+id/title_linearLayout"
         android:longClickable="true"
+        android:dividerHeight="7dp"
+        android:background="@android:color/holo_orange_light"
+        android:divider="@android:color/transparent"
         android:layout_alignEnd="@+id/btn_calendar">
     </ListView>
 
@@ -26,9 +126,13 @@
         android:id="@+id/list_viewActual"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tx_date"
+        android:layout_below="@+id/title_linearLayout2"
         android:layout_toRightOf="@+id/list_view"
         android:longClickable="true"
+        android:background="@android:color/holo_green_light"
+        android:dividerHeight="7dp"
+        android:layout_marginLeft="5dp"
+        android:divider="@android:color/transparent"
         android:layout_alignParentEnd="true">
     </ListView>
 
