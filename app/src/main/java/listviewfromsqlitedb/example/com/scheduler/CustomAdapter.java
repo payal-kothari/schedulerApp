@@ -279,10 +279,19 @@ public class CustomAdapter extends BaseAdapter{
         String firstHalfDiff = diffInOldAndNewEndTimeHr.substring(0,diffInOldAndNewEndTimeHr.indexOf(":"));
         String secondHalfDiff = diffInOldAndNewEndTimeHr.substring(diffInOldAndNewEndTimeHr.indexOf(":")+1, diffInOldAndNewEndTimeHr.length());
 
+        int firstHalfEndInMin = Integer.parseInt(firstHalfEnd) * 60;
+        int totalEndInMin = firstHalfEndInMin + Integer.parseInt(secondHalfEnd);
+
+        int firstHalfDiffInMin = Integer.parseInt(firstHalfDiff) * 60;
+        int totalDiffInMin = firstHalfDiffInMin + Integer.parseInt(secondHalfDiff);
+
+        int newtime = totalEndInMin + totalDiffInMin;
+
+
 //        int newFirstHalfStart = Integer.parseInt(firstHalfStart) + Integer.parseInt(firstHalfDiff);
 //        int newSecondHalfStart = Integer.parseInt(secondHalfStart) + Integer.parseInt(secondHalfDiff);
-        int newFirstHalfEnd = Math.abs(Integer.parseInt(firstHalfEnd) + Integer.parseInt(firstHalfDiff));
-        int newSecondHalfEnd = Math.abs(Integer.parseInt(secondHalfEnd) + Integer.parseInt(secondHalfDiff));
+        int newFirstHalfEnd = Math.abs(newtime / 60);
+        int newSecondHalfEnd = Math.abs(newtime % 60);
 
         String amPmOfPrevious = previousEntryEndTime.substring(5, 7);
         String firstHalfPrevious = previousEntryEndTime.substring(0, 2);

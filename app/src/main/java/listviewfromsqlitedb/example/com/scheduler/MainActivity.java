@@ -112,7 +112,6 @@ public class MainActivity extends Activity {
                     } });
                 adb.setNegativeButton("No", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-
                        dialog.cancel();
                     } });
                 adb.show();
@@ -138,6 +137,52 @@ public class MainActivity extends Activity {
                 adb.setNegativeButton("No", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
+                    } });
+                adb.setNeutralButton("Insert below", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        ArrayList<Entry> allEntries = new ArrayList<Entry>();
+                        allEntries = adapter_ob.fetchAll();
+                        Entry currentEntry = allEntries.get((int) id);
+                        int currentEntryId = currentEntry.getID();
+                        Cursor c1 = adapter_ob.fetchAllCursor();
+                        if (c1 != null && c1.getCount() != 0) {
+                            if (c1.moveToFirst()) {
+                                do {
+                                    int id = c1.getInt(c1.getColumnIndex("_id"));
+                                    Log.d("selectedId: ",String.valueOf(currentEntryId));
+                                    Log.d("now id: ", String.valueOf(id));
+                                    if(id > currentEntryId){
+                                        int tempId = id;
+                                        tempId++;
+                                        String dateTemp = c1.getString(c1
+                                                .getColumnIndex("date"));
+                                        String startTemp = c1.getString(c1
+                                                .getColumnIndex("startTime"));
+                                        String endTemp = c1.getString(c1
+                                                .getColumnIndex("endTime"));
+                                        String taskTemp = c1.getString(c1
+                                                .getColumnIndex("taskName"));
+                                        String totalTemp = c1.getString(c1
+                                                .getColumnIndex("total"));
+                                        DatabaseManagerTemp dm = new DatabaseManagerTemp(MainActivity.this);
+                                        Log.d("copying to temp: ", startTemp);
+                                        dm.insertDetails(tempId, dateTemp, startTemp, endTemp, taskTemp, totalTemp);
+                                        Log.d("deleting id: ", String.valueOf(id));
+                                        adapter_ob.deleteOneRecord(id);
+                                    }
+                                } while (c1.moveToNext());
+                            }
+
+                        }
+                        c1.close();
+                        String date = currentEntry.getDate();
+                        String start = currentEntry.getStartTime();
+                        String end = currentEntry.getEndTime();
+                        String task = currentEntry.getTask();
+                        String total = currentEntry.getTotal();
+                        Log.d("insertingc copy id: ", task);
+                        adapter_ob.insertDetails(date, start, end, task, total);
+                        copyFromOtherTable();
                     } });
                 adb.show();
                 return true;
@@ -347,6 +392,32 @@ public class MainActivity extends Activity {
                 }
             }
         });
+    }
+
+    private void copyFromOtherTable() {
+        DatabaseManagerTemp dm = new DatabaseManagerTemp(MainActivity.this);
+        Cursor c1 = dm.fetchAllCursor();
+        if (c1 != null && c1.getCount() != 0) {
+            if (c1.moveToFirst()) {
+                do {
+                        String date = c1.getString(c1
+                                .getColumnIndex("date"));
+                        String start = c1.getString(c1
+                                .getColumnIndex("startTime"));
+                        String end = c1.getString(c1
+                                .getColumnIndex("endTime"));
+                        String task = c1.getString(c1
+                                .getColumnIndex("taskName"));
+                        String total = c1.getString(c1
+                                .getColumnIndex("total"));
+                        adapter_ob = new DatabaseManager(MainActivity.this);
+                        Log.d("copying from other: ", start);
+                        adapter_ob.insertDetails(date, start, end, task, total);
+                } while (c1.moveToNext());
+            }
+        }
+        dm.deleteTable();
+        c1.close();
     }
 
     private void formatDate(String selectedDate, int selectedDay) {

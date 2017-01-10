@@ -11,23 +11,23 @@ import java.util.ArrayList;
 /**
  * Created by payalkothari on 12/22/16.
  */
-public class DatabaseManager{
+public class DatabaseManagerTemp{
     SQLiteDatabase database_ob;
-    DatabaseHelper databaseHelper_ob;
+    DatabaseHelperTemp databaseHelper_ob;
     Context context;
 
-    public DatabaseManager(Context c){
+    public DatabaseManagerTemp(Context c){
         context = c;
     }
 
-    public DatabaseManager opnToRead() {
-        databaseHelper_ob = new DatabaseHelper(context, databaseHelper_ob.DATABASE_NAME, null, databaseHelper_ob.DATABASE_VERSION);
+    public DatabaseManagerTemp opnToRead() {
+        databaseHelper_ob = new DatabaseHelperTemp(context, databaseHelper_ob.DATABASE_NAME, null, databaseHelper_ob.DATABASE_VERSION);
         database_ob = databaseHelper_ob.getReadableDatabase();
         return this;
     }
 
-    public DatabaseManager opnToWrite() {
-        databaseHelper_ob = new DatabaseHelper(context, databaseHelper_ob.DATABASE_NAME, null, databaseHelper_ob.DATABASE_VERSION);
+    public DatabaseManagerTemp opnToWrite() {
+        databaseHelper_ob = new DatabaseHelperTemp(context, databaseHelper_ob.DATABASE_NAME, null, databaseHelper_ob.DATABASE_VERSION);
         database_ob = databaseHelper_ob.getWritableDatabase();
         return this;
     }
@@ -36,8 +36,16 @@ public class DatabaseManager{
         database_ob.close();
     }
 
-    public long insertDetails(String date, String startTime, String endTime, String task, String total) {
+    public void deleteTable(){
+        databaseHelper_ob = new DatabaseHelperTemp(context, databaseHelper_ob.DATABASE_NAME, null, databaseHelper_ob.DATABASE_VERSION);
+        database_ob = databaseHelper_ob.getWritableDatabase();
+        database_ob.execSQL("DROP TABLE IF EXISTS " + databaseHelper_ob.TABLE_NAME);
+        database_ob.execSQL(databaseHelper_ob.CREATE_SCHEDULE_TABLE);
+    }
+
+    public long insertDetails(int id, String date, String startTime, String endTime, String task, String total) {
         ContentValues contentValues = new ContentValues();
+        contentValues.put(databaseHelper_ob.KEY_ID, id);
         contentValues.put(databaseHelper_ob.DATE, date);
         contentValues.put(databaseHelper_ob.START_TIME, startTime);
         contentValues.put(databaseHelper_ob.END_TIME, endTime);
