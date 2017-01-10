@@ -141,7 +141,7 @@ public class MainActivity extends Activity {
                 adb.setNeutralButton("Insert below", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         ArrayList<Entry> allEntries = new ArrayList<Entry>();
-                        allEntries = adapter_ob.fetchAll();
+                        allEntries = adapter_ob.fetchByDateList(selectedDate);
                         Entry currentEntry = allEntries.get((int) id);
                         int currentEntryId = currentEntry.getID();
                         Cursor c1 = adapter_ob.fetchAllCursor();
@@ -172,7 +172,6 @@ public class MainActivity extends Activity {
                                     }
                                 } while (c1.moveToNext());
                             }
-
                         }
                         c1.close();
                         String date = currentEntry.getDate();
@@ -181,7 +180,7 @@ public class MainActivity extends Activity {
                         String task = currentEntry.getTask();
                         String total = currentEntry.getTotal();
                         Log.d("insertingc copy id: ", task);
-                        adapter_ob.insertDetails(date, start, end, task, total);
+                        adapter_ob.insertDetails(date, end, end, "NEW*", "0:0");
                         copyFromOtherTable();
                     } });
                 adb.show();
@@ -433,6 +432,7 @@ public class MainActivity extends Activity {
         strb.append(day).append(" ").append(monthInStr).append(" ").append(year);
 
         formatedDate = strb.toString();
+        Log.d("formated date", formatedDate);
     }
 
     public String calculateTotal(String s, String e) {
@@ -550,6 +550,7 @@ public class MainActivity extends Activity {
                     // arg2 = month
                     // arg3 = day
                     if(!copyFromPrevious){
+                        Log.d("check***", String.valueOf(copyFromPrevious));
                         showDate(arg1, arg2+1, arg3);
                     }else {
                         copyFromPrevious = false;
@@ -563,8 +564,12 @@ public class MainActivity extends Activity {
             };
 
     private void showDate(int year, int month, int day) {
+        String monthStr = null;
+        if(month <10){
+            monthStr = "0" + String.valueOf(month);
+        }
         StringBuilder strbuilder = new StringBuilder().append(day).append("/")
-                .append(month).append("/").append(year);
+                .append(monthStr).append("/").append(year);
 
         selectedDate = strbuilder.toString();
         Calendar c = Calendar.getInstance();
@@ -577,10 +582,12 @@ public class MainActivity extends Activity {
     }
 
     public void onWindowFocusChanged(boolean hasFocus) {
-
+        Log.d("window focised1", "focus changed");
         super.onWindowFocusChanged(hasFocus);
+        Log.d("window focised2", "focus changed");
         showListForActual();
         showlist();
+        Log.d("window focised3", "focus changed");
     }
 
     @Override
@@ -595,6 +602,7 @@ public class MainActivity extends Activity {
         ArrayList<Entry> allEntries = new ArrayList<Entry>();
         allEntries.clear();
         Cursor c1 = adapter_ob.fetchByDate(selectedDate);
+        Log.d("date in shwlist", selectedDate);
         if (c1 != null && c1.getCount() != 0) {
             if (c1.moveToFirst()) {
                 do {
@@ -614,8 +622,7 @@ public class MainActivity extends Activity {
             }
         }
         c1.close();
-        CustomAdapter customAdapter = new CustomAdapter(
-                MainActivity.this, allEntries);
+        CustomAdapter customAdapter = new CustomAdapter(MainActivity.this, allEntries);
         scheduleList.setAdapter(customAdapter);
     }
 
