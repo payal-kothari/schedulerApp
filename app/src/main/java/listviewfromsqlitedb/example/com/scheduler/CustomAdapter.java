@@ -34,8 +34,6 @@ public class CustomAdapter extends BaseAdapter{
     CharSequence[] Tasks;
     static String newStart;
     static String newEnd;
-    static public boolean notifyNextFlag;
-    static public String notifyAmPm;
 
     public CustomAdapter(Context c, List<Entry> listE) {
         this.context = c;
@@ -179,7 +177,7 @@ public class CustomAdapter extends BaseAdapter{
                 dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-
+                        dialog.cancel();
                     }
                 });
 

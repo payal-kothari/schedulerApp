@@ -24,7 +24,6 @@ public class FirstActivity extends Activity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_first_activity);
         btnCalendar = (Button) findViewById(R.id.btn_calendar);
 
         calendar = Calendar.getInstance();

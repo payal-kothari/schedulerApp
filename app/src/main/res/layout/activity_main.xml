@@ -140,37 +140,49 @@
 
     <Button
         android:id="@+id/btn_newTask"
-        android:layout_width="wrap_content"
+        android:layout_width="94dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_margin="2dp"
+        android:layout_margin="1dp"
         android:text="New Task" />
 
     <Button
         android:id="@+id/btn_calendar"
-        android:layout_width="wrap_content"
+        android:layout_width="95dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_margin="2dp"
+        android:layout_margin="1dp"
         android:layout_toRightOf="@id/btn_newTask"
         android:text="Calendar" />
 
     <Button
         android:id="@+id/btn_In"
-        android:layout_width="wrap_content"
+        android:layout_width="38dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_margin="2dp"
         android:layout_toRightOf="@id/btn_calendar"
-        android:text="IN" />
+        android:text="IN"
+        android:layout_margin="1dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp" />
 
     <Button
         android:id="@+id/btn_copyFromPreviousSchedule"
+        android:layout_width="90dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="1dp"
+        android:layout_toRightOf="@id/btn_In"
+        android:text="Copy old" />
+
+    <Button
+        android:id="@+id/btn_toDo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_margin="2dp"
-        android:layout_toRightOf="@id/btn_In"
-        android:text="Copy old" />
+        android:layout_margin="1dp"
+        android:layout_toRightOf="@id/btn_copyFromPreviousSchedule"
+        android:text="To Do" />
+
 
 </RelativeLayout>

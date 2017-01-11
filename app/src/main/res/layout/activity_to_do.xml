@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:id="@+id/tx_date"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:text="Date" />
+
+    <ListView
+        android:id="@+id/toDo_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:longClickable="true"
+        android:dividerHeight="7dp"
+        android:background="@android:color/white"
+        android:divider="@android:color/transparent"
+        android:layout_below="@+id/tx_date"
+        android:layout_above="@+id/btn_addTask">
+    </ListView>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Task"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/btn_addTask" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/ed_task"
+        android:layout_alignTop="@+id/btn_newTask"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/toDo_list"
+        android:hint="Add new task"
+        android:layout_toStartOf="@+id/btn_addTask" />
+
+</RelativeLayout>

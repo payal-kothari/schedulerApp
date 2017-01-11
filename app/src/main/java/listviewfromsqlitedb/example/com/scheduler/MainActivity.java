@@ -30,7 +30,7 @@ public class MainActivity extends Activity {
     DatabaseManagerForActual manager_ob_actual;
     ListView scheduleList;
     ListView actualScheduleList;
-    Button btnNewTask, btnCalendar, btnIn, btnCopyFromPrevious;
+    Button btnNewTask, btnCalendar, btnIn, btnCopyFromPrevious, btnToDo;
     DatabaseManager adapter;
     DatabaseHelper helper;
     private String format = "";
@@ -71,6 +71,7 @@ public class MainActivity extends Activity {
         btnCalendar = (Button) findViewById(R.id.btn_calendar);
         btnCopyFromPrevious = (Button) findViewById(R.id.btn_copyFromPreviousSchedule);
         txDate = (TextView) findViewById(R.id.tx_date);
+        btnToDo =  (Button) findViewById(R.id.btn_toDo);
 
         Calendar c = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
@@ -196,6 +197,15 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 showDialog(999);
+            }
+        });
+
+        btnToDo.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ToDo.class);
+                intent.putExtra("DATE", selectedDate);
+                startActivity(intent);
             }
         });
 
@@ -474,24 +484,6 @@ public class MainActivity extends Activity {
         int end = Integer.parseInt(firstHalfEnd) * 60 + Integer.parseInt(secondHalfEnd);
 
         diff = end - start;
-
-
-//        Log.d("total ampmstart" , amPmStart);
-//        Log.d("total ampmend" , amPmEnd);
-//        if(!amPmStart.equals(amPmEnd)){
-//            if(start > end){
-//                int temp  = (start - end);
-//                Log.d("start > end", String.valueOf(temp));
-//                diff = 720 - temp;
-//            }else {
-//
-//                int temp = end - start;
-//                diff = 720 + temp;
-//            }
-//        }else {
-//            diff = end - start;
-//        }
-
         int hh = diff / 60;
         int mm = diff % 60;
 
