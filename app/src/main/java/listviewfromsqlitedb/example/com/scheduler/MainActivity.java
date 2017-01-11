@@ -19,11 +19,13 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends Activity {
     DatabaseManager adapter_ob;
@@ -203,6 +205,11 @@ public class MainActivity extends Activity {
         btnToDo.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                try {
+                    copyOldToDo();
+                } catch (ParseException e1) {
+                    e1.printStackTrace();
+                }
                 Intent intent = new Intent(MainActivity.this, ToDo.class);
                 intent.putExtra("DATE", selectedDate);
                 startActivity(intent);
@@ -401,6 +408,39 @@ public class MainActivity extends Activity {
                 }
             }
         });
+    }
+
+    private void copyOldToDo() throws ParseException {
+        DatabaseManagerToDo manager_ob_to_do = new DatabaseManagerToDo(MainActivity.this);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        Date d =  dateFormat.parse(selectedDate);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(d);
+        calendar.add(Calendar.DATE, -1);
+        String yesterdayAsString = dateFormat.format(calendar.getTime());
+        Cursor c1 = manager_ob_to_do.findOldRecords(yesterdayAsString);
+        Log.d("ToDoAct","now here");
+        if (c1 != null && c1.getCount() != 0) {
+            if (c1.moveToFirst()) {
+                do {
+                    ArrayList<String> tasksByDate = manager_ob_to_do.fetchByDateTasksList(selectedDate);
+                    String date = c1.getString(c1
+                            .getColumnIndex("date"));
+                    String task = c1.getString(c1
+                            .getColumnIndex("task"));
+                    String status = c1.getString(c1
+                            .getColumnIndex("status"));
+                    int statusId = c1.getInt(c1
+                            .getColumnIndex("statusId"));
+                    if(status.equals("N") && !tasksByDate.contains(task)){
+                        manager_ob_to_do.insertDetails(selectedDate, task, status, statusId );
+                    }
+                    Log.d("ToDoAct",date);
+                    Log.d("ToDoAct",task);
+                    Log.d("ToDoAct",status);
+                } while (c1.moveToNext());
+            }
+        }
     }
 
     private void copyFromOtherTable() {

@@ -28,6 +28,7 @@ public class ToDo extends Activity{
     ListView toDoList;
     Button btnAddTask;
     EditText ed_Task;
+    static int statusID=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,18 +50,23 @@ public class ToDo extends Activity{
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, final long id) {
                 AlertDialog.Builder adb = new AlertDialog.Builder(ToDo.this);
-                adb.setMessage("Do you want to delete this entry ? ");
+                adb.setTitle("Enter task name: ");
+                final EditText input = new EditText(ToDo.this);
+                adb.setView(input);
                 adb.setIcon(android.R.drawable.ic_dialog_alert);
-                adb.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         adapter_ob_ToDo = new DatabaseManagerToDo(ToDo.this);
                         ArrayList<EntryToDo> allEntries = new ArrayList<EntryToDo>();
                         allEntries = adapter_ob_ToDo.fetchByDateList(date);
                         EntryToDo currentEntry = allEntries.get((int) id);
                         int rowID = currentEntry.getID();
-                        adapter_ob_ToDo.deleteOneRecord(rowID);
+                        String dateForThisEntry = currentEntry.getDate();
+                        int statusId = currentEntry.getStatusID();
+                        String resultTask = input.getEditableText().toString();
+                        adapter_ob_ToDo.updateldetail(rowID, dateForThisEntry, resultTask, "N", statusId);
                     } });
-                adb.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                adb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
                     } });
@@ -76,8 +82,9 @@ public class ToDo extends Activity{
                 String taskName = ed_Task.getText().toString();
                 ed_Task.setText("");
                 if(!taskName.equals("")){
+                    statusID++;
                     adapter_ob_ToDo = new DatabaseManagerToDo(ToDo.this);
-                    adapter_ob_ToDo.insertDetails(date, taskName);
+                    adapter_ob_ToDo.insertDetails(date, taskName, "N", statusID);
                     showlist();
                 }
             }
@@ -101,6 +108,8 @@ public class ToDo extends Activity{
                     EntryToDo allItems = new EntryToDo();
                     allItems.setTask(c1.getString(c1
                             .getColumnIndex("task")));
+                    allItems.setStatus(c1.getString(c1
+                            .getColumnIndex("status")));
                     allEntries.add(allItems);
                 } while (c1.moveToNext());
             }

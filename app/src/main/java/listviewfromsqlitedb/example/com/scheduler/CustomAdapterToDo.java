@@ -5,6 +5,7 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.graphics.Paint;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
@@ -26,11 +27,11 @@ import java.util.List;
  * Created by payalkothari on 12/30/16.
  */
 public class CustomAdapterToDo extends BaseAdapter{
-    DatabaseManager adapter_ob;
     Context context;
     List<EntryToDo> list;
     LayoutInflater layoutInflater = null;
     DatabaseManagerToDo adapterToDo_ob;
+    List<View> viewList;
 
     public CustomAdapterToDo(Context c, List<EntryToDo> listE) {
         this.context = c;
@@ -68,48 +69,59 @@ public class CustomAdapterToDo extends BaseAdapter{
             listViewHolder = (ListViewHolder) v.getTag();
         }
 
+        EntryToDo myTask = list.get(position);
+
+        listViewHolder.tx_task.setText(list.get(position).task);
+//        Log.d("here",list.get(position).status);
+        if (list.get(position).status.equals("Y"))
+        {
+            listViewHolder.tx_task.setPaintFlags(listViewHolder.tx_task.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        }
+        else
+        {
+            listViewHolder.tx_task.setPaintFlags( listViewHolder.tx_task.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+        }
+
         listViewHolder.tx_task.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                TextView task = (TextView) v.findViewById(R.id.tx_task);
+                task.setPaintFlags(task.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                 adapterToDo_ob = new DatabaseManagerToDo(context);
                 ArrayList<EntryToDo> allEntries = new ArrayList<EntryToDo>();
                 allEntries = adapterToDo_ob.fetchByDateList(MainActivity.selectedDate);
                 EntryToDo currentEntry = allEntries.get(position);
                 int rowID = currentEntry.getID();
                 String dateForThisEntry = currentEntry.getDate();
-                final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-                dialogBuilder.setTitle("Tasks");
-                final EditText input = new EditText(context);
-                dialogBuilder.setView(input);
-
-                dialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        adapterToDo_ob = new DatabaseManagerToDo(context);
-                        ArrayList<EntryToDo> allEntries = new ArrayList<EntryToDo>();
-                        allEntries = adapterToDo_ob.fetchByDateList(MainActivity.selectedDate);
-                        EntryToDo currentEntry = allEntries.get(position);
-                        int rowID = currentEntry.getID();
-                        String dateForThisEntry = currentEntry.getDate();
-                        String resultTask = input.getEditableText().toString();
-                        adapterToDo_ob.updateldetail(rowID, dateForThisEntry, resultTask);
-                    }
-                });
-                dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
-                AlertDialog alertDialogObject = dialogBuilder.create();
-                //Show the dialog
-                alertDialogObject.show();
+                String taskN = currentEntry.getTask();
+                int statusId = currentEntry.getStatusID();
+                updateAll(statusId);
+                adapterToDo_ob.updateldetail(rowID, dateForThisEntry, taskN, "Y", statusId);
             }
         });
 
-        listViewHolder.tx_task.setText(list.get(position).task);
-
         return v;
+    }
+
+    private void updateAll(int statusId) {
+        adapterToDo_ob = new DatabaseManagerToDo(context);
+        ArrayList<EntryToDo> allEntries = new ArrayList<EntryToDo>();
+        Cursor c1 = adapterToDo_ob.fetchByStatusId(statusId);
+        if (c1 != null && c1.getCount() != 0) {
+            if (c1.moveToFirst()) {
+                do {
+                    int rowId = c1.getInt(c1
+                            .getColumnIndex("_id"));
+                    String date = c1.getString(c1
+                            .getColumnIndex("date"));
+                    String task = c1.getString(c1
+                            .getColumnIndex("task"));
+                    int statId = c1.getInt(c1
+                            .getColumnIndex("statusId"));
+                    adapterToDo_ob.updateldetail(rowId, date, task, "Y", statId );
+                } while (c1.moveToNext());
+            }
+        }
     }
 
 

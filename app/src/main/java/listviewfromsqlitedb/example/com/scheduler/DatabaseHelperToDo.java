@@ -16,8 +16,11 @@ public class DatabaseHelperToDo extends SQLiteOpenHelper {
     public static final String KEY_ID = "_id";
     public static final String DATE = "date";
     public static final String TASK = "task";
+    public static final String STATUS = "status";
+    public static final String STATUSID = "statusId";
     public static final String CREATE_TO_DO_TABLE = "create table " + TABLE_NAME + "("
-            + KEY_ID + " integer primary key autoincrement," +  DATE + " text not null," + TASK + " text not null" + ");";
+            + KEY_ID + " integer primary key autoincrement," +  DATE + " text not null," + TASK + " text not null,"
+            + STATUS + " text not null," + STATUSID + " integer" + ");";
 
     public DatabaseHelperToDo(Context context, String name, CursorFactory factory, int version) {
         super(context, name, factory, version);
