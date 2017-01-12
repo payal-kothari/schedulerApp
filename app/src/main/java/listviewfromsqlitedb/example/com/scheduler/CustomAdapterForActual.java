@@ -221,6 +221,7 @@ public class CustomAdapterForActual extends BaseAdapter{
                 AlertDialog alertDialogObject = dialogBuilder.create();
                 //Show the dialog
                 alertDialogObject.show();
+                alertDialogObject.getButton(DialogInterface.BUTTON_NEUTRAL).setTextSize(40);
             }
         });
 

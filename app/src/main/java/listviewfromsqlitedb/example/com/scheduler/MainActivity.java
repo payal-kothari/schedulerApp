@@ -88,14 +88,8 @@ public class MainActivity extends Activity {
         Calendar c = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
         selectedDate = df.format(c.getTime());
-        //toDoList.setBackgroundResource(R.drawable.todo);
-
-        //Intent intent = getIntent();
-        //selectedDate = intent.getStringExtra("DATE");
-        //selectedDay = intent.getIntExtra("DAY",0);
         formatDate(selectedDate, 3);
         txDate.setText(formatedDate);
-
 
         showlist();
         showListForActual();
@@ -109,7 +103,6 @@ public class MainActivity extends Activity {
                 adb.setTitle("Enter task name: ");
                 final EditText input = new EditText(MainActivity.this);
                 adb.setView(input);
-                adb.setIcon(android.R.drawable.ic_dialog_alert);
                 adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         adapter_ob_ToDo = new DatabaseManagerToDo(MainActivity.this);
@@ -141,6 +134,8 @@ public class MainActivity extends Activity {
                     statusID++;
                     adapter_ob_ToDo = new DatabaseManagerToDo(MainActivity.this);
                     adapter_ob_ToDo.insertDetails(selectedDate, taskName, "N", statusID);
+                    showlistToDo();
+                }else {
                     showlistToDo();
                 }
             }
@@ -383,6 +378,7 @@ public class MainActivity extends Activity {
                     AlertDialog alertDialogObject = dialogBuilder.create();
                     //Show the dialog
                     alertDialogObject.show();
+                    alertDialogObject.getButton(DialogInterface.BUTTON_NEUTRAL).setTextSize(40);
                 } else {
                     DatabaseManagerForActual manager = new DatabaseManagerForActual(MainActivity.this);
                     Cursor c = manager.fetchByDate(ongoingDate);

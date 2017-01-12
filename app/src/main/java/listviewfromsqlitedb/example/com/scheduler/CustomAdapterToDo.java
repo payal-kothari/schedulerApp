@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Paint;
 import android.os.SystemClock;
@@ -73,8 +74,6 @@ public class CustomAdapterToDo extends BaseAdapter{
 
         EntryToDo myTask = list.get(position);
 
-
-
         listViewHolder.tx_task.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -87,13 +86,7 @@ public class CustomAdapterToDo extends BaseAdapter{
                 String dateForThisEntry = currentEntry.getDate();
                 String taskN = currentEntry.getTask();
                 int statusId = currentEntry.getStatusID();
-                if(currentEntry.getStatus().equals("Y")){
-                    Log.d("statusCheck", currentEntry.getStatus());
-                    task.setPaintFlags(task.getPaintFlags() | (~Paint.STRIKE_THRU_TEXT_FLAG));
-                    updateAll(statusId, "N");
-                    listViewHolder.tx_task.setText(list.get(position).task);
-                    adapterToDo_ob.updateldetail(rowID, dateForThisEntry, taskN, "N", statusId);
-                }else if(currentEntry.getStatus().equals("N")){
+                if(currentEntry.getStatus().equals("N")){
                     Log.d("statusCheck", currentEntry.getStatus());
                     task.setPaintFlags(task.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                     updateAll(statusId, "Y");
