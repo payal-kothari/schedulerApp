@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -40,6 +41,7 @@ public class MainActivity extends Activity {
     StringBuilder stringbuilder, stringbuilderEnd;
     static String s, e;
     int year, month, day;
+    public static boolean TodoTouchFlag = false;
     static String selectedDate; TextView txDate;
     DatabaseManagerToDo adapter_ob_ToDo;
     static String date;
@@ -94,6 +96,7 @@ public class MainActivity extends Activity {
         formatDate(selectedDate, 3);
         txDate.setText(formatedDate);
 
+
         showlist();
         showListForActual();
         showlistToDo();
@@ -128,6 +131,7 @@ public class MainActivity extends Activity {
             }
         });
 
+
         btnAddTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -141,7 +145,6 @@ public class MainActivity extends Activity {
                 }
             }
         });
-
 
         btnCopyFromPrevious.setOnClickListener(new OnClickListener() {
             @Override
@@ -602,7 +605,7 @@ public class MainActivity extends Activity {
         actualScheduleList.setAdapter(customAdapterForActual);
     }
 
-    private void showlistToDo() {
+    public void showlistToDo() {
         adapter_ob_ToDo = new DatabaseManagerToDo(this);
         ArrayList<EntryToDo> allEntries = new ArrayList<EntryToDo>();
         allEntries.clear();
@@ -664,14 +667,28 @@ public class MainActivity extends Activity {
                     // arg2 = month
                     // arg3 = day
 
+
                     showDate(arg1, arg2 + 1, arg3);
+                    String todayDate = getTodayDate();
                     try {
-                        copyOldToDo();
+                        if(todayDate.equals(selectedDate)){
+                            copyOldToDo();
+                        }
                     } catch (ParseException e1) {
                         e1.printStackTrace();
                     }
                 }
             };
+
+    public String getTodayDate(){
+        Calendar c = Calendar.getInstance();
+        System.out.println("Current time => " + c.getTime());
+
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        String todayDate = df.format(c.getTime());
+
+        return todayDate;
+    }
 
     private String makeIntsTwoDigit(int year, int month, int day) {
         String dayStr;
@@ -696,10 +713,19 @@ public class MainActivity extends Activity {
 
     private void showDate(int year, int month, int day) {
         String monthStr = null;
+        String dayStr = null;
         if(month <10){
             monthStr = "0" + String.valueOf(month);
+        }else {
+            monthStr = String.valueOf(month);
         }
-        StringBuilder strbuilder = new StringBuilder().append(day).append("/")
+
+        if(day <10){
+            dayStr = "0" + String.valueOf(day);
+        }else {
+            dayStr = String.valueOf(day);
+        }
+        StringBuilder strbuilder = new StringBuilder().append(dayStr).append("/")
                 .append(monthStr).append("/").append(year);
 
         selectedDate = strbuilder.toString();
