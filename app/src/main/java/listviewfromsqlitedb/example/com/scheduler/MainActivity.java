@@ -40,8 +40,13 @@ public class MainActivity extends Activity {
     StringBuilder stringbuilder, stringbuilderEnd;
     static String s, e;
     int year, month, day;
-    static String selectedDate;
-    TextView txDate;
+    static String selectedDate; TextView txDate;
+    DatabaseManagerToDo adapter_ob_ToDo;
+    static String date;
+    ListView toDoList;
+    Button btnAddTask;
+    EditText ed_Task;
+    static int statusID=0;
     static int ongoingTaskID;
     static String ongoingStartTime;
     static String ongoingTask;
@@ -56,8 +61,9 @@ public class MainActivity extends Activity {
     static String formatedDate;
     public static final String[] MONTHS = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
     static final String[] DAYS = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"};
-    private boolean copyFromPrevious;
+    static boolean copyFromPrevious;
     static String selectedOldDateStr;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -73,11 +79,14 @@ public class MainActivity extends Activity {
         btnCalendar = (Button) findViewById(R.id.btn_calendar);
         btnCopyFromPrevious = (Button) findViewById(R.id.btn_copyFromPreviousSchedule);
         txDate = (TextView) findViewById(R.id.tx_date);
-        btnToDo =  (Button) findViewById(R.id.btn_toDo);
+        toDoList = (ListView) findViewById(R.id.toDo_list);
+        btnAddTask = (Button) findViewById(R.id.btn_toDoAdd);
+        ed_Task = (EditText) findViewById(R.id.ed_task);
 
         Calendar c = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
         selectedDate = df.format(c.getTime());
+        //toDoList.setBackgroundResource(R.drawable.todo);
 
         //Intent intent = getIntent();
         //selectedDate = intent.getStringExtra("DATE");
@@ -87,12 +96,57 @@ public class MainActivity extends Activity {
 
         showlist();
         showListForActual();
+        showlistToDo();
+
+        toDoList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
+
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, final long id) {
+                AlertDialog.Builder adb = new AlertDialog.Builder(MainActivity.this);
+                adb.setTitle("Enter task name: ");
+                final EditText input = new EditText(MainActivity.this);
+                adb.setView(input);
+                adb.setIcon(android.R.drawable.ic_dialog_alert);
+                adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        adapter_ob_ToDo = new DatabaseManagerToDo(MainActivity.this);
+                        ArrayList<EntryToDo> allEntries = new ArrayList<EntryToDo>();
+                        allEntries = adapter_ob_ToDo.fetchByDateList(selectedDate);
+                        EntryToDo currentEntry = allEntries.get((int) id);
+                        int rowID = currentEntry.getID();
+                        String dateForThisEntry = currentEntry.getDate();
+                        int statusId = currentEntry.getStatusID();
+                        String resultTask = input.getEditableText().toString();
+                        adapter_ob_ToDo.updateldetail(rowID, dateForThisEntry, resultTask, "N", statusId);
+                    } });
+                adb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    } });
+                adb.show();
+                return true;
+            }
+        });
+
+        btnAddTask.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String taskName = ed_Task.getText().toString();
+                ed_Task.setText("");
+                if(!taskName.equals("")){
+                    statusID++;
+                    adapter_ob_ToDo = new DatabaseManagerToDo(MainActivity.this);
+                    adapter_ob_ToDo.insertDetails(selectedDate, taskName, "N", statusID);
+                    showlistToDo();
+                }
+            }
+        });
+
 
         btnCopyFromPrevious.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                copyFromPrevious = true;
-                showDialog(999);
+                showDialog(988);
             }
         });
 
@@ -199,20 +253,6 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 showDialog(999);
-            }
-        });
-
-        btnToDo.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    copyOldToDo();
-                } catch (ParseException e1) {
-                    e1.printStackTrace();
-                }
-                Intent intent = new Intent(MainActivity.this, ToDo.class);
-                intent.putExtra("DATE", selectedDate);
-                startActivity(intent);
             }
         });
 
@@ -562,15 +602,57 @@ public class MainActivity extends Activity {
         actualScheduleList.setAdapter(customAdapterForActual);
     }
 
+    private void showlistToDo() {
+        adapter_ob_ToDo = new DatabaseManagerToDo(this);
+        ArrayList<EntryToDo> allEntries = new ArrayList<EntryToDo>();
+        allEntries.clear();
+        Cursor c1 = adapter_ob_ToDo.fetchByDate(selectedDate);
+        Log.d("date in shwlist", selectedDate);
+        if (c1 != null && c1.getCount() != 0) {
+            if (c1.moveToFirst()) {
+                do {
+                    EntryToDo allItems = new EntryToDo();
+                    allItems.setTask(c1.getString(c1
+                            .getColumnIndex("task")));
+                    allItems.setStatus(c1.getString(c1
+                            .getColumnIndex("status")));
+                    allEntries.add(allItems);
+                } while (c1.moveToNext());
+            }
+        }
+        c1.close();
+        CustomAdapterToDo customAdapterToDo = new CustomAdapterToDo(MainActivity.this, allEntries);
+        toDoList.setAdapter(customAdapterToDo);
+    }
+
     @Override
     protected Dialog onCreateDialog(int id) {
         // TODO Auto-generated method stub
         if (id == 999) {
             return new DatePickerDialog(this,
                     myDateListener, year, month, day);
+        }else if( id == 988){
+            return new DatePickerDialog(this,
+                    myDateListenerForOldSchedule, year, month, day);
         }
         return null;
     }
+
+    DatePickerDialog.OnDateSetListener myDateListenerForOldSchedule = new
+            DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker arg0,
+                                      int arg1, int arg2, int arg3) {
+                    // TODO Auto-generated method stub
+                    // arg1 = year
+                    // arg2 = month
+                    // arg3 = day
+                    copyFromPrevious = true;
+                    selectedOldDateStr = makeIntsTwoDigit(arg1, arg2+1, arg3);
+                    Log.d("oldDate**", selectedOldDateStr);
+                    setToOldSchedule(selectedOldDateStr);
+                }
+            };
 
     DatePickerDialog.OnDateSetListener myDateListener = new
             DatePickerDialog.OnDateSetListener() {
@@ -581,19 +663,36 @@ public class MainActivity extends Activity {
                     // arg1 = year
                     // arg2 = month
                     // arg3 = day
-                    if(!copyFromPrevious){
-                        Log.d("check***", String.valueOf(copyFromPrevious));
-                        showDate(arg1, arg2+1, arg3);
-                    }else {
-                        copyFromPrevious = false;
-                        StringBuilder selectedOldDate = new StringBuilder();
-                        int month = arg2+1;
-                        selectedOldDate.append(arg3).append("/").append(month).append("/").append(arg1);
-                        selectedOldDateStr = selectedOldDate.toString();
-                        setToOldSchedule(selectedOldDateStr);
+
+                    showDate(arg1, arg2 + 1, arg3);
+                    try {
+                        copyOldToDo();
+                    } catch (ParseException e1) {
+                        e1.printStackTrace();
                     }
                 }
             };
+
+    private String makeIntsTwoDigit(int year, int month, int day) {
+        String dayStr;
+        String monthStr;
+        String yearStr;
+        if(day < 10){
+            dayStr = "0" + String.valueOf(day);
+        }else {
+            dayStr = String.valueOf(day);
+        }
+        if (month < 10){
+            monthStr = "0" + String.valueOf(month);
+        }else {
+            monthStr = String.valueOf(month);
+        }
+        yearStr = String.valueOf(year);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(dayStr).append("/").append(monthStr).append("/").append(yearStr);
+        return sb.toString();
+    }
 
     private void showDate(int year, int month, int day) {
         String monthStr = null;
@@ -619,6 +718,7 @@ public class MainActivity extends Activity {
         Log.d("window focised2", "focus changed");
         showListForActual();
         showlist();
+        showlistToDo();
         Log.d("window focised3", "focus changed");
     }
 

@@ -15,7 +15,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".AddTaskActivity"/>
-        <activity android:name=".ToDo"/>
         <activity android:name=".EditActivity"/>
 
     </application>

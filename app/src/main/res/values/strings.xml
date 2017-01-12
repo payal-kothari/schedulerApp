@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">scheduler</string>
+    <string name="app_name">Scheduler</string>
+    <string name="ToDo_watermark">To Do</string>
 </resources>

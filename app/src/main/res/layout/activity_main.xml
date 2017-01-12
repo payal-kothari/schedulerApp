@@ -16,14 +16,12 @@
         android:text="Date" />
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:id="@+id/title_linearLayout"
         android:layout_below="@+id/tx_date"
-        android:layout_alignEnd="@+id/btn_calendar"
-        android:background="@android:color/holo_orange_light"
-        android:weightSum="1">
+        android:background="@android:color/holo_orange_light">
 
         <TextView
             android:id="@+id/tv_startTime"
@@ -36,29 +34,29 @@
 
         <TextView
             android:id="@+id/tv_endTime"
-            android:layout_width="45dp"
+            android:layout_width="42dp"
             android:layout_height="wrap_content"
             android:textStyle="bold"
             android:textColor="@android:color/black"
-            android:gravity="right"
+            android:gravity="left"
             android:text="End"/>
 
         <TextView
             android:id="@+id/tv_task"
-            android:layout_width="52dp"
+            android:layout_width="49dp"
             android:layout_height="wrap_content"
             android:textStyle="bold"
             android:textColor="@android:color/black"
-            android:gravity="right"
+            android:gravity="left"
             android:text="Task" />
 
         <TextView
             android:id="@+id/tv_total"
-            android:layout_width="50dp"
+            android:layout_width="35dp"
             android:textStyle="bold"
             android:textColor="@android:color/black"
             android:layout_height="wrap_content"
-            android:gravity="center"
+            android:gravity="left"
             android:text="Total"/>
     </LinearLayout>
 
@@ -70,7 +68,6 @@
         android:layout_below="@+id/tx_date"
         android:background="@android:color/holo_green_light"
         android:layout_toRightOf="@+id/title_linearLayout"
-        android:layout_marginLeft="5dp"
         android:weightSum="1">
 
         <TextView
@@ -88,16 +85,16 @@
             android:layout_height="wrap_content"
             android:textStyle="bold"
             android:textColor="@android:color/black"
-            android:gravity="right"
+            android:gravity="left"
             android:text="End"/>
 
         <TextView
             android:id="@+id/tv_task2"
-            android:layout_width="52dp"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:textStyle="bold"
             android:textColor="@android:color/black"
-            android:gravity="right"
+            android:gravity="left"
             android:text="Task" />
 
         <TextView
@@ -106,37 +103,43 @@
             android:layout_height="wrap_content"
             android:textStyle="bold"
             android:textColor="@android:color/black"
-            android:gravity="center"
+            android:gravity="left"
             android:text="Total"/>
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/list_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <LinearLayout
+        android:id="@+id/listView_linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_below="@+id/title_linearLayout"
-        android:longClickable="true"
-        android:dividerHeight="7dp"
-        android:background="@android:color/holo_orange_light"
-        android:divider="@android:color/transparent"
-        android:layout_alignEnd="@+id/btn_calendar"
-        android:layout_above="@+id/btn_newTask">
-    </ListView>
+        android:layout_above="@+id/toDo_list">
 
-    <ListView
-        android:id="@+id/list_viewActual"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/title_linearLayout2"
-        android:layout_toRightOf="@+id/list_view"
-        android:longClickable="true"
-        android:background="@android:color/holo_green_light"
-        android:dividerHeight="7dp"
-        android:layout_marginLeft="5dp"
-        android:divider="@android:color/transparent"
-        android:layout_alignParentEnd="true"
-        android:layout_above="@+id/btn_In">
-    </ListView>
+        <ListView
+            android:id="@+id/list_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:longClickable="true"
+            android:dividerHeight="7dp"
+            android:background="@android:color/holo_orange_light"
+            android:divider="@android:color/transparent"
+           >
+        </ListView>
+
+        <ListView
+            android:id="@+id/list_viewActual"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/list_view"
+            android:layout_weight="0.5"
+            android:longClickable="true"
+            android:background="@android:color/holo_green_light"
+            android:dividerHeight="7dp"
+            android:divider="@android:color/transparent"
+            android:layout_alignParentEnd="true">
+        </ListView>
+
+    </LinearLayout>
 
     <Button
         android:id="@+id/btn_newTask"
@@ -175,14 +178,39 @@
         android:layout_toRightOf="@id/btn_In"
         android:text="Copy old" />
 
-    <Button
-        android:id="@+id/btn_toDo"
+
+    <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:id="@+id/ed_task"
+        android:hint="Add new task"
+        android:layout_toLeftOf="@+id/btn_toDoAdd"
+        android:layout_below="@+id/toDo_list"
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/btn_calendar"
+        />
+
+    <Button
+        android:id="@+id/btn_toDoAdd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_margin="1dp"
-        android:layout_toRightOf="@id/btn_copyFromPreviousSchedule"
-        android:text="To Do" />
+        android:layout_above="@+id/btn_calendar"
+        android:layout_alignParentEnd="true"
+        android:text="+" />
+
+
+    <ListView
+        android:id="@+id/toDo_list"
+        android:layout_width="wrap_content"
+        android:layout_height="150dp"
+        android:longClickable="true"
+        android:dividerHeight="7dp"
+        android:background="@drawable/todolistt"
+        android:divider="@android:color/transparent"
+        android:layout_above="@+id/btn_toDoAdd"
+        android:layout_alignParentStart="true">
+    </ListView>
 
 
 </RelativeLayout>
