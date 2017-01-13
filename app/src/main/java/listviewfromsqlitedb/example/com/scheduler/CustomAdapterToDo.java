@@ -72,28 +72,28 @@ public class CustomAdapterToDo extends BaseAdapter{
             listViewHolder = (ListViewHolder) v.getTag();
         }
 
-        EntryToDo myTask = list.get(position);
+//        EntryToDo myTask = list.get(position);
 
-        listViewHolder.tx_task.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TextView task = (TextView) v.findViewById(R.id.tx_task);
-                adapterToDo_ob = new DatabaseManagerToDo(context);
-                ArrayList<EntryToDo> allEntries = new ArrayList<EntryToDo>();
-                allEntries = adapterToDo_ob.fetchByDateList(MainActivity.selectedDate);
-                EntryToDo currentEntry = allEntries.get(position);
-                int rowID = currentEntry.getID();
-                String dateForThisEntry = currentEntry.getDate();
-                String taskN = currentEntry.getTask();
-                int statusId = currentEntry.getStatusID();
-                if(currentEntry.getStatus().equals("N")){
-                    Log.d("statusCheck", currentEntry.getStatus());
-                    task.setPaintFlags(task.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                    updateAll(statusId, "Y");
-                    adapterToDo_ob.updateldetail(rowID, dateForThisEntry, taskN, "Y", statusId);
-                }
-            }
-        });
+//        listViewHolder.tx_task.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                TextView task = (TextView) v.findViewById(R.id.tx_task);
+//                adapterToDo_ob = new DatabaseManagerToDo(context);
+//                ArrayList<EntryToDo> allEntries = new ArrayList<EntryToDo>();
+//                allEntries = adapterToDo_ob.fetchByDateList(MainActivity.selectedDate);
+//                EntryToDo currentEntry = allEntries.get(position);
+//                int rowID = currentEntry.getID();
+//                String dateForThisEntry = currentEntry.getDate();
+//                String taskN = currentEntry.getTask();
+//                int statusId = currentEntry.getStatusID();
+//                if(currentEntry.getStatus().equals("N")){
+//                    Log.d("statusCheck", currentEntry.getStatus());
+//                    //task.setPaintFlags(task.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+//                    updateAllStatus(statusId, "Y");
+//                    adapterToDo_ob.updateldetail(rowID, dateForThisEntry, taskN, "Y", statusId);
+//                }
+//            }
+//        });
 
         listViewHolder.tx_task.setText(list.get(position).task);
 //        Log.d("here",list.get(position).status);
@@ -108,10 +108,11 @@ public class CustomAdapterToDo extends BaseAdapter{
         return v;
     }
 
-    private void updateAll(int statusId, String status) {
-        adapterToDo_ob = new DatabaseManagerToDo(context);
+
+    private void updateAllStatus(int statusId, String status) {
+        DatabaseManagerToDo manager_ob_to_do = new DatabaseManagerToDo(context);
         ArrayList<EntryToDo> allEntries = new ArrayList<EntryToDo>();
-        Cursor c1 = adapterToDo_ob.fetchByStatusId(statusId);
+        Cursor c1 = manager_ob_to_do.fetchByStatusId(statusId);
         if (c1 != null && c1.getCount() != 0) {
             if (c1.moveToFirst()) {
                 do {
@@ -123,12 +124,11 @@ public class CustomAdapterToDo extends BaseAdapter{
                             .getColumnIndex("task"));
                     int statId = c1.getInt(c1
                             .getColumnIndex("statusId"));
-                    adapterToDo_ob.updateldetail(rowId, date, task, status, statId );
+                    manager_ob_to_do.updateldetail(rowId, date, task, status, statId );
                 } while (c1.moveToNext());
             }
         }
     }
-
 
     class ListViewHolder{
         public TextView tx_task;

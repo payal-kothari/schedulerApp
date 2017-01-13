@@ -7,6 +7,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
@@ -124,6 +125,30 @@ public class MainActivity extends Activity {
             }
         });
 
+
+        toDoList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                adapter_ob_ToDo = new DatabaseManagerToDo(MainActivity.this);
+                ArrayList<EntryToDo> allEntries = new ArrayList<EntryToDo>();
+                allEntries = adapter_ob_ToDo.fetchByDateList(selectedDate);
+                EntryToDo currentEntry = allEntries.get((int) id);
+                int rowID = currentEntry.getID();
+                String dateForThisEntry = currentEntry.getDate();
+                String taskN = currentEntry.getTask();
+                int statusId = currentEntry.getStatusID();
+                if(currentEntry.getStatus().equals("N")){
+                    Log.d("statusCheck", currentEntry.getStatus());
+                    updateAllStatus(statusId, "Y");
+                    adapter_ob_ToDo.updateldetail(rowID, dateForThisEntry, taskN, "Y", statusId);
+                    showlistToDo();
+                }else if (currentEntry.getStatus().equals("Y")){
+                    updateAllStatus(statusId, "Y");
+                    adapter_ob_ToDo.updateldetail(rowID, dateForThisEntry, taskN, "N", statusId);
+                    showlistToDo();
+                }
+            }
+        });
 
         btnAddTask.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -669,6 +694,27 @@ public class MainActivity extends Activity {
         c1.close();
         CustomAdapterToDo customAdapterToDo = new CustomAdapterToDo(MainActivity.this, allEntries);
         toDoList.setAdapter(customAdapterToDo);
+    }
+
+    public void updateAllStatus(int statusId, String status) {
+        DatabaseManagerToDo manager_ob_to_do = new DatabaseManagerToDo(MainActivity.this);
+        ArrayList<EntryToDo> allEntries = new ArrayList<EntryToDo>();
+        Cursor c1 = manager_ob_to_do.fetchByStatusId(statusId);
+        if (c1 != null && c1.getCount() != 0) {
+            if (c1.moveToFirst()) {
+                do {
+                    int rowId = c1.getInt(c1
+                            .getColumnIndex("_id"));
+                    String date = c1.getString(c1
+                            .getColumnIndex("date"));
+                    String task = c1.getString(c1
+                            .getColumnIndex("task"));
+                    int statId = c1.getInt(c1
+                            .getColumnIndex("statusId"));
+                    manager_ob_to_do.updateldetail(rowId, date, task, status, statId );
+                } while (c1.moveToNext());
+            }
+        }
     }
 
     // need to open date picker with current date
