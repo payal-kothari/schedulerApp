@@ -396,7 +396,12 @@ public class MainActivity extends Activity {
                     int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
                     int minute = mcurrentTime.get(Calendar.MINUTE);
                     setTime(hour, minute, "start");
-                    String total = calculateTotal(ongoingStartTime, s);
+
+                    String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(ongoingStartTime);
+                    String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(s);
+                    String total = TimeCalculations.newCalculateTotal(formatedStartTime, formatedEndTime);
+
+                    //String total = calculateTotal(ongoingStartTime, s);
                     manager.updateldetail(ongoingID, ongoingDate, ongoingStartTime, s, ongoingTask, total);
                     btnIn.setText("IN");
                     showListForActual();
@@ -422,7 +427,12 @@ public class MainActivity extends Activity {
                     setTimeForEnd(tempHour, tempMinute, AmPmFormat);
                     //String end = String.valueOf(tempHour) + start.substring(2,start.length());
                     String task = c.getString(c.getColumnIndex(helper.TASK_NAME));
-                    String total = calculateTotal(start, e);
+
+                    String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(start);
+                    String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(e);
+                    String total = TimeCalculations.newCalculateTotal(formatedStartTime, formatedEndTime);
+
+                    // String total = calculateTotal(start, e);
                     Log.d("mainActivity", total);
                     adapter.insertDetails(selectedDate, start, e, task, total);
                     showlist();
@@ -440,7 +450,15 @@ public class MainActivity extends Activity {
                     }
                     setTimeForEnd(hour, minute, AmPmFormat);
                     String task = "None";
-                    String total = calculateTotal(s, e);
+
+                    String formattedDateStart = new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime());
+                    Calendar cal = Calendar.getInstance();
+                    cal.add(Calendar.HOUR, 1);
+                    Date d = cal.getTime();
+                    String formattedDateEnd = new SimpleDateFormat("HH:mm:ss").format(d);
+                    String total = TimeCalculations.newCalculateTotal(formattedDateStart, formattedDateEnd);
+
+                    //String total = calculateTotal(s, e);
                     Log.d("mainActivity 1", total);
                     long val = adapter.insertDetails(selectedDate, s, e, task, total);
                     showlist();
@@ -524,6 +542,8 @@ public class MainActivity extends Activity {
         Log.d("formated date", formatedDate);
     }
 
+
+// OLD Calculate Total method
     public String calculateTotal(String s, String e) {
         int diff = 0;
         String firstHalfStart = s.substring(0,2);

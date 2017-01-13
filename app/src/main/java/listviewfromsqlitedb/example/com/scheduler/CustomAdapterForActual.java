@@ -92,6 +92,8 @@ public class CustomAdapterForActual extends BaseAdapter{
                         String endT = currentEntry.getEndTime();
                         String taskN = currentEntry.getTask();
                         String resultS = editActivity.showStartTime(selectedHour, selectedMinute);
+
+
                         String total = mainActivity.calculateTotal(resultS, endT);
                         adapter_ob.updateldetail(rowID, dateForThisEntry, resultS, endT, taskN, total);
                     }

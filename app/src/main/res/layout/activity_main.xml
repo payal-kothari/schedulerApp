@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:background="@drawable/wood">
 
 
     <TextView
@@ -21,7 +22,7 @@
         android:orientation="horizontal"
         android:id="@+id/title_linearLayout"
         android:layout_below="@+id/tx_date"
-        android:background="@android:color/holo_orange_light">
+       >
 
         <TextView
             android:id="@+id/tv_startTime"
@@ -66,7 +67,7 @@
         android:orientation="horizontal"
         android:id="@+id/title_linearLayout2"
         android:layout_below="@+id/tx_date"
-        android:background="@android:color/holo_green_light"
+
         android:layout_toRightOf="@+id/title_linearLayout"
         android:weightSum="1">
 
@@ -121,7 +122,7 @@
             android:layout_weight="0.5"
             android:longClickable="true"
             android:dividerHeight="7dp"
-            android:background="@android:color/holo_orange_light"
+
             android:divider="@android:color/transparent"
            >
         </ListView>
@@ -133,7 +134,7 @@
             android:layout_toRightOf="@+id/list_view"
             android:layout_weight="0.5"
             android:longClickable="true"
-            android:background="@android:color/holo_green_light"
+
             android:dividerHeight="7dp"
             android:divider="@android:color/transparent"
             android:layout_alignParentEnd="true">
@@ -206,7 +207,7 @@
         android:layout_height="150dp"
         android:longClickable="true"
         android:dividerHeight="7dp"
-        android:background="@drawable/todolistt"
+
         android:divider="@android:color/transparent"
         android:layout_above="@+id/btn_toDoAdd"
         android:layout_alignParentStart="true">
