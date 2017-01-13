@@ -2,6 +2,7 @@ package listviewfromsqlitedb.example.com.scheduler;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -34,13 +35,11 @@ public class TimeCalculations {
             System.out.print(diffMinutes + " minutes, ");
             System.out.print(diffSeconds + " seconds.");
 
-
             strb.append(String.valueOf(diffHours)).append(":").append(String.valueOf(diffMinutes));
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return strb.toString();
     }
 
@@ -55,9 +54,28 @@ public class TimeCalculations {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
         return format.format(tempDate1);
     }
 
+    public static String forwardTimeByGivenHour(String timeToForward, int byHours){
+
+        SimpleDateFormat parseFormat1 = new SimpleDateFormat("hh:mm a");
+        Date tempDate1 = new Date();
+        String timeWithSpace = timeToForward.substring(0, 5) + " " + timeToForward.substring(5, timeToForward.length());
+        try {
+            tempDate1 = parseFormat1.parse(timeWithSpace);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(tempDate1);
+        calendar.add(Calendar.HOUR, byHours);
+        String forwardedTimeWithSpace = parseFormat1.format(calendar.getTime());
+
+        String forwardedTimeWithoutSpace = forwardedTimeWithSpace.replace(" ", "");
+
+        return forwardedTimeWithoutSpace;
+    }
 
 }

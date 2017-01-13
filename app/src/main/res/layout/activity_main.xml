@@ -177,7 +177,7 @@
         android:layout_alignParentBottom="true"
         android:layout_margin="1dp"
         android:layout_toRightOf="@id/btn_In"
-        android:text="Copy old" />
+        android:text="Copy other" />
 
 
     <EditText
@@ -207,7 +207,6 @@
         android:layout_height="150dp"
         android:longClickable="true"
         android:dividerHeight="7dp"
-
         android:divider="@android:color/transparent"
         android:layout_above="@+id/btn_toDoAdd"
         android:layout_alignParentStart="true">

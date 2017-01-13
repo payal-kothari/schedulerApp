@@ -93,8 +93,11 @@ public class CustomAdapterForActual extends BaseAdapter{
                         String taskN = currentEntry.getTask();
                         String resultS = editActivity.showStartTime(selectedHour, selectedMinute);
 
+                        String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(resultS);
+                        String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(endT);
+                        String total = TimeCalculations.newCalculateTotal(formatedStartTime, formatedEndTime);
 
-                        String total = mainActivity.calculateTotal(resultS, endT);
+                        //String total = mainActivity.calculateTotal(resultS, endT);
                         adapter_ob.updateldetail(rowID, dateForThisEntry, resultS, endT, taskN, total);
                     }
                 }, hour, minute, false);
@@ -122,7 +125,12 @@ public class CustomAdapterForActual extends BaseAdapter{
                         String startT = currentEntry.getStartTime();
                         String taskN = currentEntry.getTask();
                         String resultE = editActivity.showEndTime(selectedHour, selectedMinute);
-                        String total = mainActivity.calculateTotal(startT, resultE);
+
+                        String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(startT);
+                        String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(resultE);
+                        String total = TimeCalculations.newCalculateTotal(formatedStartTime, formatedEndTime);
+
+                        //String total = mainActivity.calculateTotal(startT, resultE);
                         adapter_ob.updateldetail(rowID, dateForThisEntry, startT, resultE, taskN, total);
                     }
                 }, hour, minute, false);
@@ -165,7 +173,12 @@ public class CustomAdapterForActual extends BaseAdapter{
                         String startT = currentEntry.getStartTime();
                         String endT = currentEntry.getEndTime();
                         Toast.makeText(context,selectedText,Toast.LENGTH_LONG).show();
-                        String total = mainActivity.calculateTotal(startT, endT);
+
+                        String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(startT);
+                        String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(endT);
+                        String total = TimeCalculations.newCalculateTotal(formatedStartTime, formatedEndTime);
+
+                        //String total = mainActivity.calculateTotal(startT, endT);
                         adapter_ob.updateldetail(rowID, dateForThisEntry, startT, endT, selectedText, total);
                     }
                 });
@@ -204,7 +217,12 @@ public class CustomAdapterForActual extends BaseAdapter{
                                 String dateForThisEntry = currentEntry.getDate();
                                 String startT = currentEntry.getStartTime();
                                 String endT = currentEntry.getEndTime();
-                                String total = mainActivity.calculateTotal(startT, endT);
+
+                                String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(startT);
+                                String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(endT);
+                                String total = TimeCalculations.newCalculateTotal(formatedStartTime, formatedEndTime);
+
+                                //String total = mainActivity.calculateTotal(startT, endT);
                                 adapter_ob.updateldetail(rowID, dateForThisEntry, startT, endT, resultTask, total);
                             } // End of onClick(DialogInterface dialog, int whichButton)
                         }); //End of alert.setPositiveButton

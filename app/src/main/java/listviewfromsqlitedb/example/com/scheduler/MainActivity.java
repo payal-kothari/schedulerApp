@@ -88,7 +88,7 @@ public class MainActivity extends Activity {
         Calendar c = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
         selectedDate = df.format(c.getTime());
-        formatDate(selectedDate, 3);
+        formatedDate = setFormatedDate();
         txDate.setText(formatedDate);
 
         showlist();
@@ -243,10 +243,6 @@ public class MainActivity extends Activity {
             }
         });
 
-        calendar = Calendar.getInstance();
-        year = calendar.get(Calendar.YEAR);
-        month = calendar.get(Calendar.MONTH);
-        day = calendar.get(Calendar.DAY_OF_MONTH);
         btnCalendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -280,23 +276,27 @@ public class MainActivity extends Activity {
                         public void onClick(DialogInterface dialog, int id) {
                             Log.d("Selected", "now on click of OK : " + selectedText);
                             String AmPmFormat;
-                            Calendar mcurrentTime = Calendar.getInstance();
-                            int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
-                            int minute = mcurrentTime.get(Calendar.MINUTE);
-                            setTime(hour, minute, "start");
-                            if(hour <12){
-                                AmPmFormat = "AM";
-                            }else {
-                                AmPmFormat = "PM";
-                            }
+//                            Calendar mcurrentTime = Calendar.getInstance();
+//                            int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+//                            int minute = mcurrentTime.get(Calendar.MINUTE);
+
+                            String start = new SimpleDateFormat("hh:mm a").format(Calendar.getInstance().getTime());
+                            String startWithoutSpace = start.replace(" ", "");
+//
+//                            setTime(hour, minute, "start");
+//                            if(hour <12){
+//                                AmPmFormat = "AM";
+//                            }else {
+//                                AmPmFormat = "PM";
+//                            }
+                            String AmPmFormatOfStart = startWithoutSpace.substring(startWithoutSpace.length()-2, startWithoutSpace.length());
                             StringBuilder stringbuilder = new StringBuilder();
                             stringbuilder.append("00").append(":").append("00")
-                                    .append("").append(AmPmFormat);
+                                    .append("").append(AmPmFormatOfStart);
                             String e = stringbuilder.toString();
                             DatabaseManagerForActual manager = new DatabaseManagerForActual(MainActivity.this);
-                            System.out.println("Taskkkkkk " + taskFromUser);
                             String total = "-:-";
-                            manager.insertDetails(selectedDate, s, e, selectedText, total);
+                            manager.insertDetails(selectedDate, startWithoutSpace, e, selectedText, total);
                             showListForActual();
                             DatabaseManagerForActual manager1 = new DatabaseManagerForActual(MainActivity.this);
                             Cursor c = manager1.fetchAllCursor();
@@ -304,7 +304,6 @@ public class MainActivity extends Activity {
                             ongoingID = c.getInt(c.getColumnIndex("_id"));
                             Log.d("rowId ongoign ",  String.valueOf(ongoingID));
                             ongoingDate = selectedDate;
-                            Log.d("date ongoign ",  ongoingDate);
                             btnIn.setText("OUT");
                             showListForActual();
                             status = 0;
@@ -335,23 +334,27 @@ public class MainActivity extends Activity {
                                         taskFromUser = "-";
                                     }
                             String AmPmFormat;
-                            Calendar mcurrentTime = Calendar.getInstance();
-                            int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
-                            int minute = mcurrentTime.get(Calendar.MINUTE);
-                            setTime(hour, minute, "start");
-                            if(hour <12){
-                                AmPmFormat = "AM";
-                            }else {
-                                AmPmFormat = "PM";
-                            }
+//                            Calendar mcurrentTime = Calendar.getInstance();
+//                            int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+//                            int minute = mcurrentTime.get(Calendar.MINUTE);
+
+                            String start = new SimpleDateFormat("hh:mm a").format(Calendar.getInstance().getTime());
+                            String startWithoutSpace = start.replace(" ", "");
+
+//                            setTime(hour, minute, "start");
+//                            if(hour <12){
+//                                AmPmFormat = "AM";
+//                            }else {
+//                                AmPmFormat = "PM";
+//                            }
+                            String AmPmFormatOfStart = startWithoutSpace.substring(startWithoutSpace.length()-2, startWithoutSpace.length());
                             StringBuilder stringbuilder = new StringBuilder();
                             stringbuilder.append("00").append(":").append("00")
-                                    .append("").append(AmPmFormat);
+                                    .append("").append(AmPmFormatOfStart);
                             String e = stringbuilder.toString();
                             DatabaseManagerForActual manager = new DatabaseManagerForActual(MainActivity.this);
-                            System.out.println("Taskkkkkk " + taskFromUser);
                             String total = "-:-";
-                            manager.insertDetails(selectedDate, s, e, taskFromUser, total);
+                            manager.insertDetails(selectedDate, startWithoutSpace, e, taskFromUser, total);
                             showListForActual();
                             DatabaseManagerForActual manager1 = new DatabaseManagerForActual(MainActivity.this);
                             Cursor c = manager1.fetchAllCursor();
@@ -392,17 +395,20 @@ public class MainActivity extends Activity {
                             }
                         } while (c.moveToNext());
                     }
-                    Calendar mcurrentTime = Calendar.getInstance();
-                    int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
-                    int minute = mcurrentTime.get(Calendar.MINUTE);
-                    setTime(hour, minute, "start");
+//                    Calendar mcurrentTime = Calendar.getInstance();
+//                    int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+//                    int minute = mcurrentTime.get(Calendar.MINUTE);
+//                    setTime(hour, minute, "start");
+
+                    String end = new SimpleDateFormat("hh:mm a").format(Calendar.getInstance().getTime());
+                    String endWithoutSpace = end.replace(" ", "");
 
                     String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(ongoingStartTime);
-                    String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(s);
+                    String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(endWithoutSpace);
                     String total = TimeCalculations.newCalculateTotal(formatedStartTime, formatedEndTime);
 
                     //String total = calculateTotal(ongoingStartTime, s);
-                    manager.updateldetail(ongoingID, ongoingDate, ongoingStartTime, s, ongoingTask, total);
+                    manager.updateldetail(ongoingID, ongoingDate, ongoingStartTime, endWithoutSpace, ongoingTask, total);
                     btnIn.setText("IN");
                     showListForActual();
                     status = 1;
@@ -424,31 +430,36 @@ public class MainActivity extends Activity {
                     String AmPmFormat = start.substring(5, 7);
                     int tempHour = Integer.parseInt(tempHr);
                     int tempMinute = Integer.parseInt(tempMin);
-                    setTimeForEnd(tempHour, tempMinute, AmPmFormat);
+
+                    String endTime = TimeCalculations.forwardTimeByGivenHour(start, 1);
+                    //setTimeForEnd(tempHour, tempMinute, AmPmFormat);
                     //String end = String.valueOf(tempHour) + start.substring(2,start.length());
                     String task = c.getString(c.getColumnIndex(helper.TASK_NAME));
 
                     String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(start);
-                    String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(e);
+                    String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(endTime);
                     String total = TimeCalculations.newCalculateTotal(formatedStartTime, formatedEndTime);
 
                     // String total = calculateTotal(start, e);
-                    Log.d("mainActivity", total);
-                    adapter.insertDetails(selectedDate, start, e, task, total);
+                    adapter.insertDetails(selectedDate, start, endTime, task, total);
                     showlist();
                 }else { // when database is empty
                     String AmPmFormat;
-                    Calendar mcurrentTime = Calendar.getInstance();
-                    int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
-                    int minute = mcurrentTime.get(Calendar.MINUTE);
-                    setTime(hour, minute, "start");
-                    if(hour <12){
-                        AmPmFormat = "AM";
-                    }else {
-                        hour -=12;
-                        AmPmFormat = "PM";
-                    }
-                    setTimeForEnd(hour, minute, AmPmFormat);
+//                    Calendar mcurrentTime = Calendar.getInstance();
+//                    int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+//                    int minute = mcurrentTime.get(Calendar.MINUTE);
+                    String start = new SimpleDateFormat("hh:mm a").format(Calendar.getInstance().getTime());
+                    String startWithoutSpace = start.replace(" ", "");
+
+//                    setTime(hour, minute, "start");
+//                    if(hour <12){
+//                        AmPmFormat = "AM";
+//                    }else {
+//                        hour -=12;
+//                        AmPmFormat = "PM";
+//                    }
+//                    setTimeForEnd(hour, minute, AmPmFormat);
+                    String endTime = TimeCalculations.forwardTimeByGivenHour(startWithoutSpace, 1);
                     String task = "None";
 
                     String formattedDateStart = new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime());
@@ -460,11 +471,26 @@ public class MainActivity extends Activity {
 
                     //String total = calculateTotal(s, e);
                     Log.d("mainActivity 1", total);
-                    long val = adapter.insertDetails(selectedDate, s, e, task, total);
+                    long val = adapter.insertDetails(selectedDate, startWithoutSpace, endTime, task, total);
                     showlist();
                 }
             }
         });
+    }
+
+    private String setFormatedDate() {
+        Calendar cal = Calendar.getInstance();
+        String date = new SimpleDateFormat("E, MMM d, yyyy").format(cal.getTime());
+        return date;
+    }
+
+    private String setFormatedDate(int year, int month, int day) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, year);
+        cal.set(Calendar.DAY_OF_MONTH, day);
+        cal.set(Calendar.MONTH, month);
+        String date = new SimpleDateFormat("E, MMM d, yyyy").format(cal.getTime());
+        return date;
     }
 
     private void copyOldToDo() throws ParseException {
@@ -526,71 +552,72 @@ public class MainActivity extends Activity {
         c1.close();
     }
 
-    private void formatDate(String selectedDate, int selectedDay) {
-        String s = selectedDate.substring(selectedDate.indexOf("/") + 1);
-        s = s.substring(0, s.indexOf("/"));
-        String monthInStr = MONTHS[Integer.parseInt(s)-1];
-        String dayStr = DAYS[selectedDay-1];
+    private void formatDate(String selectedDate) {
+//        String s = selectedDate.substring(selectedDate.indexOf("/") + 1);
+//        s = s.substring(0, s.indexOf("/"));
+//        String monthInStr = MONTHS[Integer.parseInt(s)-1];
+//
+//        String day = selectedDate.substring(0,selectedDate.indexOf("/"));
+//        String year = selectedDate.substring(selectedDate.length()-4,selectedDate.length());
+//
+//        StringBuilder strb = new StringBuilder();
+//        strb.append(day).append(" ").append(monthInStr).append(" ").append(year);
 
-        String day = selectedDate.substring(0,selectedDate.indexOf("/"));
-        String year = selectedDate.substring(selectedDate.length()-4,selectedDate.length());
 
-        StringBuilder strb = new StringBuilder();
-        strb.append(day).append(" ").append(monthInStr).append(" ").append(year);
-
-        formatedDate = strb.toString();
-        Log.d("formated date", formatedDate);
+//
+//        formatedDate = strb.toString();
+//        Log.d("formated date", formatedDate);
     }
 
 
 // OLD Calculate Total method
-    public String calculateTotal(String s, String e) {
-        int diff = 0;
-        String firstHalfStart = s.substring(0,2);
-        String secondHalfStart = s.substring(3,5);
-        String amPmStart = s.substring(5,7);
-        String firstHalfEnd = e.substring(0,2);
-        String secondHalfEnd = e.substring(3,5);
-        String amPmEnd = e.substring(5,7);
-
-        if(amPmEnd.equals("AM") && amPmStart.equals("AM") && firstHalfStart.equals("12")){
-            firstHalfStart = String.valueOf(0);
-        }
-
-        if(amPmStart.equals("PM") && !firstHalfStart.equals("12")){
-            int x = Integer.parseInt(firstHalfStart) + 12;
-            firstHalfStart = String.valueOf(x);
-        }
-        if(amPmStart.equals("AM") && firstHalfStart.equals("12") && !amPmEnd.equals("AM")){
-            int x = Integer.parseInt(firstHalfStart) + 12;
-            firstHalfStart = String.valueOf(x);
-        }
-        if(amPmEnd.equals("PM") && !firstHalfEnd.equals("12")){
-            int x = Integer.parseInt(firstHalfEnd) + 12;
-            firstHalfEnd = String.valueOf(x);
-        }
-        if(amPmEnd.equals("AM") && firstHalfEnd.equals("12")){
-            int x = Integer.parseInt(firstHalfEnd) + 12;
-            firstHalfEnd = String.valueOf(x);
-        }
-
-        int start = Integer.parseInt(firstHalfStart) * 60 + Integer.parseInt(secondHalfStart);
-        if(firstHalfEnd.contains("-")){
-            firstHalfEnd = String.valueOf(0);
-        }else if(secondHalfEnd.contains("-")){
-            secondHalfEnd = String.valueOf(0);
-        }
-        int end = Integer.parseInt(firstHalfEnd) * 60 + Integer.parseInt(secondHalfEnd);
-
-        diff = end - start;
-        int hh = diff / 60;
-        int mm = diff % 60;
-
-        StringBuilder strbuilder = new StringBuilder();
-        strbuilder.append(String.valueOf(hh)).append(":").append(String.valueOf(mm));
-
-        return strbuilder.toString();
-    }
+//    public String calculateTotal(String s, String e) {
+//        int diff = 0;
+//        String firstHalfStart = s.substring(0,2);
+//        String secondHalfStart = s.substring(3,5);
+//        String amPmStart = s.substring(5,7);
+//        String firstHalfEnd = e.substring(0,2);
+//        String secondHalfEnd = e.substring(3,5);
+//        String amPmEnd = e.substring(5,7);
+//
+//        if(amPmEnd.equals("AM") && amPmStart.equals("AM") && firstHalfStart.equals("12")){
+//            firstHalfStart = String.valueOf(0);
+//        }
+//
+//        if(amPmStart.equals("PM") && !firstHalfStart.equals("12")){
+//            int x = Integer.parseInt(firstHalfStart) + 12;
+//            firstHalfStart = String.valueOf(x);
+//        }
+//        if(amPmStart.equals("AM") && firstHalfStart.equals("12") && !amPmEnd.equals("AM")){
+//            int x = Integer.parseInt(firstHalfStart) + 12;
+//            firstHalfStart = String.valueOf(x);
+//        }
+//        if(amPmEnd.equals("PM") && !firstHalfEnd.equals("12")){
+//            int x = Integer.parseInt(firstHalfEnd) + 12;
+//            firstHalfEnd = String.valueOf(x);
+//        }
+//        if(amPmEnd.equals("AM") && firstHalfEnd.equals("12")){
+//            int x = Integer.parseInt(firstHalfEnd) + 12;
+//            firstHalfEnd = String.valueOf(x);
+//        }
+//
+//        int start = Integer.parseInt(firstHalfStart) * 60 + Integer.parseInt(secondHalfStart);
+//        if(firstHalfEnd.contains("-")){
+//            firstHalfEnd = String.valueOf(0);
+//        }else if(secondHalfEnd.contains("-")){
+//            secondHalfEnd = String.valueOf(0);
+//        }
+//        int end = Integer.parseInt(firstHalfEnd) * 60 + Integer.parseInt(secondHalfEnd);
+//
+//        diff = end - start;
+//        int hh = diff / 60;
+//        int mm = diff % 60;
+//
+//        StringBuilder strbuilder = new StringBuilder();
+//        strbuilder.append(String.valueOf(hh)).append(":").append(String.valueOf(mm));
+//
+//        return strbuilder.toString();
+//    }
 
     private void showListForActual() {
         manager_ob_actual = new DatabaseManagerForActual(this);
@@ -644,15 +671,20 @@ public class MainActivity extends Activity {
         toDoList.setAdapter(customAdapterToDo);
     }
 
+    // need to open date picker with current date
+    Calendar c = Calendar.getInstance();
+    int mYear = c.get(Calendar.YEAR);
+    int mMonth = c.get(Calendar.MONTH);
+    int mDay = c.get(Calendar.DAY_OF_MONTH);
     @Override
     protected Dialog onCreateDialog(int id) {
         // TODO Auto-generated method stub
         if (id == 999) {
             return new DatePickerDialog(this,
-                    myDateListener, year, month, day);
+                    myDateListener, mYear, mMonth, mDay);
         }else if( id == 988){
             return new DatePickerDialog(this,
-                    myDateListenerForOldSchedule, year, month, day);
+                    myDateListenerForOldSchedule, mYear, mMonth, mDay);
         }
         return null;
     }
@@ -667,11 +699,21 @@ public class MainActivity extends Activity {
                     // arg2 = month
                     // arg3 = day
                     copyFromPrevious = true;
-                    selectedOldDateStr = makeIntsTwoDigit(arg1, arg2+1, arg3);
+                    selectedOldDateStr = formatSelectedDate(arg1, arg2, arg3);
                     Log.d("oldDate**", selectedOldDateStr);
                     setToOldSchedule(selectedOldDateStr);
                 }
             };
+
+    private String formatSelectedDate(int year, int month, int day) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(0);
+        cal.set(year, month, day);
+        Date date = cal.getTime();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+        return sdf.format(date);
+    }
 
     DatePickerDialog.OnDateSetListener myDateListener = new
             DatePickerDialog.OnDateSetListener() {
@@ -684,7 +726,8 @@ public class MainActivity extends Activity {
                     // arg3 = day
 
 
-                    showDate(arg1, arg2 + 1, arg3);
+                    selectedDate = formatSelectedDate(arg1, arg2, arg3);
+                    formatedDate = setFormatedDate(arg1, arg2, arg3);
                     String todayDate = getTodayDate();
                     try {
                         if(todayDate.equals(selectedDate)){
@@ -706,53 +749,46 @@ public class MainActivity extends Activity {
         return todayDate;
     }
 
-    private String makeIntsTwoDigit(int year, int month, int day) {
-        String dayStr;
-        String monthStr;
-        String yearStr;
-        if(day < 10){
-            dayStr = "0" + String.valueOf(day);
-        }else {
-            dayStr = String.valueOf(day);
-        }
-        if (month < 10){
-            monthStr = "0" + String.valueOf(month);
-        }else {
-            monthStr = String.valueOf(month);
-        }
-        yearStr = String.valueOf(year);
+//    private String makeIntsTwoDigit(int year, int month, int day) {
+//        String dayStr;
+//        String monthStr;
+//        String yearStr;
+//        if(day < 10){
+//            dayStr = "0" + String.valueOf(day);
+//        }else {
+//            dayStr = String.valueOf(day);
+//        }
+//        if (month < 10){
+//            monthStr = "0" + String.valueOf(month);
+//        }else {
+//            monthStr = String.valueOf(month);
+//        }
+//        yearStr = String.valueOf(year);
+//
+//        StringBuilder sb = new StringBuilder();
+//        sb.append(dayStr).append("/").append(monthStr).append("/").append(yearStr);
+//        return sb.toString();
+//    }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(dayStr).append("/").append(monthStr).append("/").append(yearStr);
-        return sb.toString();
-    }
-
-    private void showDate(int year, int month, int day) {
-        String monthStr = null;
-        String dayStr = null;
-        if(month <10){
-            monthStr = "0" + String.valueOf(month);
-        }else {
-            monthStr = String.valueOf(month);
-        }
-
-        if(day <10){
-            dayStr = "0" + String.valueOf(day);
-        }else {
-            dayStr = String.valueOf(day);
-        }
-        StringBuilder strbuilder = new StringBuilder().append(dayStr).append("/")
-                .append(monthStr).append("/").append(year);
-
-        selectedDate = strbuilder.toString();
-        Calendar c = Calendar.getInstance();
-        Date d = new Date(year, month, day+3);
-        c.setTime(d);
-        int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
-        SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
-        selectedDay = dayOfWeek;
-        formatDate(selectedDate, selectedDay);
-    }
+//    private void showDate(int year, int month, int day) {
+//        String monthStr = null;
+//        String dayStr = null;
+//        if(month <10){
+//            monthStr = "0" + String.valueOf(month);
+//        }else {
+//            monthStr = String.valueOf(month);
+//        }
+//
+//        if(day <10){
+//            dayStr = "0" + String.valueOf(day);
+//        }else {
+//            dayStr = String.valueOf(day);
+//        }
+//        StringBuilder strbuilder = new StringBuilder().append(dayStr).append("/")
+//                .append(monthStr).append("/").append(year);
+//
+//        selectedDate = strbuilder.toString();
+//    }
 
     public void onWindowFocusChanged(boolean hasFocus) {
         Log.d("window focised1", "focus changed");
@@ -800,75 +836,75 @@ public class MainActivity extends Activity {
         scheduleList.setAdapter(customAdapter);
     }
 
-    public void setTime(int hour, int minute, String blockName) {
-        String minstr;
-        String hrStr = "";
-        if(blockName.equals("end")){
-            hour++;
-        }
-        if (hour == 0) {
-            hour += 12;
-            format = "AM";
-        } else if (hour == 12) {
-            format = "PM";
-        } else if (hour > 12) {
-            hour -= 12;
-            format = "PM";
-        } else {
-            format = "AM";
-        }
+//    public void setTime(int hour, int minute, String blockName) {
+//        String minstr;
+//        String hrStr = "";
+//        if(blockName.equals("end")){
+//            hour++;
+//        }
+//        if (hour == 0) {
+//            hour += 12;
+//            format = "AM";
+//        } else if (hour == 12) {
+//            format = "PM";
+//        } else if (hour > 12) {
+//            hour -= 12;
+//            format = "PM";
+//        } else {
+//            format = "AM";
+//        }
+//
+//        if(minute >= 10){
+//            minstr = String.valueOf(minute);
+//        }else {
+//            minstr = "0" + String.valueOf(minute);
+//        }
+//        if(hour < 10){
+//            hrStr = "0" + String.valueOf(hour);
+//        }else {
+//            hrStr = String.valueOf(hour);
+//        }
+//
+//        stringbuilder = new StringBuilder();
+//        stringbuilder.append(hrStr).append(":").append(minstr)
+//                .append("").append(format);
+//
+//        if(blockName.equals("start")){
+//            s = stringbuilder.toString();
+//        }else if(blockName.equals("end")){
+//            e = stringbuilder.toString();
+//        }
+//    }
 
-        if(minute >= 10){
-            minstr = String.valueOf(minute);
-        }else {
-            minstr = "0" + String.valueOf(minute);
-        }
-        if(hour < 10){
-            hrStr = "0" + String.valueOf(hour);
-        }else {
-            hrStr = String.valueOf(hour);
-        }
-
-        stringbuilder = new StringBuilder();
-        stringbuilder.append(hrStr).append(":").append(minstr)
-                .append("").append(format);
-
-        if(blockName.equals("start")){
-            s = stringbuilder.toString();
-        }else if(blockName.equals("end")){
-            e = stringbuilder.toString();
-        }
-    }
-
-    private void setTimeForEnd(int hour, int minute, String oldAmPm) {
-        String minstr;
-        String hrStr = "";
-        hour++;
-        if(hour == 12 && oldAmPm.equals("AM")){
-            format = "PM";
-        }else if(hour == 12 && oldAmPm.equals("PM")){
-            format = "AM";
-        }else if(hour >12 ){
-            hour -= 12;
-            format = oldAmPm;
-        }
-
-        if(minute >= 10){
-            minstr = String.valueOf(minute);
-        }else {
-            minstr = "0" + String.valueOf(minute);
-        }
-        if(hour < 10){
-            hrStr = "0" + String.valueOf(hour);
-        }else {
-            hrStr = String.valueOf(hour);
-        }
-
-        stringbuilderEnd = new StringBuilder();
-        stringbuilderEnd.append(hrStr).append(":").append(minstr)
-                .append("").append(format);
-        e = stringbuilderEnd.toString();
-    }
+//    private void setTimeForEnd(int hour, int minute, String oldAmPm) {
+//        String minstr;
+//        String hrStr = "";
+//        hour++;
+//        if(hour == 12 && oldAmPm.equals("AM")){
+//            format = "PM";
+//        }else if(hour == 12 && oldAmPm.equals("PM")){
+//            format = "AM";
+//        }else if(hour >12 ){
+//            hour -= 12;
+//            format = oldAmPm;
+//        }
+//
+//        if(minute >= 10){
+//            minstr = String.valueOf(minute);
+//        }else {
+//            minstr = "0" + String.valueOf(minute);
+//        }
+//        if(hour < 10){
+//            hrStr = "0" + String.valueOf(hour);
+//        }else {
+//            hrStr = String.valueOf(hour);
+//        }
+//
+//        stringbuilderEnd = new StringBuilder();
+//        stringbuilderEnd.append(hrStr).append(":").append(minstr)
+//                .append("").append(format);
+//        e = stringbuilderEnd.toString();
+//    }
 
     public void setToOldSchedule(String selectedOldDateStr) {
         adapter_ob = new DatabaseManager(MainActivity.this);
