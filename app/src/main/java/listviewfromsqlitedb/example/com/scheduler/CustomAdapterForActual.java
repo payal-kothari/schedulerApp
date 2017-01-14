@@ -95,7 +95,7 @@ public class CustomAdapterForActual extends BaseAdapter{
 
                         String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(resultS);
                         String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(endT);
-                        String total = TimeCalculations.newCalculateTotal(formatedStartTime, formatedEndTime);
+                        String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
 
                         //String total = mainActivity.calculateTotal(resultS, endT);
                         adapter_ob.updateldetail(rowID, dateForThisEntry, resultS, endT, taskN, total);
@@ -128,7 +128,7 @@ public class CustomAdapterForActual extends BaseAdapter{
 
                         String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(startT);
                         String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(resultE);
-                        String total = TimeCalculations.newCalculateTotal(formatedStartTime, formatedEndTime);
+                        String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
 
                         //String total = mainActivity.calculateTotal(startT, resultE);
                         adapter_ob.updateldetail(rowID, dateForThisEntry, startT, resultE, taskN, total);
@@ -176,7 +176,7 @@ public class CustomAdapterForActual extends BaseAdapter{
 
                         String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(startT);
                         String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(endT);
-                        String total = TimeCalculations.newCalculateTotal(formatedStartTime, formatedEndTime);
+                        String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
 
                         //String total = mainActivity.calculateTotal(startT, endT);
                         adapter_ob.updateldetail(rowID, dateForThisEntry, startT, endT, selectedText, total);
@@ -220,7 +220,7 @@ public class CustomAdapterForActual extends BaseAdapter{
 
                                 String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(startT);
                                 String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(endT);
-                                String total = TimeCalculations.newCalculateTotal(formatedStartTime, formatedEndTime);
+                                String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
 
                                 //String total = mainActivity.calculateTotal(startT, endT);
                                 adapter_ob.updateldetail(rowID, dateForThisEntry, startT, endT, resultTask, total);

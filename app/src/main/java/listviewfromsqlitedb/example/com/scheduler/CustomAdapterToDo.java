@@ -95,7 +95,9 @@ public class CustomAdapterToDo extends BaseAdapter{
 //            }
 //        });
 
-        listViewHolder.tx_task.setText(list.get(position).task);
+        int index = position;
+        String taskNameWithIndex = String.valueOf(++index) + list.get(position).task;
+        listViewHolder.tx_task.setText(taskNameWithIndex);
 //        Log.d("here",list.get(position).status);
         if (list.get(position).status.equals("Y"))
         {

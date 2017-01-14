@@ -62,8 +62,6 @@ public class MainActivity extends Activity {
     static String ongoingDate;
     static int selectedDay;
     static String formatedDate;
-    public static final String[] MONTHS = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-    static final String[] DAYS = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"};
     static boolean copyFromPrevious;
     static String selectedOldDateStr;
 
@@ -114,12 +112,26 @@ public class MainActivity extends Activity {
                         String dateForThisEntry = currentEntry.getDate();
                         int statusId = currentEntry.getStatusID();
                         String resultTask = input.getEditableText().toString();
-                        adapter_ob_ToDo.updateldetail(rowID, dateForThisEntry, resultTask, "N", statusId);
+                        if(!resultTask.contains("") && resultTask.trim().length() > 0 ){
+                            adapter_ob_ToDo.updateldetail(rowID, dateForThisEntry, resultTask, "N", statusId);
+                        }
                     } });
                 adb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
                     } });
+                adb.setNeutralButton("Delete", new DialogInterface.OnClickListener(){
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        adapter_ob_ToDo = new DatabaseManagerToDo(MainActivity.this);
+                        ArrayList<EntryToDo> allEntries = new ArrayList<EntryToDo>();
+                        allEntries = adapter_ob_ToDo.fetchByDateList(selectedDate);
+                        EntryToDo currentEntry = allEntries.get((int) id);
+                        int rowID = currentEntry.getID();
+                        adapter_ob_ToDo.deleteOneRecord(rowID);
+                    }
+                });
                 adb.show();
                 return true;
             }
@@ -430,7 +442,7 @@ public class MainActivity extends Activity {
 
                     String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(ongoingStartTime);
                     String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(endWithoutSpace);
-                    String total = TimeCalculations.newCalculateTotal(formatedStartTime, formatedEndTime);
+                    String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
 
                     //String total = calculateTotal(ongoingStartTime, s);
                     manager.updateldetail(ongoingID, ongoingDate, ongoingStartTime, endWithoutSpace, ongoingTask, total);
@@ -463,7 +475,7 @@ public class MainActivity extends Activity {
 
                     String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(start);
                     String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(endTime);
-                    String total = TimeCalculations.newCalculateTotal(formatedStartTime, formatedEndTime);
+                    String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
 
                     // String total = calculateTotal(start, e);
                     adapter.insertDetails(selectedDate, start, endTime, task, total);
@@ -492,7 +504,7 @@ public class MainActivity extends Activity {
                     cal.add(Calendar.HOUR, 1);
                     Date d = cal.getTime();
                     String formattedDateEnd = new SimpleDateFormat("HH:mm:ss").format(d);
-                    String total = TimeCalculations.newCalculateTotal(formattedDateStart, formattedDateEnd);
+                    String total = TimeCalculations.calculateTotal(formattedDateStart, formattedDateEnd);
 
                     //String total = calculateTotal(s, e);
                     Log.d("mainActivity 1", total);

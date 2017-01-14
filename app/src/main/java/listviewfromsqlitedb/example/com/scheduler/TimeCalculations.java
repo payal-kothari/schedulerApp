@@ -11,7 +11,7 @@ import java.util.Date;
 public class TimeCalculations {
 
 
-    public static String newCalculateTotal(String formattedDateStart, String formattedDateEnd) {
+    public static String calculateTotal(String formattedDateStart, String formattedDateEnd) {
         StringBuilder strb = new StringBuilder();
         SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
 

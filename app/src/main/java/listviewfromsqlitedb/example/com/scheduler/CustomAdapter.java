@@ -101,7 +101,7 @@ public class CustomAdapter extends BaseAdapter{
 
                         String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(resultS);
                         String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(endT);
-                        String total = TimeCalculations.newCalculateTotal(formatedStartTime, formatedEndTime);
+                        String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
 
                         adapter_ob.updateldetail(rowID, dateForThisEntry, resultS, endT, taskN, total);
                     }
@@ -135,13 +135,13 @@ public class CustomAdapter extends BaseAdapter{
 
                         String formatedOldEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(oldEndTime);
                         String formatedResultE = TimeCalculations.convertAmPmToHHMMSSTimeFormat(resultE);
-                        String diffInOldAndNewEndTimeHr =  TimeCalculations.newCalculateTotal(formatedOldEndTime, formatedResultE);
+                        String diffInOldAndNewEndTimeHr =  TimeCalculations.calculateTotal(formatedOldEndTime, formatedResultE);
                         //String diffInOldAndNewEndTimeHr =  mainActivity.calculateTotal(oldEndTime, resultE);
                         shiftOtherEntries(diffInOldAndNewEndTimeHr, rowID, dateForThisEntry, resultE);
 
                         String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(startT);
                         String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(resultE);
-                        String total = TimeCalculations.newCalculateTotal(formatedStartTime, formatedEndTime);
+                        String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
 
                         adapter_ob.updateldetail(rowID, dateForThisEntry, startT, resultE, taskN, total);
                     }
@@ -188,7 +188,7 @@ public class CustomAdapter extends BaseAdapter{
 
                         String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(startT);
                         String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(endT);
-                        String total = TimeCalculations.newCalculateTotal(formatedStartTime, formatedEndTime);
+                        String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
                         //String total = mainActivity.calculateTotal(startT, endT);
                         adapter_ob.updateldetail(rowID, dateForThisEntry, startT, endT, selectedText, total);
                     }
@@ -231,7 +231,7 @@ public class CustomAdapter extends BaseAdapter{
 
                                 String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(startT);
                                 String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(endT);
-                                String total = TimeCalculations.newCalculateTotal(formatedStartTime, formatedEndTime);
+                                String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
                                 //String total = mainActivity.calculateTotal(startT, endT);
                                 adapter_ob.updateldetail(rowID, dateForThisEntry, startT, endT, resultTask, total);
                             } // End of onClick(DialogInterface dialog, int whichButton)
@@ -282,7 +282,7 @@ public class CustomAdapter extends BaseAdapter{
 
                         String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(newStart);
                         String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(newEnd);
-                        String total = TimeCalculations.newCalculateTotal(formatedStartTime, formatedEndTime);
+                        String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
                         //String total = mainActivity.calculateTotal(newStart, newEnd);
                         adapter_ob.updateldetail(currentId, dateForThisEntry, newStart, newEnd, task, total);
                     }
