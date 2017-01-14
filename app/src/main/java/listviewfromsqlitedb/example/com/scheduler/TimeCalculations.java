@@ -35,7 +35,12 @@ public class TimeCalculations {
             System.out.print(diffMinutes + " minutes, ");
             System.out.print(diffSeconds + " seconds.");
 
-            strb.append(String.valueOf(diffHours)).append(":").append(String.valueOf(diffMinutes));
+//            String diffMinutesStr = "";
+//            if(diffMinutes <10){
+//                diffMinutesStr = "0" + String.valueOf(diffMinutes);
+//            }
+
+            strb.append(String.valueOf(diffHours)).append(":").append(diffMinutes);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -57,7 +62,7 @@ public class TimeCalculations {
         return format.format(tempDate1);
     }
 
-    public static String forwardTimeByGivenHour(String timeToForward, int byHours){
+    public static String forwardTimeByGivenHour(String timeToForward, int byHours, int byMinutes){
 
         SimpleDateFormat parseFormat1 = new SimpleDateFormat("hh:mm a");
         Date tempDate1 = new Date();
@@ -71,6 +76,7 @@ public class TimeCalculations {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(tempDate1);
         calendar.add(Calendar.HOUR, byHours);
+        calendar.add(Calendar.MINUTE, byMinutes);
         String forwardedTimeWithSpace = parseFormat1.format(calendar.getTime());
 
         String forwardedTimeWithoutSpace = forwardedTimeWithSpace.replace(" ", "");

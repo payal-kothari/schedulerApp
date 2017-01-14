@@ -468,7 +468,7 @@ public class MainActivity extends Activity {
                     int tempHour = Integer.parseInt(tempHr);
                     int tempMinute = Integer.parseInt(tempMin);
 
-                    String endTime = TimeCalculations.forwardTimeByGivenHour(start, 1);
+                    String endTime = TimeCalculations.forwardTimeByGivenHour(start, 1, 0);
                     //setTimeForEnd(tempHour, tempMinute, AmPmFormat);
                     //String end = String.valueOf(tempHour) + start.substring(2,start.length());
                     String task = c.getString(c.getColumnIndex(helper.TASK_NAME));
@@ -496,7 +496,7 @@ public class MainActivity extends Activity {
 //                        AmPmFormat = "PM";
 //                    }
 //                    setTimeForEnd(hour, minute, AmPmFormat);
-                    String endTime = TimeCalculations.forwardTimeByGivenHour(startWithoutSpace, 1);
+                    String endTime = TimeCalculations.forwardTimeByGivenHour(startWithoutSpace, 1, 0);
                     String task = "None";
 
                     String formattedDateStart = new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime());

@@ -249,7 +249,20 @@ public class CustomAdapterForActual extends BaseAdapter{
         listViewHolder.tx_s.setText(list.get(position).startTime);
         listViewHolder.tx_e.setText(list.get(position).endTime);
         listViewHolder.tx_t.setText(list.get(position).taskName);
-        listViewHolder.tx_tot.setText(list.get(position).total);
+
+        String totalStr = list.get(position).total;
+        if(totalStr.matches(".*\\d.*")){   // string total contains digits
+            String totalHr = totalStr.substring(0, totalStr.indexOf(":"));
+            String totalMin = totalStr.substring(totalStr.indexOf(":")+1, totalStr.length());
+            if(Integer.parseInt(totalMin) < 10){
+                totalMin = "0" + totalMin;
+            }
+            String totalToShow = totalHr + ":" + totalMin;
+            listViewHolder.tx_tot.setText(totalToShow);
+        }else {                             // string total doesn't contain digits
+            listViewHolder.tx_tot.setText(totalStr);
+        }
+
 
         return v;
     }

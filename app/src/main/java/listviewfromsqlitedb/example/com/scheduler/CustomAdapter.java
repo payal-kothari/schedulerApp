@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * Created by payalkothari on 12/30/16.
@@ -260,7 +261,14 @@ public class CustomAdapter extends BaseAdapter{
         listViewHolder.tx_s.setText(list.get(position).startTime);
         listViewHolder.tx_e.setText(list.get(position).endTime);
         listViewHolder.tx_t.setText(list.get(position).taskName);
-        listViewHolder.tx_tot.setText(list.get(position).total);
+        String totalStr = list.get(position).total;
+        String totalHr = totalStr.substring(0, totalStr.indexOf(":"));
+        String totalMin = totalStr.substring(totalStr.indexOf(":")+1, totalStr.length());
+        if(Integer.parseInt(totalMin) < 10){
+            totalMin = "0" + totalMin;
+        }
+        String totalToShow = totalHr + ":" + totalMin;
+        listViewHolder.tx_tot.setText(totalToShow);
 
         return v;
     }
@@ -304,96 +312,98 @@ public class CustomAdapter extends BaseAdapter{
         String firstHalfDiff = diffInOldAndNewEndTimeHr.substring(0,diffInOldAndNewEndTimeHr.indexOf(":"));
         String secondHalfDiff = diffInOldAndNewEndTimeHr.substring(diffInOldAndNewEndTimeHr.indexOf(":")+1, diffInOldAndNewEndTimeHr.length());
 
-        int firstHalfEndInMin = Integer.parseInt(firstHalfEnd) * 60;
-        int totalEndInMin = firstHalfEndInMin + Integer.parseInt(secondHalfEnd);
+        String newEndTime = TimeCalculations.forwardTimeByGivenHour(endTime, Integer.parseInt(firstHalfDiff), Integer.parseInt(secondHalfDiff));
 
-        int firstHalfDiffInMin = Integer.parseInt(firstHalfDiff) * 60;
-        int totalDiffInMin = firstHalfDiffInMin + Integer.parseInt(secondHalfDiff);
-
-        int newtime = totalEndInMin + totalDiffInMin;
-
-
-//        int newFirstHalfStart = Integer.parseInt(firstHalfStart) + Integer.parseInt(firstHalfDiff);
-//        int newSecondHalfStart = Integer.parseInt(secondHalfStart) + Integer.parseInt(secondHalfDiff);
-        int newFirstHalfEnd = Math.abs(newtime / 60);
-        int newSecondHalfEnd = Math.abs(newtime % 60);
-
-        String amPmOfPrevious = previousEntryEndTime.substring(5, 7);
-        String firstHalfPrevious = previousEntryEndTime.substring(0, 2);
-        String newAmPmEnd = amPmOfPrevious;
-        if(newFirstHalfEnd == 12 && amPmOfPrevious.equals("AM")){
-            newAmPmEnd = "PM";
-        }else if (newFirstHalfEnd == 12 && amPmOfPrevious.equals("PM")){
-            newAmPmEnd = "AM";
-        }else if(newFirstHalfEnd > 12 && amPmOfPrevious.equals("AM") && !firstHalfPrevious.equals("12")){
-            newFirstHalfEnd = newFirstHalfEnd -12;
-            newAmPmEnd = "PM";
-        }else if (newFirstHalfEnd > 12 && amPmOfPrevious.equals("PM") && !firstHalfPrevious.equals("12")){
-            newFirstHalfEnd = newFirstHalfEnd -12;
-            newAmPmEnd = "AM";
-        }else if(newFirstHalfEnd > 12 && firstHalfPrevious.equals("12")) {
-            newFirstHalfEnd = newFirstHalfEnd - 12;
-        }
-
-//        String newAmPmStart = null;
-//        if(newFirstHalfStart==12 && amPmStart.equals("AM")){
-//            newAmPmStart = "PM";
-//        }else if(newFirstHalfStart==12 && amPmStart.equals("PM")){
-//            newAmPmStart = "AM";
-//        }else if(newFirstHalfStart>12 && amPmStart.equals("AM")){
-//            newFirstHalfStart = newFirstHalfStart - 12;
-//            if(!notifyNextFlag){
-//                newAmPmStart = "PM";
-//                notifyNextFlag = false;
-//            }
-//        }else if(newFirstHalfStart>12 && amPmStart.equals("PM")){
-//            newFirstHalfStart = newFirstHalfStart - 12;
-//            if(!notifyNextFlag){
-//                newAmPmStart = "AM";
-//                notifyNextFlag = false;
-//            }
+//        int firstHalfEndInMin = Integer.parseInt(firstHalfEnd) * 60;
+//        int totalEndInMin = firstHalfEndInMin + Integer.parseInt(secondHalfEnd);
+//
+//        int firstHalfDiffInMin = Integer.parseInt(firstHalfDiff) * 60;
+//        int totalDiffInMin = firstHalfDiffInMin + Integer.parseInt(secondHalfDiff);
+//
+//        int newtime = totalEndInMin + totalDiffInMin;
+//
+//
+////        int newFirstHalfStart = Integer.parseInt(firstHalfStart) + Integer.parseInt(firstHalfDiff);
+////        int newSecondHalfStart = Integer.parseInt(secondHalfStart) + Integer.parseInt(secondHalfDiff);
+//        int newFirstHalfEnd = Math.abs(newtime / 60);
+//        int newSecondHalfEnd = Math.abs(newtime % 60);
+//
+//        String amPmOfPrevious = previousEntryEndTime.substring(5, 7);
+//        String firstHalfPrevious = previousEntryEndTime.substring(0, 2);
+//        String newAmPmEnd = amPmOfPrevious;
+//        if(newFirstHalfEnd == 12 && amPmOfPrevious.equals("AM")){
+//            newAmPmEnd = "PM";
+//        }else if (newFirstHalfEnd == 12 && amPmOfPrevious.equals("PM")){
+//            newAmPmEnd = "AM";
+//        }else if(newFirstHalfEnd > 12 && amPmOfPrevious.equals("AM") && !firstHalfPrevious.equals("12")){
+//            newFirstHalfEnd = newFirstHalfEnd -12;
+//            newAmPmEnd = "PM";
+//        }else if (newFirstHalfEnd > 12 && amPmOfPrevious.equals("PM") && !firstHalfPrevious.equals("12")){
+//            newFirstHalfEnd = newFirstHalfEnd -12;
+//            newAmPmEnd = "AM";
+//        }else if(newFirstHalfEnd > 12 && firstHalfPrevious.equals("12")) {
+//            newFirstHalfEnd = newFirstHalfEnd - 12;
 //        }
 //
-//        String newAmPmEnd = null;
-//        if(newFirstHalfEnd==12 && amPmEnd.equals("AM")){
-//            newAmPmEnd = "PM";
-//        }else if(newFirstHalfEnd==12 && amPmEnd.equals("PM")){
-//            newAmPmEnd = "AM";
-//        }else if(newFirstHalfEnd>12 && amPmEnd.equals("AM")){
-//            newFirstHalfEnd = newFirstHalfEnd - 12;
-//            if(!(newFirstHalfStart == 12)){
-//                newAmPmEnd = "PM";
-//            }
-//        }else if(newFirstHalfEnd>12 && amPmEnd.equals("PM")){
-//            newFirstHalfEnd = newFirstHalfEnd - 12;
-//            if(!(newFirstHalfStart == 12)){
-//                newAmPmEnd = "AM";
-//            }
+////        String newAmPmStart = null;
+////        if(newFirstHalfStart==12 && amPmStart.equals("AM")){
+////            newAmPmStart = "PM";
+////        }else if(newFirstHalfStart==12 && amPmStart.equals("PM")){
+////            newAmPmStart = "AM";
+////        }else if(newFirstHalfStart>12 && amPmStart.equals("AM")){
+////            newFirstHalfStart = newFirstHalfStart - 12;
+////            if(!notifyNextFlag){
+////                newAmPmStart = "PM";
+////                notifyNextFlag = false;
+////            }
+////        }else if(newFirstHalfStart>12 && amPmStart.equals("PM")){
+////            newFirstHalfStart = newFirstHalfStart - 12;
+////            if(!notifyNextFlag){
+////                newAmPmStart = "AM";
+////                notifyNextFlag = false;
+////            }
+////        }
+////
+////        String newAmPmEnd = null;
+////        if(newFirstHalfEnd==12 && amPmEnd.equals("AM")){
+////            newAmPmEnd = "PM";
+////        }else if(newFirstHalfEnd==12 && amPmEnd.equals("PM")){
+////            newAmPmEnd = "AM";
+////        }else if(newFirstHalfEnd>12 && amPmEnd.equals("AM")){
+////            newFirstHalfEnd = newFirstHalfEnd - 12;
+////            if(!(newFirstHalfStart == 12)){
+////                newAmPmEnd = "PM";
+////            }
+////        }else if(newFirstHalfEnd>12 && amPmEnd.equals("PM")){
+////            newFirstHalfEnd = newFirstHalfEnd - 12;
+////            if(!(newFirstHalfStart == 12)){
+////                newAmPmEnd = "AM";
+////            }
+////        }
+//
+//
+//        String newHrStrEnd;
+//        String newMinstrEnd;
+//        if(newFirstHalfEnd < 10){
+//            newHrStrEnd = "0" + String.valueOf(newFirstHalfEnd);
+//        }else {
+//            newHrStrEnd = String.valueOf(newFirstHalfEnd);
 //        }
-
-
-        String newHrStrEnd;
-        String newMinstrEnd;
-        if(newFirstHalfEnd < 10){
-            newHrStrEnd = "0" + String.valueOf(newFirstHalfEnd);
-        }else {
-            newHrStrEnd = String.valueOf(newFirstHalfEnd);
-        }
-
-
-        if(newSecondHalfEnd >= 10){
-            newMinstrEnd = String.valueOf(newSecondHalfEnd);
-        }else {
-            newMinstrEnd = "0" + String.valueOf(newSecondHalfEnd);
-        }
+//
+//
+//        if(newSecondHalfEnd >= 10){
+//            newMinstrEnd = String.valueOf(newSecondHalfEnd);
+//        }else {
+//            newMinstrEnd = "0" + String.valueOf(newSecondHalfEnd);
+//        }
 
 //        StringBuilder strbStart = new StringBuilder();
 //        strbStart.append(newHrStrStart).append(":").append(newMinstrStart).append(newAmPmStart);
-        StringBuilder strbEnd = new StringBuilder();
-        strbEnd.append(newHrStrEnd).append(":").append(newMinstrEnd).append(newAmPmEnd);
+//        StringBuilder strbEnd = new StringBuilder();
+//        strbEnd.append(newHrStrEnd).append(":").append(newMinstrEnd).append(newAmPmEnd);
 
         newStart = previousEntryEndTime;
-        newEnd = strbEnd.toString();
+        newEnd = newEndTime;
 
         return newEnd;
 
