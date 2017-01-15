@@ -11,15 +11,18 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -214,24 +217,65 @@ public class MainActivity extends Activity {
         scheduleList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position,final long id) {
-                AlertDialog.Builder adb = new AlertDialog.Builder(MainActivity.this);
-                adb.setMessage("Do you want to delete this entry ? ");
-                adb.setIcon(android.R.drawable.ic_dialog_alert);
-                adb.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        adapter_ob = new DatabaseManager(MainActivity.this);
+                LayoutInflater inflater = getLayoutInflater();
+                View alertLayout = inflater.inflate(R.layout.my_alert_dialog, null);
+                final AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+                alert.setView(alertLayout);
+                alert.setIcon(android.R.drawable.ic_dialog_alert);
+                final Button insert_above = (Button) alertLayout.findViewById(R.id.btn_insertAbove);
+                final Button insert_below = (Button) alertLayout.findViewById(R.id.btn_insertBelow);
+                final Button delete = (Button) alertLayout.findViewById(R.id.btn_delete);
+                final AlertDialog dialog = alert.create();
+
+                alert.setCancelable(true);
+                insert_above.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
                         ArrayList<Entry> allEntries = new ArrayList<Entry>();
                         allEntries = adapter_ob.fetchByDateList(selectedDate);
                         Entry currentEntry = allEntries.get((int) id);
-                        int rowID = currentEntry.getID();
-                        adapter_ob.deleteOneRecord(rowID);
-                    } });
-                adb.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    } });
-                adb.setNeutralButton("Insert below", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
+                        int currentEntryId = currentEntry.getID();
+                        Cursor c1 = adapter_ob.fetchAllCursor();
+                        if (c1 != null && c1.getCount() != 0) {
+                            if (c1.moveToFirst()) {
+                                do {
+                                    int id = c1.getInt(c1.getColumnIndex("_id"));
+                                    Log.d("selectedId: ",String.valueOf(currentEntryId));
+                                    Log.d("now id: ", String.valueOf(id));
+                                    if(id >= currentEntryId){
+                                        int tempId = id;
+                                        tempId++;
+                                        String dateTemp = c1.getString(c1
+                                                .getColumnIndex("date"));
+                                        String startTemp = c1.getString(c1
+                                                .getColumnIndex("startTime"));
+                                        String endTemp = c1.getString(c1
+                                                .getColumnIndex("endTime"));
+                                        String taskTemp = c1.getString(c1
+                                                .getColumnIndex("taskName"));
+                                        String totalTemp = c1.getString(c1
+                                                .getColumnIndex("total"));
+                                        DatabaseManagerTemp dm = new DatabaseManagerTemp(MainActivity.this);
+                                        Log.d("copying to temp: ", startTemp);
+                                        dm.insertDetails(tempId, dateTemp, startTemp, endTemp, taskTemp, totalTemp);
+                                        Log.d("deleting id: ", String.valueOf(id));
+                                        adapter_ob.deleteOneRecord(id);
+                                    }
+                                } while (c1.moveToNext());
+                            }
+                        }
+                        c1.close();
+                        String date = currentEntry.getDate();
+                        String start = currentEntry.getStartTime();
+                        adapter_ob.insertDetails(date, start, start, "NEW*", "0:0");
+                        copyFromOtherTable();
+                        dialog.dismiss();
+                    }
+                });
+
+                insert_below.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
                         ArrayList<Entry> allEntries = new ArrayList<Entry>();
                         allEntries = adapter_ob.fetchByDateList(selectedDate);
                         Entry currentEntry = allEntries.get((int) id);
@@ -274,8 +318,125 @@ public class MainActivity extends Activity {
                         Log.d("insertingc copy id: ", task);
                         adapter_ob.insertDetails(date, end, end, "NEW*", "0:0");
                         copyFromOtherTable();
-                    } });
-                adb.show();
+                        dialog.dismiss();
+                    }
+                });
+
+                delete.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        adapter_ob = new DatabaseManager(MainActivity.this);
+                        ArrayList<Entry> allEntries = new ArrayList<Entry>();
+                        allEntries = adapter_ob.fetchByDateList(selectedDate);
+                        Entry currentEntry = allEntries.get((int) id);
+                        int rowID = currentEntry.getID();
+                        adapter_ob.deleteOneRecord(rowID);
+                        dialog.dismiss();
+                    }
+                });
+//                alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        adapter_ob = new DatabaseManager(MainActivity.this);
+//                        ArrayList<Entry> allEntries = new ArrayList<Entry>();
+//                        allEntries = adapter_ob.fetchByDateList(selectedDate);
+//                        Entry currentEntry = allEntries.get((int) id);
+//                        int rowID = currentEntry.getID();
+//                        adapter_ob.deleteOneRecord(rowID);
+//                    } });
+//                alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.cancel();
+//                    } });
+
+
+//                adb.setNeutralButton("Insert below", new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        ArrayList<Entry> allEntries = new ArrayList<Entry>();
+//                        allEntries = adapter_ob.fetchByDateList(selectedDate);
+//                        Entry currentEntry = allEntries.get((int) id);
+//                        int currentEntryId = currentEntry.getID();
+//                        Cursor c1 = adapter_ob.fetchAllCursor();
+//                        if (c1 != null && c1.getCount() != 0) {
+//                            if (c1.moveToFirst()) {
+//                                do {
+//                                    int id = c1.getInt(c1.getColumnIndex("_id"));
+//                                    Log.d("selectedId: ",String.valueOf(currentEntryId));
+//                                    Log.d("now id: ", String.valueOf(id));
+//                                    if(id > currentEntryId){
+//                                        int tempId = id;
+//                                        tempId++;
+//                                        String dateTemp = c1.getString(c1
+//                                                .getColumnIndex("date"));
+//                                        String startTemp = c1.getString(c1
+//                                                .getColumnIndex("startTime"));
+//                                        String endTemp = c1.getString(c1
+//                                                .getColumnIndex("endTime"));
+//                                        String taskTemp = c1.getString(c1
+//                                                .getColumnIndex("taskName"));
+//                                        String totalTemp = c1.getString(c1
+//                                                .getColumnIndex("total"));
+//                                        DatabaseManagerTemp dm = new DatabaseManagerTemp(MainActivity.this);
+//                                        Log.d("copying to temp: ", startTemp);
+//                                        dm.insertDetails(tempId, dateTemp, startTemp, endTemp, taskTemp, totalTemp);
+//                                        Log.d("deleting id: ", String.valueOf(id));
+//                                        adapter_ob.deleteOneRecord(id);
+//                                    }
+//                                } while (c1.moveToNext());
+//                            }
+//                        }
+//                        c1.close();
+//                        String date = currentEntry.getDate();
+//                        String start = currentEntry.getStartTime();
+//                        String end = currentEntry.getEndTime();
+//                        String task = currentEntry.getTask();
+//                        String total = currentEntry.getTotal();
+//                        Log.d("insertingc copy id: ", task);
+//                        adapter_ob.insertDetails(date, end, end, "NEW*", "0:0");
+//                        copyFromOtherTable();
+//                    } });
+//                adb.setNeutralButton("Insert above", new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        ArrayList<Entry> allEntries = new ArrayList<Entry>();
+//                        allEntries = adapter_ob.fetchByDateList(selectedDate);
+//                        Entry currentEntry = allEntries.get((int) id);
+//                        int currentEntryId = currentEntry.getID();
+//                        Cursor c1 = adapter_ob.fetchAllCursor();
+//                        if (c1 != null && c1.getCount() != 0) {
+//                            if (c1.moveToFirst()) {
+//                                do {
+//                                    int id = c1.getInt(c1.getColumnIndex("_id"));
+//                                    Log.d("selectedId: ",String.valueOf(currentEntryId));
+//                                    Log.d("now id: ", String.valueOf(id));
+//                                    if(id >= currentEntryId){
+//                                        int tempId = id;
+//                                        tempId++;
+//                                        String dateTemp = c1.getString(c1
+//                                                .getColumnIndex("date"));
+//                                        String startTemp = c1.getString(c1
+//                                                .getColumnIndex("startTime"));
+//                                        String endTemp = c1.getString(c1
+//                                                .getColumnIndex("endTime"));
+//                                        String taskTemp = c1.getString(c1
+//                                                .getColumnIndex("taskName"));
+//                                        String totalTemp = c1.getString(c1
+//                                                .getColumnIndex("total"));
+//                                        DatabaseManagerTemp dm = new DatabaseManagerTemp(MainActivity.this);
+//                                        Log.d("copying to temp: ", startTemp);
+//                                        dm.insertDetails(tempId, dateTemp, startTemp, endTemp, taskTemp, totalTemp);
+//                                        Log.d("deleting id: ", String.valueOf(id));
+//                                        adapter_ob.deleteOneRecord(id);
+//                                    }
+//                                } while (c1.moveToNext());
+//                            }
+//                        }
+//                        c1.close();
+//                        String date = currentEntry.getDate();
+//                        String start = currentEntry.getStartTime();
+//                        adapter_ob.insertDetails(date, start, start, "NEW*", "0:0");
+//                        copyFromOtherTable();
+//                    } });
+
+                dialog.show();
                 return true;
             }
         });
