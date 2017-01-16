@@ -52,7 +52,6 @@ public class DatabaseManager{
     public ArrayList<Entry> fetchAll() {
         String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME, databaseHelper_ob.TOTAL };
         opnToWrite();
-        //Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, null, null, null, null,"startTime ASC");
         Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, null, null, null, null, null);
         ArrayList<Entry> entryList = new ArrayList<Entry>();
         // looping through all rows and adding to list
@@ -61,7 +60,6 @@ public class DatabaseManager{
                 Entry entry = new Entry();
                 entry.setID(c.getInt(0));
                 entry.setDate(c.getString(1));
-                System.out.println("********" + c.getString(1));
                 entry.setStart(c.getString(2));
                 entry.setEnd(c.getString(3));
                 entry.setTask(c.getString(4));
@@ -77,7 +75,6 @@ public class DatabaseManager{
         ArrayList<String> tasksList = new ArrayList<>();
         String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME, databaseHelper_ob.TOTAL };
         opnToWrite();
-        //Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, null, null, null, null,"startTime ASC");
         Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, null, null, null, null, null);
         if (c.moveToFirst()) {
             do {
@@ -102,7 +99,6 @@ public class DatabaseManager{
                 Entry entry = new Entry();
                 entry.setID(c.getInt(0));
                 entry.setDate(c.getString(1));
-                System.out.println("********" + c.getString(1));
                 entry.setStart(c.getString(2));
                 entry.setEnd(c.getString(3));
                 entry.setTask(c.getString(4));
@@ -114,11 +110,9 @@ public class DatabaseManager{
         return entryList;
     }
 
-
     public Cursor fetchByDate(String date) {
         String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME, databaseHelper_ob.TOTAL };
         opnToWrite();
-        int nameId = 1;
         Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME,
                 null, databaseHelper_ob.DATE + "=?", new String[] { date }, null, null, null, null);
         return c;
@@ -127,7 +121,6 @@ public class DatabaseManager{
     public Cursor fetchAllCursor() {
         String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME, databaseHelper_ob.TOTAL };
         opnToWrite();
-        //Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, null, null, null, null,"startTime ASC");
         Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME, cols, null, null, null, null, null);
         return c;
     }

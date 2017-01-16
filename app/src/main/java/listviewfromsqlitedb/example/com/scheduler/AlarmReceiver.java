@@ -18,23 +18,27 @@ public class AlarmReceiver extends BroadcastReceiver {
     Random rand = new Random();
     public static String NOTIFICATION_ID = "notification-id";
     public static String NOTIFICATION = "notification";
-
+    MainActivity mainActivity = new MainActivity();
     @Override
     public void onReceive(Context context, Intent intent) {
-        int randomNum = rand.nextInt((10 - 0) + 1) + 0;
         NotificationManager notificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
-        if(randomNum > 5){
+        Notification notification = intent.getParcelableExtra(NOTIFICATION);
+        int id = intent.getIntExtra(NOTIFICATION_ID, 0);
+        String tone = intent.getStringExtra("Tone");
+
+        if(tone.equals("ring")){
+            mainActivity.alarmsMap.remove(id);
             mp= MediaPlayer.create(context, R.raw.thuglife);
             mp.start();
-            Notification notification = intent.getParcelableExtra(NOTIFICATION);
-            int id = intent.getIntExtra(NOTIFICATION_ID, 0);
             notificationManager.notify(id, notification);
-            Toast.makeText(context, "time : " , Toast.LENGTH_LONG).show();
-        }else {
-            mp= MediaPlayer.create(context, R.raw.thuglife2);
+        }else if(tone.equals("beep")){
+            mainActivity.alarmsMap.remove(id);
+            mp= MediaPlayer.create(context, R.raw.double_beep);
             mp.start();
-            Toast.makeText(context, "time : " , Toast.LENGTH_LONG).show();
+            notificationManager.notify(id, notification);
+        }else if(tone.equals("vibrate")){
+            mainActivity.alarmsMap.remove(id);
+            notificationManager.notify(id, notification);
         }
-
     }
 }

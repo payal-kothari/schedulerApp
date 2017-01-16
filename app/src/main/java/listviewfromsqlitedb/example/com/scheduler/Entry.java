@@ -10,20 +10,11 @@ public class Entry {
     String taskName;
     String date;
     int ID;
-    String actualStartTime;
-    String actualEndTime;
+
     String total;
 
     public void setStart(String start){
         this.startTime = start;
-    }
-
-    public void setActualStart(String actualStart){
-        this.actualStartTime = actualStart;
-    }
-
-    public void setActualEnd(String actualEnd){
-        this.actualEndTime = actualEnd;
     }
 
     public void setEnd(String end){

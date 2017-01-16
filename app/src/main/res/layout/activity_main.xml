@@ -134,10 +134,10 @@
             android:layout_toRightOf="@+id/list_view"
             android:layout_weight="0.5"
             android:longClickable="true"
-
             android:dividerHeight="7dp"
             android:divider="@android:color/transparent"
-            android:layout_alignParentEnd="true">
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true">
         </ListView>
 
     </LinearLayout>
@@ -189,7 +189,7 @@
         android:layout_below="@+id/toDo_list"
         android:layout_alignParentStart="true"
         android:layout_above="@+id/btn_calendar"
-        />
+        android:layout_alignParentLeft="true" />
 
     <Button
         android:id="@+id/btn_toDoAdd"
@@ -198,8 +198,8 @@
         android:layout_margin="1dp"
         android:layout_above="@+id/btn_calendar"
         android:layout_alignParentEnd="true"
-        android:text="+" />
-
+        android:text="+"
+        android:layout_alignParentRight="true" />
 
     <ListView
         android:id="@+id/toDo_list"
@@ -209,7 +209,8 @@
         android:dividerHeight="7dp"
         android:divider="@android:color/transparent"
         android:layout_above="@+id/btn_toDoAdd"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true">
     </ListView>
 
 

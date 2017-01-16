@@ -1,9 +1,12 @@
 package listviewfromsqlitedb.example.com.scheduler;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.text.Html;
 import android.util.Log;
@@ -78,7 +81,6 @@ public class CustomAdapter extends BaseAdapter{
         listViewHolder.tx_s.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 Calendar mcurrentTime = Calendar.getInstance();
                 int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
                 int minute = mcurrentTime.get(Calendar.MINUTE);
@@ -101,6 +103,7 @@ public class CustomAdapter extends BaseAdapter{
                         String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
 
                         adapter_ob.updateldetail(rowID, dateForThisEntry, resultS, endT, taskN, total);
+                        mainActivity.updateAlarm(rowID, dateForThisEntry, resultS, taskN, null, context);
                     }
                 }, hour, minute, false);
                 mTimePicker.setTitle("Select Time");
@@ -281,13 +284,10 @@ public class CustomAdapter extends BaseAdapter{
                     if( currentId > rowID){
                         String task = c1.getString(c1.getColumnIndex("taskName"));
                         previousEntryEndTime = changeTime(diffInOldAndNewEndTimeHr, previousEntryEndTime, c1.getString(c1.getColumnIndex("endTime")));
-                        Log.d("CustomAdpater newS", newStart);
-                        Log.d("CustomAdpater newE", newEnd);
-
                         String formatedStartTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(newStart);
                         String formatedEndTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(newEnd);
                         String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
-                        //String total = mainActivity.calculateTotal(newStart, newEnd);
+                        mainActivity.updateAlarm(currentId, dateForThisEntry, newStart, task, null, context);
                         adapter_ob.updateldetail(currentId, dateForThisEntry, newStart, newEnd, task, total);
                     }
                 } while (c1.moveToNext());
@@ -297,112 +297,15 @@ public class CustomAdapter extends BaseAdapter{
     }
 
     private String changeTime(String diffInOldAndNewEndTimeHr, String previousEntryEndTime, String endTime) {
-//        String firstHalfStart = startTime.substring(0,2);
-//        String secondHalfStart = startTime.substring(3,5);
-//        String amPmStart = startTime.substring(5,7);
-
         Log.d("ChangeTime endT*", endTime);
-        String firstHalfEnd = endTime.substring(0,2);
-        String secondHalfEnd = endTime.substring(3,5);
-        String amPmEnd = endTime.substring(5,7);
         String firstHalfDiff = diffInOldAndNewEndTimeHr.substring(0,diffInOldAndNewEndTimeHr.indexOf(":"));
         String secondHalfDiff = diffInOldAndNewEndTimeHr.substring(diffInOldAndNewEndTimeHr.indexOf(":")+1, diffInOldAndNewEndTimeHr.length());
 
         String newEndTime = TimeCalculations.forwardTimeByGivenHour(endTime, Integer.parseInt(firstHalfDiff), Integer.parseInt(secondHalfDiff));
-
-//        int firstHalfEndInMin = Integer.parseInt(firstHalfEnd) * 60;
-//        int totalEndInMin = firstHalfEndInMin + Integer.parseInt(secondHalfEnd);
-//
-//        int firstHalfDiffInMin = Integer.parseInt(firstHalfDiff) * 60;
-//        int totalDiffInMin = firstHalfDiffInMin + Integer.parseInt(secondHalfDiff);
-//
-//        int newtime = totalEndInMin + totalDiffInMin;
-//
-//
-////        int newFirstHalfStart = Integer.parseInt(firstHalfStart) + Integer.parseInt(firstHalfDiff);
-////        int newSecondHalfStart = Integer.parseInt(secondHalfStart) + Integer.parseInt(secondHalfDiff);
-//        int newFirstHalfEnd = Math.abs(newtime / 60);
-//        int newSecondHalfEnd = Math.abs(newtime % 60);
-//
-//        String amPmOfPrevious = previousEntryEndTime.substring(5, 7);
-//        String firstHalfPrevious = previousEntryEndTime.substring(0, 2);
-//        String newAmPmEnd = amPmOfPrevious;
-//        if(newFirstHalfEnd == 12 && amPmOfPrevious.equals("AM")){
-//            newAmPmEnd = "PM";
-//        }else if (newFirstHalfEnd == 12 && amPmOfPrevious.equals("PM")){
-//            newAmPmEnd = "AM";
-//        }else if(newFirstHalfEnd > 12 && amPmOfPrevious.equals("AM") && !firstHalfPrevious.equals("12")){
-//            newFirstHalfEnd = newFirstHalfEnd -12;
-//            newAmPmEnd = "PM";
-//        }else if (newFirstHalfEnd > 12 && amPmOfPrevious.equals("PM") && !firstHalfPrevious.equals("12")){
-//            newFirstHalfEnd = newFirstHalfEnd -12;
-//            newAmPmEnd = "AM";
-//        }else if(newFirstHalfEnd > 12 && firstHalfPrevious.equals("12")) {
-//            newFirstHalfEnd = newFirstHalfEnd - 12;
-//        }
-//
-////        String newAmPmStart = null;
-////        if(newFirstHalfStart==12 && amPmStart.equals("AM")){
-////            newAmPmStart = "PM";
-////        }else if(newFirstHalfStart==12 && amPmStart.equals("PM")){
-////            newAmPmStart = "AM";
-////        }else if(newFirstHalfStart>12 && amPmStart.equals("AM")){
-////            newFirstHalfStart = newFirstHalfStart - 12;
-////            if(!notifyNextFlag){
-////                newAmPmStart = "PM";
-////                notifyNextFlag = false;
-////            }
-////        }else if(newFirstHalfStart>12 && amPmStart.equals("PM")){
-////            newFirstHalfStart = newFirstHalfStart - 12;
-////            if(!notifyNextFlag){
-////                newAmPmStart = "AM";
-////                notifyNextFlag = false;
-////            }
-////        }
-////
-////        String newAmPmEnd = null;
-////        if(newFirstHalfEnd==12 && amPmEnd.equals("AM")){
-////            newAmPmEnd = "PM";
-////        }else if(newFirstHalfEnd==12 && amPmEnd.equals("PM")){
-////            newAmPmEnd = "AM";
-////        }else if(newFirstHalfEnd>12 && amPmEnd.equals("AM")){
-////            newFirstHalfEnd = newFirstHalfEnd - 12;
-////            if(!(newFirstHalfStart == 12)){
-////                newAmPmEnd = "PM";
-////            }
-////        }else if(newFirstHalfEnd>12 && amPmEnd.equals("PM")){
-////            newFirstHalfEnd = newFirstHalfEnd - 12;
-////            if(!(newFirstHalfStart == 12)){
-////                newAmPmEnd = "AM";
-////            }
-////        }
-//
-//
-//        String newHrStrEnd;
-//        String newMinstrEnd;
-//        if(newFirstHalfEnd < 10){
-//            newHrStrEnd = "0" + String.valueOf(newFirstHalfEnd);
-//        }else {
-//            newHrStrEnd = String.valueOf(newFirstHalfEnd);
-//        }
-//
-//
-//        if(newSecondHalfEnd >= 10){
-//            newMinstrEnd = String.valueOf(newSecondHalfEnd);
-//        }else {
-//            newMinstrEnd = "0" + String.valueOf(newSecondHalfEnd);
-//        }
-
-//        StringBuilder strbStart = new StringBuilder();
-//        strbStart.append(newHrStrStart).append(":").append(newMinstrStart).append(newAmPmStart);
-//        StringBuilder strbEnd = new StringBuilder();
-//        strbEnd.append(newHrStrEnd).append(":").append(newMinstrEnd).append(newAmPmEnd);
-
         newStart = previousEntryEndTime;
         newEnd = newEndTime;
 
         return newEnd;
-
     }
 
 

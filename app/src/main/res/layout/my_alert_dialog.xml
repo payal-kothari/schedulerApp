@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
+    android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/linear_layout">
 
@@ -9,32 +9,65 @@
         android:layout_height="wrap_content"
         android:id="@+id/btn_insertAbove"
         android:text="Insert Above"
+        android:gravity="center"
         />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/btn_cancelAlarm"
-        android:layout_toRightOf="@+id/btn_insertAbove"
-        android:text="Cancel Alarm"
-        />
-
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/btn_delete"
-        android:layout_toRightOf="@+id/btn_cancelAlarm"
         android:text="Delete"
+        android:layout_below="@+id/btn_insertAbove"
         />
 
-    <Button
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/btn_setAlarm"
-        android:layout_marginLeft="130dp"
-        android:layout_below="@id/btn_cancelAlarm"
-        android:text="Set Alarm"
+        android:text="Alarm"
+        android:textColor="@android:color/black"
+        android:layout_marginLeft="2dp"
+        android:textSize="20dp"
+        android:layout_below="@+id/btn_delete"
+    />
+
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/alarm_switch"
+        android:layout_below="@+id/btn_delete"
+        android:orientation="horizontal"
+        android:id="@+id/alarmTone_radioGroup">
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="beep"
+            android:id="@+id/radio_beep"
+            android:checked="true"/>
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="vibrate"
+            android:id="@+id/radio_vibrate"/>
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ring"
+            android:id="@+id/radio_ring"/>
+    </RadioGroup>
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/alarm_switch"
+        android:textOff="OFF"
+        android:textOn="ON"
+        android:layout_toRightOf="@+id/btn_setAlarm"
+        android:layout_below="@+id/btn_delete"
+        android:layout_marginLeft="20dp"
         />
 
 </RelativeLayout>

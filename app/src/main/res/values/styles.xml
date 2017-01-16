@@ -5,7 +5,10 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+
+    <style name="toggle_text" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+    </style>
 </resources>
