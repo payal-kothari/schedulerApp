@@ -1,21 +1,22 @@
 package listviewfromsqlitedb.example.com.scheduler;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.Notification;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -24,6 +25,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,7 +39,7 @@ public class MainActivity extends Activity {
     DatabaseManagerForActual manager_ob_actual;
     ListView scheduleList;
     ListView actualScheduleList;
-    Button btnNewTask, btnCalendar, btnIn, btnCopyFromPrevious, btnToDo;
+    Button btnNewTask, btnCalendar, btnIn, btnCopyFromPrevious;
     DatabaseManager adapter;
     DatabaseHelper helper;
     private String format = "";
@@ -67,6 +69,7 @@ public class MainActivity extends Activity {
     static String formatedDate;
     static boolean copyFromPrevious;
     static String selectedOldDateStr;
+    final static int RQS_1 = 1;
 
 
     @Override
@@ -221,13 +224,62 @@ public class MainActivity extends Activity {
                 View alertLayout = inflater.inflate(R.layout.my_alert_dialog, null);
                 final AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
                 alert.setView(alertLayout);
-                alert.setIcon(android.R.drawable.ic_dialog_alert);
                 final Button insert_above = (Button) alertLayout.findViewById(R.id.btn_insertAbove);
-                final Button insert_below = (Button) alertLayout.findViewById(R.id.btn_insertBelow);
+                final Button cancel_alarm = (Button) alertLayout.findViewById(R.id.btn_cancelAlarm);
                 final Button delete = (Button) alertLayout.findViewById(R.id.btn_delete);
+                final Button alarm = (Button) alertLayout.findViewById(R.id.btn_setAlarm);
                 final AlertDialog dialog = alert.create();
 
+                dialog.setTitle("Choose your option: ");
                 alert.setCancelable(true);
+
+                alarm.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ArrayList<Entry> allEntries = new ArrayList<Entry>();
+                        allEntries = adapter_ob.fetchByDateList(selectedDate);
+                        Entry currentEntry = allEntries.get((int) id);
+                        int currId = currentEntry.getID();
+                        String dateToSet = currentEntry.getDate();
+                        String timeToSet = currentEntry.getStartTime();
+                        String task = currentEntry.getTask();
+                        int hour;
+                        String spaceAddedTimeToset = timeToSet.substring(0, 5) + " " + timeToSet.substring(5, timeToSet.length());
+                        if(spaceAddedTimeToset.substring(spaceAddedTimeToset.indexOf(" ")+1, spaceAddedTimeToset.length()).equals("PM")){
+                            String hr = spaceAddedTimeToset.substring(0, 2);
+                            hour = Integer.parseInt(hr) + 12;
+                        }else {
+                            String hr = spaceAddedTimeToset.substring(0, 2);
+                            hour = Integer.parseInt(hr);
+                        }
+                        String minute = spaceAddedTimeToset.substring(3, 5);
+                        int min = Integer.parseInt(minute);
+                        Calendar cal = Calendar.getInstance();
+                        Date date = new Date();
+                        SimpleDateFormat format = new SimpleDateFormat("dd/mm/yyyy");
+                        try {
+                            date = format.parse(dateToSet);
+                        } catch (ParseException e1) {
+                            e1.printStackTrace();
+                        }
+                        cal.setTime(date);
+                        cal.set(Calendar.HOUR_OF_DAY, hour);
+                        cal.set(Calendar.MINUTE, min);
+                        cal.set(Calendar.SECOND, 0);
+
+                        Notification notification = getNotification( task + " task has started");
+                        Intent notificationIntent = new Intent(MainActivity.this, AlarmReceiver.class);
+                        notificationIntent.putExtra(AlarmReceiver.NOTIFICATION_ID, currId);
+                        notificationIntent.putExtra(AlarmReceiver.NOTIFICATION, notification);
+                        PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, currId, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+//                        Intent intent = new Intent(getBaseContext(), AlarmReceiver.class);
+//                        PendingIntent pendingIntent = PendingIntent.getBroadcast(getBaseContext(), currId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+                        AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+                        alarmManager.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent);
+                        dialog.dismiss();
+                    }
+                });
                 insert_above.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -273,51 +325,19 @@ public class MainActivity extends Activity {
                     }
                 });
 
-                insert_below.setOnClickListener(new OnClickListener() {
+                cancel_alarm.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         ArrayList<Entry> allEntries = new ArrayList<Entry>();
                         allEntries = adapter_ob.fetchByDateList(selectedDate);
                         Entry currentEntry = allEntries.get((int) id);
-                        int currentEntryId = currentEntry.getID();
-                        Cursor c1 = adapter_ob.fetchAllCursor();
-                        if (c1 != null && c1.getCount() != 0) {
-                            if (c1.moveToFirst()) {
-                                do {
-                                    int id = c1.getInt(c1.getColumnIndex("_id"));
-                                    Log.d("selectedId: ",String.valueOf(currentEntryId));
-                                    Log.d("now id: ", String.valueOf(id));
-                                    if(id > currentEntryId){
-                                        int tempId = id;
-                                        tempId++;
-                                        String dateTemp = c1.getString(c1
-                                                .getColumnIndex("date"));
-                                        String startTemp = c1.getString(c1
-                                                .getColumnIndex("startTime"));
-                                        String endTemp = c1.getString(c1
-                                                .getColumnIndex("endTime"));
-                                        String taskTemp = c1.getString(c1
-                                                .getColumnIndex("taskName"));
-                                        String totalTemp = c1.getString(c1
-                                                .getColumnIndex("total"));
-                                        DatabaseManagerTemp dm = new DatabaseManagerTemp(MainActivity.this);
-                                        Log.d("copying to temp: ", startTemp);
-                                        dm.insertDetails(tempId, dateTemp, startTemp, endTemp, taskTemp, totalTemp);
-                                        Log.d("deleting id: ", String.valueOf(id));
-                                        adapter_ob.deleteOneRecord(id);
-                                    }
-                                } while (c1.moveToNext());
-                            }
-                        }
-                        c1.close();
-                        String date = currentEntry.getDate();
-                        String start = currentEntry.getStartTime();
-                        String end = currentEntry.getEndTime();
-                        String task = currentEntry.getTask();
-                        String total = currentEntry.getTotal();
-                        Log.d("insertingc copy id: ", task);
-                        adapter_ob.insertDetails(date, end, end, "NEW*", "0:0");
-                        copyFromOtherTable();
+                        int currId = currentEntry.getID();
+
+                        Intent notificationIntent = new Intent(MainActivity.this, AlarmReceiver.class);
+                        PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,
+                                currId, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+                        alarmManager.cancel(pendingIntent);
                         dialog.dismiss();
                     }
                 });
@@ -334,112 +354,11 @@ public class MainActivity extends Activity {
                         dialog.dismiss();
                     }
                 });
-//                alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        adapter_ob = new DatabaseManager(MainActivity.this);
-//                        ArrayList<Entry> allEntries = new ArrayList<Entry>();
-//                        allEntries = adapter_ob.fetchByDateList(selectedDate);
-//                        Entry currentEntry = allEntries.get((int) id);
-//                        int rowID = currentEntry.getID();
-//                        adapter_ob.deleteOneRecord(rowID);
-//                    } });
-//                alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        dialog.cancel();
-//                    } });
-
-
-//                adb.setNeutralButton("Insert below", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        ArrayList<Entry> allEntries = new ArrayList<Entry>();
-//                        allEntries = adapter_ob.fetchByDateList(selectedDate);
-//                        Entry currentEntry = allEntries.get((int) id);
-//                        int currentEntryId = currentEntry.getID();
-//                        Cursor c1 = adapter_ob.fetchAllCursor();
-//                        if (c1 != null && c1.getCount() != 0) {
-//                            if (c1.moveToFirst()) {
-//                                do {
-//                                    int id = c1.getInt(c1.getColumnIndex("_id"));
-//                                    Log.d("selectedId: ",String.valueOf(currentEntryId));
-//                                    Log.d("now id: ", String.valueOf(id));
-//                                    if(id > currentEntryId){
-//                                        int tempId = id;
-//                                        tempId++;
-//                                        String dateTemp = c1.getString(c1
-//                                                .getColumnIndex("date"));
-//                                        String startTemp = c1.getString(c1
-//                                                .getColumnIndex("startTime"));
-//                                        String endTemp = c1.getString(c1
-//                                                .getColumnIndex("endTime"));
-//                                        String taskTemp = c1.getString(c1
-//                                                .getColumnIndex("taskName"));
-//                                        String totalTemp = c1.getString(c1
-//                                                .getColumnIndex("total"));
-//                                        DatabaseManagerTemp dm = new DatabaseManagerTemp(MainActivity.this);
-//                                        Log.d("copying to temp: ", startTemp);
-//                                        dm.insertDetails(tempId, dateTemp, startTemp, endTemp, taskTemp, totalTemp);
-//                                        Log.d("deleting id: ", String.valueOf(id));
-//                                        adapter_ob.deleteOneRecord(id);
-//                                    }
-//                                } while (c1.moveToNext());
-//                            }
-//                        }
-//                        c1.close();
-//                        String date = currentEntry.getDate();
-//                        String start = currentEntry.getStartTime();
-//                        String end = currentEntry.getEndTime();
-//                        String task = currentEntry.getTask();
-//                        String total = currentEntry.getTotal();
-//                        Log.d("insertingc copy id: ", task);
-//                        adapter_ob.insertDetails(date, end, end, "NEW*", "0:0");
-//                        copyFromOtherTable();
-//                    } });
-//                adb.setNeutralButton("Insert above", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        ArrayList<Entry> allEntries = new ArrayList<Entry>();
-//                        allEntries = adapter_ob.fetchByDateList(selectedDate);
-//                        Entry currentEntry = allEntries.get((int) id);
-//                        int currentEntryId = currentEntry.getID();
-//                        Cursor c1 = adapter_ob.fetchAllCursor();
-//                        if (c1 != null && c1.getCount() != 0) {
-//                            if (c1.moveToFirst()) {
-//                                do {
-//                                    int id = c1.getInt(c1.getColumnIndex("_id"));
-//                                    Log.d("selectedId: ",String.valueOf(currentEntryId));
-//                                    Log.d("now id: ", String.valueOf(id));
-//                                    if(id >= currentEntryId){
-//                                        int tempId = id;
-//                                        tempId++;
-//                                        String dateTemp = c1.getString(c1
-//                                                .getColumnIndex("date"));
-//                                        String startTemp = c1.getString(c1
-//                                                .getColumnIndex("startTime"));
-//                                        String endTemp = c1.getString(c1
-//                                                .getColumnIndex("endTime"));
-//                                        String taskTemp = c1.getString(c1
-//                                                .getColumnIndex("taskName"));
-//                                        String totalTemp = c1.getString(c1
-//                                                .getColumnIndex("total"));
-//                                        DatabaseManagerTemp dm = new DatabaseManagerTemp(MainActivity.this);
-//                                        Log.d("copying to temp: ", startTemp);
-//                                        dm.insertDetails(tempId, dateTemp, startTemp, endTemp, taskTemp, totalTemp);
-//                                        Log.d("deleting id: ", String.valueOf(id));
-//                                        adapter_ob.deleteOneRecord(id);
-//                                    }
-//                                } while (c1.moveToNext());
-//                            }
-//                        }
-//                        c1.close();
-//                        String date = currentEntry.getDate();
-//                        String start = currentEntry.getStartTime();
-//                        adapter_ob.insertDetails(date, start, start, "NEW*", "0:0");
-//                        copyFromOtherTable();
-//                    } });
-
                 dialog.show();
                 return true;
             }
         });
+
 
         btnCalendar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -601,8 +520,8 @@ public class MainActivity extends Activity {
                     String end = new SimpleDateFormat("hh:mm a").format(Calendar.getInstance().getTime());
                     String endWithoutSpace = end.replace(" ", "");
 
-                    String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(ongoingStartTime);
-                    String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(endWithoutSpace);
+                    String formatedStartTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(ongoingStartTime);
+                    String formatedEndTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(endWithoutSpace);
                     String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
 
                     //String total = calculateTotal(ongoingStartTime, s);
@@ -634,8 +553,8 @@ public class MainActivity extends Activity {
                     //String end = String.valueOf(tempHour) + start.substring(2,start.length());
                     String task = c.getString(c.getColumnIndex(helper.TASK_NAME));
 
-                    String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(start);
-                    String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(endTime);
+                    String formatedStartTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(start);
+                    String formatedEndTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(endTime);
                     String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
 
                     // String total = calculateTotal(start, e);
@@ -646,9 +565,10 @@ public class MainActivity extends Activity {
 //                    Calendar mcurrentTime = Calendar.getInstance();
 //                    int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
 //                    int minute = mcurrentTime.get(Calendar.MINUTE);
-                    String start = new SimpleDateFormat("hh:mm a").format(Calendar.getInstance().getTime());
+                    DateFormat time = new SimpleDateFormat("hh:mm a");
+                    String start = time.format(Calendar.getInstance().getTime());
                     String startWithoutSpace = start.replace(" ", "");
-
+                    Toast.makeText(MainActivity.this, startWithoutSpace, Toast.LENGTH_SHORT).show();
 //                    setTime(hour, minute, "start");
 //                    if(hour <12){
 //                        AmPmFormat = "AM";
@@ -846,6 +766,15 @@ public class MainActivity extends Activity {
         actualScheduleList.setAdapter(customAdapterForActual);
     }
 
+    private Notification getNotification(String content) {
+        Notification.Builder builder = new Notification.Builder(this);
+        builder.setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 });
+        builder.setContentTitle("Scheduler");
+        builder.setContentText(content);
+        builder.setSmallIcon(R.drawable.icon);
+        return builder.build();
+    }
+
     public void showlistToDo() {
         adapter_ob_ToDo = new DatabaseManagerToDo(this);
         ArrayList<EntryToDo> allEntries = new ArrayList<EntryToDo>();
@@ -951,6 +880,9 @@ public class MainActivity extends Activity {
                     try {
                         if(todayDate.equals(selectedDate)){
                             copyOldToDo();
+                            btnIn.setEnabled(true);
+                        }else {
+                            btnIn.setEnabled(false);
                         }
                     } catch (ParseException e1) {
                         e1.printStackTrace();

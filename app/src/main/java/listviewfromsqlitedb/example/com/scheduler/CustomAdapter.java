@@ -16,13 +16,9 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.StringTokenizer;
 
 /**
  * Created by payalkothari on 12/30/16.
@@ -100,8 +96,8 @@ public class CustomAdapter extends BaseAdapter{
                         String taskN = currentEntry.getTask();
                         String resultS = editActivity.showStartTime(selectedHour, selectedMinute);
 
-                        String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(resultS);
-                        String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(endT);
+                        String formatedStartTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(resultS);
+                        String formatedEndTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(endT);
                         String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
 
                         adapter_ob.updateldetail(rowID, dateForThisEntry, resultS, endT, taskN, total);
@@ -134,14 +130,14 @@ public class CustomAdapter extends BaseAdapter{
                         String taskN = currentEntry.getTask();
                         String resultE = editActivity.showEndTime(selectedHour, selectedMinute);
 
-                        String formatedOldEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(oldEndTime);
-                        String formatedResultE = TimeCalculations.convertAmPmToHHMMSSTimeFormat(resultE);
+                        String formatedOldEndTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(oldEndTime);
+                        String formatedResultE = TimeCalculations.convertAmPmToHHmmssTimeFormat(resultE);
                         String diffInOldAndNewEndTimeHr =  TimeCalculations.calculateTotal(formatedOldEndTime, formatedResultE);
                         //String diffInOldAndNewEndTimeHr =  mainActivity.calculateTotal(oldEndTime, resultE);
                         shiftOtherEntries(diffInOldAndNewEndTimeHr, rowID, dateForThisEntry, resultE);
 
-                        String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(startT);
-                        String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(resultE);
+                        String formatedStartTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(startT);
+                        String formatedEndTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(resultE);
                         String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
 
                         adapter_ob.updateldetail(rowID, dateForThisEntry, startT, resultE, taskN, total);
@@ -187,8 +183,8 @@ public class CustomAdapter extends BaseAdapter{
                         String endT = currentEntry.getEndTime();
                         Toast.makeText(context,selectedText,Toast.LENGTH_LONG).show();
 
-                        String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(startT);
-                        String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(endT);
+                        String formatedStartTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(startT);
+                        String formatedEndTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(endT);
                         String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
                         //String total = mainActivity.calculateTotal(startT, endT);
                         adapter_ob.updateldetail(rowID, dateForThisEntry, startT, endT, selectedText, total);
@@ -230,8 +226,8 @@ public class CustomAdapter extends BaseAdapter{
                                 String startT = currentEntry.getStartTime();
                                 String endT = currentEntry.getEndTime();
 
-                                String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(startT);
-                                String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(endT);
+                                String formatedStartTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(startT);
+                                String formatedEndTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(endT);
                                 String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
                                 //String total = mainActivity.calculateTotal(startT, endT);
                                 adapter_ob.updateldetail(rowID, dateForThisEntry, startT, endT, resultTask, total);
@@ -288,8 +284,8 @@ public class CustomAdapter extends BaseAdapter{
                         Log.d("CustomAdpater newS", newStart);
                         Log.d("CustomAdpater newE", newEnd);
 
-                        String formatedStartTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(newStart);
-                        String formatedEndTime = TimeCalculations.convertAmPmToHHMMSSTimeFormat(newEnd);
+                        String formatedStartTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(newStart);
+                        String formatedEndTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(newEnd);
                         String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
                         //String total = mainActivity.calculateTotal(newStart, newEnd);
                         adapter_ob.updateldetail(currentId, dateForThisEntry, newStart, newEnd, task, total);

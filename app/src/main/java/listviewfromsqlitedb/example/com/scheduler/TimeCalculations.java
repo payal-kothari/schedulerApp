@@ -48,7 +48,7 @@ public class TimeCalculations {
         return strb.toString();
     }
 
-    public static String convertAmPmToHHMMSSTimeFormat(String resultS) {
+    public static String convertAmPmToHHmmssTimeFormat(String resultS) {
 
         SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
         SimpleDateFormat parseFormat1 = new SimpleDateFormat("hh:mm a");
