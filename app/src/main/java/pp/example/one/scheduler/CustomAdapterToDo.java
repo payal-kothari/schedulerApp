@@ -1,29 +1,15 @@
-package listviewfromsqlitedb.example.com.scheduler;
+package pp.example.one.scheduler;
 
-import android.app.AlertDialog;
-import android.app.TimePickerDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Paint;
-import android.os.SystemClock;
-import android.text.Editable;
-import android.text.Html;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.TimePicker;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -96,7 +82,7 @@ public class CustomAdapterToDo extends BaseAdapter{
 //        });
 
         int index = position;
-        String taskNameWithIndex = String.valueOf(++index) + list.get(position).task;
+        String taskNameWithIndex = String.valueOf(++index) + ". "  + list.get(position).task;
         listViewHolder.tx_task.setText(taskNameWithIndex);
 //        Log.d("here",list.get(position).status);
         if (list.get(position).status.equals("Y"))

@@ -1,4 +1,4 @@
-package listviewfromsqlitedb.example.com.scheduler;
+package pp.example.one.scheduler;
 
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;

@@ -1,4 +1,4 @@
-package listviewfromsqlitedb.example.com.scheduler;
+package pp.example.one.scheduler;
 
 /**
  * Created by payalkothari on 12/30/16.

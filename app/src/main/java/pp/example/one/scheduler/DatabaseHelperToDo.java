@@ -1,4 +1,4 @@
-package listviewfromsqlitedb.example.com.scheduler;
+package pp.example.one.scheduler;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

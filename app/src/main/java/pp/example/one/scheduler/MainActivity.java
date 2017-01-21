@@ -1,4 +1,4 @@
-package listviewfromsqlitedb.example.com.scheduler;
+package pp.example.one.scheduler;
 
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -10,11 +10,14 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.text.Html;
+import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -27,6 +30,9 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.io.File;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -34,7 +40,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
@@ -46,29 +51,34 @@ public class MainActivity extends Activity {
     Button btnNewTask, btnCalendar, btnIn, btnCopyFromPrevious;
     DatabaseManager adapter;
     DatabaseHelper helper;
-    static String selectedDate; TextView txDate;
+    static String selectedDate;
+    TextView txDate;
     DatabaseManagerToDo adapter_ob_ToDo;
     static String date;
     ListView toDoList;
     Button btnAddTask;
     EditText ed_Task;
     static int statusID=0;
-    static String ongoingStartTime;
-    static String ongoingTask;
-    static int status = 1;
+    String ongoingStartTime;
+    String ongoingTask;
+    //static int status = 1;
     private CharSequence[] Tasks;
     private String selectedText;
-    static int ongoingID;
-    static String ongoingDate;
+    int ongoingID;
+    String ongoingDate;
     static String formatedDate;
     static boolean copyFromPrevious;
     static String selectedOldDateStr;
-    static HashMap<Integer, Intent> alarmsMap = new HashMap<>();
+    static HashMap<Integer, String> alarmsMap = new HashMap<>();
+    static final String SHARED_PREF_ALARM_TONES = "ALARM_TONES";
+    static final String SHARED_PREF_IN_OUT_DATA = "IN_OUT_DATA";
+    GestureDetectorCompat mDetector;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mDetector = new GestureDetectorCompat(this, new MyGestureListener());
         scheduleList = (ListView) findViewById(R.id.list_view);
         actualScheduleList = (ListView) findViewById(R.id.list_viewActual);
         btnNewTask = (Button) findViewById(R.id.btn_newTask);
@@ -88,30 +98,43 @@ public class MainActivity extends Activity {
         selectedDate = df.format(c.getTime());
         formatedDate = setFormatedDate();
         txDate.setText(formatedDate);
+        boolean InOutExist =  isInOutSharedPrefExist();
+        if(!InOutExist){
+            btnIn.setText("IN");
+            saveInOutDataInSharedPref("InOutStatus", "showing_IN");
+        }else {
+            String showing_status = getInOutDataFromSharedPref("InOutStatus", MainActivity.this);
+            if(showing_status.equals("showing_IN")){
+                btnIn.setText("IN");
+            }else if(showing_status.equals("showing_OUT")){
+                btnIn.setText("OUT");
+            }
+        }
 
         showlist();
         showListForActual();
         showlistToDo();
 
         toDoList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
-
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, final long id) {
                 AlertDialog.Builder adb = new AlertDialog.Builder(MainActivity.this);
+                adapter_ob_ToDo = new DatabaseManagerToDo(MainActivity.this);
+                ArrayList<EntryToDo> allEntries = new ArrayList<EntryToDo>();
+                allEntries = adapter_ob_ToDo.fetchByDateList(selectedDate);
+                final EntryToDo currentEntry = allEntries.get((int) id);
+                final int rowID = currentEntry.getID();
+                String taskBeforeEditing = currentEntry.getTask();
                 adb.setTitle("Enter task name: ");
                 final EditText input = new EditText(MainActivity.this);
+                input.setText(taskBeforeEditing);
                 adb.setView(input);
                 adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        adapter_ob_ToDo = new DatabaseManagerToDo(MainActivity.this);
-                        ArrayList<EntryToDo> allEntries = new ArrayList<EntryToDo>();
-                        allEntries = adapter_ob_ToDo.fetchByDateList(selectedDate);
-                        EntryToDo currentEntry = allEntries.get((int) id);
-                        int rowID = currentEntry.getID();
                         String dateForThisEntry = currentEntry.getDate();
                         int statusId = currentEntry.getStatusID();
-                        String resultTask = input.getEditableText().toString();
-                        if(!resultTask.contains("") && resultTask.trim().length() > 0 ){
+                        String resultTask = input.getText().toString();
+                        if(resultTask.trim().length() > 0 ){
                             adapter_ob_ToDo.updateldetail(rowID, dateForThisEntry, resultTask, "N", statusId);
                         }
                     } });
@@ -123,11 +146,6 @@ public class MainActivity extends Activity {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        adapter_ob_ToDo = new DatabaseManagerToDo(MainActivity.this);
-                        ArrayList<EntryToDo> allEntries = new ArrayList<EntryToDo>();
-                        allEntries = adapter_ob_ToDo.fetchByDateList(selectedDate);
-                        EntryToDo currentEntry = allEntries.get((int) id);
-                        int rowID = currentEntry.getID();
                         adapter_ob_ToDo.deleteOneRecord(rowID);
                     }
                 });
@@ -198,8 +216,9 @@ public class MainActivity extends Activity {
                         Entry currentEntry = allEntries.get((int) id);
                         int rowID = currentEntry.getID();
                         manager_ob_actual.deleteOneRecord(rowID);
-                        status = 1;
+                        //status = 1;
                         btnIn.setText("IN");
+                        saveInOutDataInSharedPref("InOutStatus", "showing_IN");
                     } });
                 adb.setNegativeButton("No", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
@@ -233,18 +252,19 @@ public class MainActivity extends Activity {
                 allEntries = adapter_ob.fetchByDateList(selectedDate);
                 final Entry currentEntry = allEntries.get((int) id);
                 final int rowID = currentEntry.getID();
-
-                if(alarmsMap.containsKey(rowID)) {
+                SharedPreferences pref = MainActivity.this.getSharedPreferences(SHARED_PREF_ALARM_TONES, Context.MODE_PRIVATE);
+//                if(alarmsMap.containsKey(rowID)) {
+                if(pref.contains(String.valueOf(rowID))) {
                     alarm_switch.setChecked(true);
-                    Intent intent = alarmsMap.get(rowID);
-                    String tone = intent.getStringExtra("Tone");
-                    if(tone.equals("beep")){
+//                    String tone = alarmsMap.get(rowID);
+                    String toneFromSharedPref = getAlarmToneFromSharedPref(rowID, MainActivity.this);
+                    if(toneFromSharedPref.equals("beep")){
                         alarmTone_radioGroup.clearCheck();
                         beep_radio.setChecked(true);
-                    }else if(tone.equals("vibrate")){
+                    }else if(toneFromSharedPref.equals("vibrate")){
                         alarmTone_radioGroup.clearCheck();
                         vibrate_radio.setChecked(true);
-                    }else if(tone.equals("ring")){
+                    }else if(toneFromSharedPref.equals("ring")){
                         alarmTone_radioGroup.clearCheck();
                         ring_radio.setChecked(true);
                     }
@@ -261,7 +281,6 @@ public class MainActivity extends Activity {
                             updateAlarm(rowID, dateToSet, timeToSet, task, selectedRadioText, MainActivity.this);
                         }
                     });
-
                 }
                 alarm_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
@@ -278,6 +297,7 @@ public class MainActivity extends Activity {
                         }else {
                             cancelAlarm(rowID, MainActivity.this);
                         }
+                        dialog.dismiss();
                     }
                 });
 
@@ -346,7 +366,8 @@ public class MainActivity extends Activity {
         btnIn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(status == 1) {
+                String buttonShowing = getInOutDataFromSharedPref("InOutStatus", MainActivity.this);
+                if(buttonShowing.equals("showing_IN")) {  // status == 1
                     List<String> allTasks;
                     DatabaseManager manager = new DatabaseManager(MainActivity.this);
                     allTasks = manager.fetchAllTasks();
@@ -373,11 +394,11 @@ public class MainActivity extends Activity {
                             String startWithoutSpace = start.replace(" ", "");
                             String AmPmFormatOfStart = startWithoutSpace.substring(startWithoutSpace.length()-2, startWithoutSpace.length());
                             StringBuilder stringbuilder = new StringBuilder();
-                            stringbuilder.append("00").append(":").append("00")
-                                    .append("").append(AmPmFormatOfStart);
+                            //stringbuilder.append("00").append(":").append("00").append("").append(AmPmFormatOfStart);
+                            stringbuilder.append("--------------");
                             String e = stringbuilder.toString();
                             DatabaseManagerForActual manager = new DatabaseManagerForActual(MainActivity.this);
-                            String total = "-:-";
+                            String total = "--------";
                             manager.insertDetails(selectedDate, startWithoutSpace, e, selectedText, total);
                             showListForActual();
                             DatabaseManagerForActual manager1 = new DatabaseManagerForActual(MainActivity.this);
@@ -387,8 +408,11 @@ public class MainActivity extends Activity {
                             Log.d("rowId ongoign ",  String.valueOf(ongoingID));
                             ongoingDate = selectedDate;
                             btnIn.setText("OUT");
+                            saveInOutDataInSharedPref("ongoingID", String.valueOf(ongoingID));
+                            saveInOutDataInSharedPref("ongoingDate", ongoingDate);
+                            saveInOutDataInSharedPref("InOutStatus", "showing_OUT");
                             showListForActual();
-                            status = 0;
+                            //status = 0;
                         }
                     });
                     dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -398,7 +422,7 @@ public class MainActivity extends Activity {
                         }
                     });
 
-                    dialogBuilder.setNeutralButton(Html.fromHtml("<b><i>" + "+" + "</i><b>"), new DialogInterface.OnClickListener() {
+                    dialogBuilder.setNeutralButton("+", new DialogInterface.OnClickListener() {
 
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -421,11 +445,11 @@ public class MainActivity extends Activity {
 
                             String AmPmFormatOfStart = startWithoutSpace.substring(startWithoutSpace.length()-2, startWithoutSpace.length());
                             StringBuilder stringbuilder = new StringBuilder();
-                            stringbuilder.append("00").append(":").append("00")
-                                    .append("").append(AmPmFormatOfStart);
+                            //stringbuilder.append("00").append(":").append("00").append("").append(AmPmFormatOfStart);
+                            stringbuilder.append("--------------");
                             String e = stringbuilder.toString();
                             DatabaseManagerForActual manager = new DatabaseManagerForActual(MainActivity.this);
-                            String total = "-:-";
+                            String total = "--------";
                             manager.insertDetails(selectedDate, startWithoutSpace, e, taskFromUser, total);
                             showListForActual();
                             DatabaseManagerForActual manager1 = new DatabaseManagerForActual(MainActivity.this);
@@ -436,8 +460,11 @@ public class MainActivity extends Activity {
                             ongoingDate = selectedDate;
                             Log.d("date ongoign ",  ongoingDate);
                             btnIn.setText("OUT");
-                                    showListForActual();
-                            status = 0;
+                            saveInOutDataInSharedPref("ongoingID", String.valueOf(ongoingID));
+                            saveInOutDataInSharedPref("ongoingDate", ongoingDate);
+                            saveInOutDataInSharedPref("InOutStatus", "showing_OUT");
+                            showListForActual();
+                            //status = 0;
                                 } // End of onClick(DialogInterface dialog, int whichButton)
                             }); //End of alert.setPositiveButton
                             alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -456,6 +483,9 @@ public class MainActivity extends Activity {
                     alertDialogObject.getButton(DialogInterface.BUTTON_NEUTRAL).setTextSize(40);
                 } else {
                     DatabaseManagerForActual manager = new DatabaseManagerForActual(MainActivity.this);
+                    ongoingDate = getInOutDataFromSharedPref("ongoingDate", MainActivity.this);
+                    String ongoingIDstr  = getInOutDataFromSharedPref("ongoingID", MainActivity.this);
+                    ongoingID = Integer.parseInt(ongoingIDstr);
                     Cursor c = manager.fetchByDate(ongoingDate);
                     if (c.moveToFirst()) {
                         do {
@@ -463,6 +493,8 @@ public class MainActivity extends Activity {
                             if(rowId == ongoingID){
                                 ongoingStartTime = c.getString(c.getColumnIndex("startTime"));
                                 ongoingTask = c.getString(c.getColumnIndex("taskName"));
+                                saveInOutDataInSharedPref("ongoingTask", ongoingTask);
+                                saveInOutDataInSharedPref("ongoingStartTime", ongoingStartTime);
                                 break;
                             }
                         } while (c.moveToNext());
@@ -477,8 +509,9 @@ public class MainActivity extends Activity {
 
                     manager.updateldetail(ongoingID, ongoingDate, ongoingStartTime, endWithoutSpace, ongoingTask, total);
                     btnIn.setText("IN");
+                    saveInOutDataInSharedPref("InOutStatus", "showing_IN");
                     showListForActual();
-                    status = 1;
+                    //status = 1;
                 }
             }
         });
@@ -526,13 +559,96 @@ public class MainActivity extends Activity {
         });
     }
 
+    public boolean isInOutSharedPrefExist() {
+        File f = new File(
+                "/data/data/pp.example.one.scheduler/shared_prefs/IN_OUT_STATUS.xml");
+        if (f.exists()){
+            Log.d("TAG", "SharedPreferences Name_of_your_preference : exist");
+            return true;
+        }
+        else{
+            Log.d("TAG", "Setup default preferences");
+            return  false;
+        }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event){
+        this.mDetector.onTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent (MotionEvent ev) {
+        // Do your calcluations
+        return super.dispatchTouchEvent(ev);
+    }
+
+    class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+        private static final String DEBUG_TAG = "Gestures";
+        static final int SWIPE_MIN_DISTANCE = 120;
+        static final int SWIPE_MAX_OFF_PATH = 250;
+        static final int SWIPE_THRESHOLD_VELOCITY = 200;
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2,
+                               float velocityX, float velocityY) {
+
+            if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH) {
+                if (Math.abs(e1.getX() - e2.getX()) > SWIPE_MAX_OFF_PATH
+                        || Math.abs(velocityY) < SWIPE_THRESHOLD_VELOCITY) {
+                    return false;
+                }
+                if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE) {
+                    Toast.makeText(MainActivity.this, "bottomToTop" ,
+                            Toast.LENGTH_SHORT).show();
+                } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE) {
+                    Toast.makeText(MainActivity.this,
+                            "topToBottom  " , Toast.LENGTH_SHORT)
+                            .show();
+                }
+            } else {
+                if (Math.abs(velocityX) < SWIPE_THRESHOLD_VELOCITY) {
+                    return false;
+                }
+                if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE) {
+                    Toast.makeText(MainActivity.this,
+                            "swipe RightToLeft " , Toast.LENGTH_SHORT).show();
+                } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE) {
+
+
+                    Toast.makeText(MainActivity.this,
+                            "swipe LeftToright  " , Toast.LENGTH_SHORT).show();
+
+
+                }
+            }
+
+            return super.onFling(e1, e2, velocityX, velocityY);
+        }
+    }
+
+    public String getAlarmToneFromSharedPref(int rowID, Context context) {
+        SharedPreferences pref = context.getSharedPreferences(SHARED_PREF_ALARM_TONES, Context.MODE_PRIVATE);
+        String tone = pref.getString(String.valueOf(rowID), null);
+        return tone;
+    }
+
     public void cancelAlarm(int rowID, Context context) {
-        alarmsMap.remove(rowID);
+//        alarmsMap.remove(rowID);
+        removeAlarmToneForRowFromSharedPref(rowID);
         Intent notificationIntent = new Intent(context, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context,
                 rowID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(pendingIntent);
+    }
+
+    public void removeAlarmToneForRowFromSharedPref(int rowID) {
+        String rowIDStr = String.valueOf(rowID);
+        SharedPreferences.Editor editor = getSharedPreferences(SHARED_PREF_ALARM_TONES, 0).edit();
+        editor.remove(rowIDStr);
+        editor.commit();
     }
 
     public void setAlarm(int rowID, String dateToSet, String timeToSet, String task, String tone, Context context) {
@@ -565,12 +681,35 @@ public class MainActivity extends Activity {
         notificationIntent.putExtra(AlarmReceiver.NOTIFICATION_ID, rowID);
         notificationIntent.putExtra(AlarmReceiver.NOTIFICATION, notification);
         notificationIntent.putExtra("Tone", tone);
-        alarmsMap.put(rowID, notificationIntent);
+//        alarmsMap.put(rowID, tone);
+        saveAlarmToneForRowInSharedPref(rowID, tone);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context,
                 rowID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent);
     }
+
+    public void saveAlarmToneForRowInSharedPref(int rowID, String tone) {
+        String rowIDStr = String.valueOf(rowID);
+        SharedPreferences.Editor editor = getSharedPreferences(SHARED_PREF_ALARM_TONES, 0).edit();
+        editor.putString(rowIDStr, tone);
+        editor.commit();
+    }
+
+    public void saveInOutDataInSharedPref(String stringName, String status) {
+        SharedPreferences.Editor editor = getSharedPreferences(SHARED_PREF_IN_OUT_DATA, 0).edit();
+        editor.putString(stringName, status);
+       // editor.putString("InOutStatus", status);
+        editor.commit();
+    }
+
+    private String getInOutDataFromSharedPref(String stringName, Context context) {
+        SharedPreferences pref = context.getSharedPreferences(SHARED_PREF_IN_OUT_DATA, Context.MODE_PRIVATE);
+        String buttonShowing = pref.getString(stringName, null);
+        //String buttonShowing = pref.getString("InOutStatus", null);
+        return buttonShowing;
+    }
+
 
     private String setFormatedDate() {
         Calendar cal = Calendar.getInstance();
@@ -688,10 +827,12 @@ public class MainActivity extends Activity {
 
     public void updateAlarm(int rowId, String date, String timeToSet, String task, String changedTone, Context context){
         String tone = changedTone;
-        Intent intent = alarmsMap.get(rowId);
-        if(intent != null){
+//        String previosTone = alarmsMap.get(rowId);
+        String previosTone = getAlarmToneFromSharedPref(rowId, context);
+
+        if(previosTone != null){
             if(tone == null){
-                tone = intent.getStringExtra("Tone");
+                tone = previosTone;
             }
             cancelAlarm(rowId, context);
             setAlarm(rowId, date, timeToSet, task, tone, context);

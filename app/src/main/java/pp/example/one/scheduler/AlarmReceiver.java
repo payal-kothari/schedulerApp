@@ -1,4 +1,4 @@
-package listviewfromsqlitedb.example.com.scheduler;
+package pp.example.one.scheduler;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
-import android.widget.Toast;
 
 import java.util.Random;
 
@@ -27,17 +26,20 @@ public class AlarmReceiver extends BroadcastReceiver {
         String tone = intent.getStringExtra("Tone");
 
         if(tone.equals("ring")){
-            mainActivity.alarmsMap.remove(id);
+//            mainActivity.alarmsMap.remove(id);
+            mainActivity.removeAlarmToneForRowFromSharedPref(id);
             mp= MediaPlayer.create(context, R.raw.thuglife);
             mp.start();
             notificationManager.notify(id, notification);
         }else if(tone.equals("beep")){
-            mainActivity.alarmsMap.remove(id);
+//            mainActivity.alarmsMap.remove(id);
+            mainActivity.removeAlarmToneForRowFromSharedPref(id);
             mp= MediaPlayer.create(context, R.raw.double_beep);
             mp.start();
             notificationManager.notify(id, notification);
         }else if(tone.equals("vibrate")){
-            mainActivity.alarmsMap.remove(id);
+//            mainActivity.alarmsMap.remove(id);
+            mainActivity.removeAlarmToneForRowFromSharedPref(id);
             notificationManager.notify(id, notification);
         }
     }
