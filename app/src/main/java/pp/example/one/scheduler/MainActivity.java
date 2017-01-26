@@ -128,6 +128,8 @@ public class MainActivity extends Activity {
                 adb.setTitle("Enter task name: ");
                 final EditText input = new EditText(MainActivity.this);
                 input.setText(taskBeforeEditing);
+                int posOfCursor = taskBeforeEditing.length();
+                input.setSelection(posOfCursor);
                 adb.setView(input);
                 adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
