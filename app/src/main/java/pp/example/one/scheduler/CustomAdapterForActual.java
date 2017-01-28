@@ -99,6 +99,7 @@ public class CustomAdapterForActual extends BaseAdapter{
 
                         //String total = mainActivity.calculateTotal(resultS, endT);
                         adapter_ob.updateldetail(rowID, dateForThisEntry, resultS, endT, taskN, total);
+
                     }
                 }, hour, minute, false);
                 mTimePicker.setTitle("Select Time");
@@ -132,6 +133,7 @@ public class CustomAdapterForActual extends BaseAdapter{
 
                         //String total = mainActivity.calculateTotal(startT, resultE);
                         adapter_ob.updateldetail(rowID, dateForThisEntry, startT, resultE, taskN, total);
+
                     }
                 }, hour, minute, false);
                 mTimePicker.setTitle("Select Time");
@@ -143,7 +145,7 @@ public class CustomAdapterForActual extends BaseAdapter{
             @Override
             public void onClick(View v) {
                 List<String> allTasks;
-                DatabaseManager manager = new DatabaseManager(context);
+                final DatabaseManager manager = new DatabaseManager(context);
                 allTasks = manager.fetchAllTasks();
                 allTasks.add("None");
                 //Create sequence of items
@@ -180,6 +182,7 @@ public class CustomAdapterForActual extends BaseAdapter{
 
                         //String total = mainActivity.calculateTotal(startT, endT);
                         adapter_ob.updateldetail(rowID, dateForThisEntry, startT, endT, selectedText, total);
+
                     }
                 });
                 dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -224,6 +227,7 @@ public class CustomAdapterForActual extends BaseAdapter{
 
                                 //String total = mainActivity.calculateTotal(startT, endT);
                                 adapter_ob.updateldetail(rowID, dateForThisEntry, startT, endT, resultTask, total);
+
                             } // End of onClick(DialogInterface dialog, int whichButton)
                         }); //End of alert.setPositiveButton
                         alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {

@@ -101,6 +101,7 @@ public class CustomAdapter extends BaseAdapter{
 
                         adapter_ob.updateldetail(rowID, dateForThisEntry, resultS, endT, taskN, total);
                         mainActivity.updateAlarm(rowID, dateForThisEntry, resultS, taskN, null, context);
+
                     }
                 }, hour, minute, false);
                 mTimePicker.setTitle("Select Time");
@@ -141,6 +142,7 @@ public class CustomAdapter extends BaseAdapter{
                         String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
 
                         adapter_ob.updateldetail(rowID, dateForThisEntry, startT, resultE, taskN, total);
+
                     }
                 }, hour, minute, false);
                 mTimePicker.setTitle("Select Time");
@@ -188,6 +190,7 @@ public class CustomAdapter extends BaseAdapter{
                         String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
                         //String total = mainActivity.calculateTotal(startT, endT);
                         adapter_ob.updateldetail(rowID, dateForThisEntry, startT, endT, selectedText, total);
+
                     }
                 });
                 dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -231,6 +234,7 @@ public class CustomAdapter extends BaseAdapter{
                                 String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
                                 //String total = mainActivity.calculateTotal(startT, endT);
                                 adapter_ob.updateldetail(rowID, dateForThisEntry, startT, endT, resultTask, total);
+
                             } // End of onClick(DialogInterface dialog, int whichButton)
                         }); //End of alert.setPositiveButton
                         alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {

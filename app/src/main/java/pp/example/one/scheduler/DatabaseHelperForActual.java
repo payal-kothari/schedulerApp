@@ -31,6 +31,7 @@ public class DatabaseHelperForActual extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_SCHEDULE_FOR_ACTUAL_TABLE);
+        db.execSQL("CREATE INDEX date_index ON scheduleForActual(date)");
     }
 
     @Override

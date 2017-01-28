@@ -101,11 +101,14 @@ public class DatabaseManagerForActual{
 
 
     public Cursor fetchByDate(String date) {
-        String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME, databaseHelper_ob.TOTAL };
         opnToWrite();
-        int nameId = 1;
-        Cursor c = database_ob_for_actual.query(databaseHelper_ob.TABLE_NAME,
-                null, databaseHelper_ob.DATE + "=?", new String[] { date }, null, null, null, null);
+        //Cursor c = database_ob_for_actual.query(databaseHelper_ob.TABLE_NAME, null, databaseHelper_ob.DATE + "=?", new String[] { date }, null, null, null, null);
+        Cursor c = database_ob_for_actual.rawQuery(
+                "SELECT *"
+                        + " FROM scheduleForActual INDEXED BY date_index"
+                        + " WHERE date = ?",
+                new String[] {date}
+        );
         return c;
     }
 

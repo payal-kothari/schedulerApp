@@ -31,6 +31,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_SCHEDULE_TABLE);
+        db.execSQL("CREATE INDEX date_index ON schedule(date)");
+        System.out.println("indexing");
     }
 
     @Override

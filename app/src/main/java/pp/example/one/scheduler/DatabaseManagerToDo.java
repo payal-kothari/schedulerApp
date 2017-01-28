@@ -89,8 +89,13 @@ public class DatabaseManagerToDo {
     public ArrayList<EntryToDo> fetchByDateList(String date) {
         String[] cols = { DatabaseHelperToDo_ob.KEY_ID, DatabaseHelperToDo_ob.DATE, DatabaseHelperToDo_ob.TASK, DatabaseHelperToDo_ob.STATUS, DatabaseHelperToDo_ob.STATUSID };
         opnToWrite();
-        Cursor c = database_ob.query(DatabaseHelperToDo_ob.TABLE_NAME,
-                null, DatabaseHelperToDo_ob.DATE + "=?", new String[] { date }, null, null, null, null);
+        //Cursor c = database_ob.query(DatabaseHelperToDo_ob.TABLE_NAME, null, DatabaseHelperToDo_ob.DATE + "=?", new String[] { date }, null, null, null, null);
+        Cursor c = database_ob.rawQuery(
+                "SELECT *"
+                        + " FROM toDo INDEXED BY date_index"
+                        + " WHERE date = ?",
+                new String[] {date}
+        );
         ArrayList<EntryToDo> entryList = new ArrayList<EntryToDo>();
         // looping through all rows and adding to list
         if (c.moveToFirst()) {

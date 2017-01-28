@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -89,7 +90,6 @@ public class DatabaseManager{
     public ArrayList<Entry> fetchByDateList(String date) {
         String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME, databaseHelper_ob.TOTAL };
         opnToWrite();
-        int nameId = 1;
         Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME,
                 null, databaseHelper_ob.DATE + "=?", new String[] { date }, null, null, null, null);
         ArrayList<Entry> entryList = new ArrayList<Entry>();
@@ -107,14 +107,19 @@ public class DatabaseManager{
                 entryList.add(entry);
             } while (c.moveToNext());
         }
+        c.close();
         return entryList;
     }
 
     public Cursor fetchByDate(String date) {
-        String[] cols = { databaseHelper_ob.KEY_ID, databaseHelper_ob.DATE, databaseHelper_ob.START_TIME, databaseHelper_ob.END_TIME, databaseHelper_ob.TASK_NAME, databaseHelper_ob.TOTAL };
         opnToWrite();
-        Cursor c = database_ob.query(databaseHelper_ob.TABLE_NAME,
-                null, databaseHelper_ob.DATE + "=?", new String[] { date }, null, null, null, null);
+        Log.d("fetching by date", "fetched");
+        Cursor c = database_ob.rawQuery(
+                "SELECT *"
+                        + " FROM schedule INDEXED BY date_index"
+                        + " WHERE date = ?",
+                new String[] {date}
+        );
         return c;
     }
 

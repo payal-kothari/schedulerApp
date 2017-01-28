@@ -58,29 +58,6 @@ public class CustomAdapterToDo extends BaseAdapter{
             listViewHolder = (ListViewHolder) v.getTag();
         }
 
-//        EntryToDo myTask = list.get(position);
-
-//        listViewHolder.tx_task.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                TextView task = (TextView) v.findViewById(R.id.tx_task);
-//                adapterToDo_ob = new DatabaseManagerToDo(context);
-//                ArrayList<EntryToDo> allEntries = new ArrayList<EntryToDo>();
-//                allEntries = adapterToDo_ob.fetchByDateList(MainActivity.selectedDate);
-//                EntryToDo currentEntry = allEntries.get(position);
-//                int rowID = currentEntry.getID();
-//                String dateForThisEntry = currentEntry.getDate();
-//                String taskN = currentEntry.getTask();
-//                int statusId = currentEntry.getStatusID();
-//                if(currentEntry.getStatus().equals("N")){
-//                    Log.d("statusCheck", currentEntry.getStatus());
-//                    //task.setPaintFlags(task.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-//                    updateAllStatus(statusId, "Y");
-//                    adapterToDo_ob.updateldetail(rowID, dateForThisEntry, taskN, "Y", statusId);
-//                }
-//            }
-//        });
-
         int index = position;
         String taskNameWithIndex = String.valueOf(++index) + ". "  + list.get(position).task;
         listViewHolder.tx_task.setText(taskNameWithIndex);

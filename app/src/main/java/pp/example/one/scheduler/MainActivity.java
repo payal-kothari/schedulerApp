@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
@@ -69,6 +70,7 @@ public class MainActivity extends Activity {
     static String formatedDate;
     static boolean copyFromPrevious;
     static String selectedOldDateStr;
+    static  int toDoListIndex, toDoListTop, plannedListIndex, plannedListTop, actualListIndex, actualListTop;
     static HashMap<Integer, String> alarmsMap = new HashMap<>();
     static final String SHARED_PREF_ALARM_TONES = "ALARM_TONES";
     static final String SHARED_PREF_IN_OUT_DATA = "IN_OUT_DATA";
@@ -111,9 +113,9 @@ public class MainActivity extends Activity {
             }
         }
 
-        showlist();
-        showListForActual();
-        showlistToDo();
+//        showlist();
+//        showListForActual();
+//        showlistToDo();
 
         toDoList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
             @Override
@@ -131,6 +133,10 @@ public class MainActivity extends Activity {
                 int posOfCursor = taskBeforeEditing.length();
                 input.setSelection(posOfCursor);
                 adb.setView(input);
+                toDoListIndex = toDoList.getFirstVisiblePosition();
+                View v = toDoList.getChildAt(0);
+                toDoListTop = (v == null) ? 0 : v.getTop();
+
                 adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         String dateForThisEntry = currentEntry.getDate();
@@ -156,7 +162,6 @@ public class MainActivity extends Activity {
             }
         });
 
-
         toDoList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -168,15 +173,26 @@ public class MainActivity extends Activity {
                 String dateForThisEntry = currentEntry.getDate();
                 String taskN = currentEntry.getTask();
                 int statusId = currentEntry.getStatusID();
+                toDoListIndex = toDoList.getFirstVisiblePosition();
+                View v = toDoList.getChildAt(0);
+                toDoListTop = (v == null) ? 0 : v.getTop();
                 if(currentEntry.getStatus().equals("N")){
                     Log.d("statusCheck", currentEntry.getStatus());
                     updateAllStatus(statusId, "Y");
                     adapter_ob_ToDo.updateldetail(rowID, dateForThisEntry, taskN, "Y", statusId);
-                    showlistToDo();
+                    try {
+                        showlistToDo();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                 }else if (currentEntry.getStatus().equals("Y")){
                     updateAllStatus(statusId, "Y");
                     adapter_ob_ToDo.updateldetail(rowID, dateForThisEntry, taskN, "N", statusId);
-                    showlistToDo();
+                    try {
+                        showlistToDo();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -185,14 +201,24 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 String taskName = ed_Task.getText().toString();
-                ed_Task.setText("");
+                if (ed_Task.length() > 0) {
+                    ed_Task.getText().clear();
+                }
                 if(!taskName.equals("")){
                     statusID++;
                     adapter_ob_ToDo = new DatabaseManagerToDo(MainActivity.this);
                     adapter_ob_ToDo.insertDetails(selectedDate, taskName, "N", statusID);
-                    showlistToDo();
+                    try {
+                        showlistToDo();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                 }else {
-                    showlistToDo();
+                    try {
+                        showlistToDo();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -210,6 +236,9 @@ public class MainActivity extends Activity {
                 AlertDialog.Builder adb = new AlertDialog.Builder(MainActivity.this);
                 adb.setMessage("Do you want to delete this entry ? ");
                 adb.setIcon(android.R.drawable.ic_dialog_alert);
+                actualListIndex = scheduleList.getFirstVisiblePosition();
+                View v = scheduleList.getChildAt(0);
+                actualListTop = (v == null) ? 0 : v.getTop();
                 adb.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         manager_ob_actual = new DatabaseManagerForActual(MainActivity.this);
@@ -252,6 +281,9 @@ public class MainActivity extends Activity {
 
                 ArrayList<Entry> allEntries;
                 allEntries = adapter_ob.fetchByDateList(selectedDate);
+                plannedListIndex = scheduleList.getFirstVisiblePosition();
+                View v = scheduleList.getChildAt(0);
+                plannedListTop = (v == null) ? 0 : v.getTop();
                 final Entry currentEntry = allEntries.get((int) id);
                 final int rowID = currentEntry.getID();
                 SharedPreferences pref = MainActivity.this.getSharedPreferences(SHARED_PREF_ALARM_TONES, Context.MODE_PRIVATE);
@@ -522,41 +554,99 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 adapter = new DatabaseManager(MainActivity.this);
-                Cursor c = adapter.fetchByDate(selectedDate);
-                int num = c.getCount();
-                if(num > 0) {
-                    c.moveToLast();
-                    String start = c.getString(c.getColumnIndex(helper.END_TIME));
-                    String tempHr = start.substring(0, 2);
 
-                    String endTime = TimeCalculations.forwardTimeByGivenHour(start, 1, 0);
-                    String task = c.getString(c.getColumnIndex(helper.TASK_NAME));
+                new AsyncTask<String, Void, Cursor>(){
+                    @Override
+                    protected Cursor doInBackground(String... params) {
+                        Cursor c = adapter.fetchByDate(selectedDate);
+                        return c;
+                    }
 
-                    String formatedStartTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(start);
-                    String formatedEndTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(endTime);
-                    String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
+                    @Override
+                    protected void onPostExecute(Cursor c) {
+                        super.onPostExecute(c);
 
-                    adapter.insertDetails(selectedDate, start, endTime, task, total);
-                    showlist();
-                }else { // when database is empty
-                    DateFormat time = new SimpleDateFormat("hh:mm a");
-                    String start = time.format(Calendar.getInstance().getTime());
-                    String startWithoutSpace = start.replace(" ", "");
+                        if(c.moveToLast()) {
+                            //c.moveToLast();
+                            String start = c.getString(3); // get end time and store as start for next task
 
-                    String endTime = TimeCalculations.forwardTimeByGivenHour(startWithoutSpace, 1, 0);
-                    String task = "None";
+                            String endTime = TimeCalculations.forwardTimeByGivenHour(start, 1, 0);
+                            String task = c.getString(4); // get task name
 
-                    String formattedDateStart = new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime());
-                    Calendar cal = Calendar.getInstance();
-                    cal.add(Calendar.HOUR, 1);
-                    Date d = cal.getTime();
-                    String formattedDateEnd = new SimpleDateFormat("HH:mm:ss").format(d);
-                    String total = TimeCalculations.calculateTotal(formattedDateStart, formattedDateEnd);
+                            String formatedStartTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(start);
+                            String formatedEndTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(endTime);
+                            Log.d("Endtime", formatedStartTime);
+                            Log.d("Endtime", formatedEndTime);
+                            String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
 
-                    Log.d("mainActivity 1", total);
-                    adapter.insertDetails(selectedDate, startWithoutSpace, endTime, task, total);
-                    showlist();
-                }
+                            adapter.insertDetails(selectedDate, start, endTime, task, total);
+                            c.close();
+                            showlist();
+                        }else { // when database is empty
+                            DateFormat time = new SimpleDateFormat("hh:mm a");
+                            String start = time.format(Calendar.getInstance().getTime());
+                            String startWithoutSpace = start.replace(" ", "");
+
+                            String endTime = TimeCalculations.forwardTimeByGivenHour(startWithoutSpace, 1, 0);
+                            String task = "None";
+
+                            String formattedDateStart = new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime());
+                            Calendar cal = Calendar.getInstance();
+                            cal.add(Calendar.HOUR, 1);
+                            Date d = cal.getTime();
+                            String formattedDateEnd = new SimpleDateFormat("HH:mm:ss").format(d);
+                            Log.d("Endtime", formattedDateStart);
+                            Log.d("Endtime", formattedDateEnd);
+                            String total = TimeCalculations.calculateTotal(formattedDateStart, formattedDateEnd);
+
+                            Log.d("mainActivity 1", total);
+                            adapter.insertDetails(selectedDate, startWithoutSpace, endTime, task, total);
+                            c.close();
+                            showlist();
+                        }
+
+
+                    }
+                }.execute(selectedDate);
+
+//                Cursor c = adapter.fetchByDate(selectedDate);
+                //int num = c.getCount();
+//                if(c.moveToLast()) {
+//                    //c.moveToLast();
+//                    String start = c.getString(3); // get end time and store as start for next task
+//
+//                    String endTime = TimeCalculations.forwardTimeByGivenHour(start, 1, 0);
+//                    String task = c.getString(4); // get task name
+//
+//                    String formatedStartTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(start);
+//                    String formatedEndTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(endTime);
+//                    Log.d("Endtime", formatedStartTime);
+//                    Log.d("Endtime", formatedEndTime);
+//                    String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
+//
+//                    adapter.insertDetails(selectedDate, start, endTime, task, total);
+//                    showlist();
+//                }else { // when database is empty
+//                    DateFormat time = new SimpleDateFormat("hh:mm a");
+//                    String start = time.format(Calendar.getInstance().getTime());
+//                    String startWithoutSpace = start.replace(" ", "");
+//
+//                    String endTime = TimeCalculations.forwardTimeByGivenHour(startWithoutSpace, 1, 0);
+//                    String task = "None";
+//
+//                    String formattedDateStart = new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime());
+//                    Calendar cal = Calendar.getInstance();
+//                    cal.add(Calendar.HOUR, 1);
+//                    Date d = cal.getTime();
+//                    String formattedDateEnd = new SimpleDateFormat("HH:mm:ss").format(d);
+//                    Log.d("Endtime", formattedDateStart);
+//                    Log.d("Endtime", formattedDateEnd);
+//                    String total = TimeCalculations.calculateTotal(formattedDateStart, formattedDateEnd);
+//
+//                    Log.d("mainActivity 1", total);
+//                    adapter.insertDetails(selectedDate, startWithoutSpace, endTime, task, total);
+//                    showlist();
+//                }
             }
         });
     }
@@ -648,8 +738,11 @@ public class MainActivity extends Activity {
 
     public void removeAlarmToneForRowFromSharedPref(int rowID) {
         String rowIDStr = String.valueOf(rowID);
-        SharedPreferences.Editor editor = getSharedPreferences(SHARED_PREF_ALARM_TONES, 0).edit();
-        editor.remove(rowIDStr);
+        SharedPreferences pref = MainActivity.this.getSharedPreferences(SHARED_PREF_ALARM_TONES, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        if(pref.contains(rowIDStr)){
+            editor.remove(rowIDStr);
+        }
         editor.commit();
     }
 
@@ -787,35 +880,6 @@ public class MainActivity extends Activity {
         c1.close();
     }
 
-    private void showListForActual() {
-        manager_ob_actual = new DatabaseManagerForActual(this);
-        ArrayList<Entry> allEntries = new ArrayList<Entry>();
-        allEntries.clear();
-        Cursor c1 = manager_ob_actual.fetchByDate(selectedDate);
-        if (c1 != null && c1.getCount() != 0) {
-            if (c1.moveToFirst()) {
-                do {
-                    Entry allItems = new Entry();
-                    allItems.setID(c1.getInt(c1
-                            .getColumnIndex("_id")));
-                    allItems.setStart(c1.getString(c1
-                            .getColumnIndex("startTime")));
-                    allItems.setEnd(c1.getString(c1
-                            .getColumnIndex("endTime")));
-                    allItems.setTask(c1.getString(c1
-                            .getColumnIndex("taskName")));
-                    allItems.setTotal(c1.getString(c1
-                            .getColumnIndex("total")));
-                    allEntries.add(allItems);
-                } while (c1.moveToNext());
-            }
-        }
-        c1.close();
-        CustomAdapterForActual customAdapterForActual = new CustomAdapterForActual(
-                MainActivity.this, allEntries);
-        actualScheduleList.setAdapter(customAdapterForActual);
-    }
-
     private Notification getNotification(String content, String tone, Context context) {
         Notification.Builder builder = new Notification.Builder(context);
         if(tone.equals("vibrate")){
@@ -839,29 +903,6 @@ public class MainActivity extends Activity {
             cancelAlarm(rowId, context);
             setAlarm(rowId, date, timeToSet, task, tone, context);
         }
-    }
-
-    public void showlistToDo() {
-        adapter_ob_ToDo = new DatabaseManagerToDo(this);
-        ArrayList<EntryToDo> allEntries = new ArrayList<EntryToDo>();
-        allEntries.clear();
-        Cursor c1 = adapter_ob_ToDo.fetchByDate(selectedDate);
-        Log.d("date in shwlist", selectedDate);
-        if (c1 != null && c1.getCount() != 0) {
-            if (c1.moveToFirst()) {
-                do {
-                    EntryToDo allItems = new EntryToDo();
-                    allItems.setTask(c1.getString(c1
-                            .getColumnIndex("task")));
-                    allItems.setStatus(c1.getString(c1
-                            .getColumnIndex("status")));
-                    allEntries.add(allItems);
-                } while (c1.moveToNext());
-            }
-        }
-        c1.close();
-        CustomAdapterToDo customAdapterToDo = new CustomAdapterToDo(MainActivity.this, allEntries);
-        toDoList.setAdapter(customAdapterToDo);
     }
 
     public void updateAllStatus(int statusId, String status) {
@@ -972,7 +1013,11 @@ public class MainActivity extends Activity {
         Log.d("window focised2", "focus changed");
         showListForActual();
         showlist();
-        showlistToDo();
+        try {
+            showlistToDo();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         Log.d("window focised3", "focus changed");
     }
 
@@ -980,36 +1025,156 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         showlist();
+        showListForActual();
+        try {
+            showlistToDo();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private class showPlannedList extends AsyncTask<String, Object, ArrayList<Entry>> {
+        ArrayList<Entry> allEntries = new ArrayList<Entry>();
+
+        @Override
+        protected ArrayList<Entry> doInBackground(String... params) {
+            DatabaseManager adapter_ob = new DatabaseManager(MainActivity.this);
+            Cursor c1 =  adapter_ob.fetchByDate(params[0]);
+            Log.d("date in shwlist", selectedDate);
+            if (c1 != null) {
+                if (c1.moveToFirst()) {
+                    do {
+                        Entry allItems = new Entry();
+                        allItems.setID(c1.getInt(0));
+                        allItems.setStart(c1.getString(2));
+                        allItems.setEnd(c1.getString(3));
+                        allItems.setTask(c1.getString(4));
+                        allItems.setTotal(c1.getString(5));
+
+//                        allItems.setID(c1.getInt(c1
+//                                .getColumnIndex("_id")));
+//                        allItems.setStart(c1.getString(c1
+//                                .getColumnIndex("startTime")));
+//                        allItems.setEnd(c1.getString(c1
+//                                .getColumnIndex("endTime")));
+//                        allItems.setTask(c1.getString(c1
+//                                .getColumnIndex("taskName")));
+//                        allItems.setTotal(c1.getString(c1
+//                                .getColumnIndex("total")));
+                        allEntries.add(allItems);
+                        Log.d("work in loadign", "too much");
+                    } while (c1.moveToNext());
+                }
+            }
+            c1.close();
+            return allEntries;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<Entry> allEntries) {
+            super.onPostExecute(allEntries);
+
+            CustomAdapter customAdapter = new CustomAdapter(MainActivity.this, allEntries);
+            scheduleList.setAdapter(customAdapter);
+            scheduleList.setSelectionFromTop(plannedListIndex, plannedListTop);
+        }
     }
 
     public void showlist() {
-        txDate.setText(formatedDate);
-        adapter_ob = new DatabaseManager(this);
-        ArrayList<Entry> allEntries = new ArrayList<Entry>();
-        allEntries.clear();
-        Cursor c1 = adapter_ob.fetchByDate(selectedDate);
-        Log.d("date in shwlist", selectedDate);
-        if (c1 != null && c1.getCount() != 0) {
-            if (c1.moveToFirst()) {
-                do {
-                    Entry allItems = new Entry();
-                    allItems.setID(c1.getInt(c1
-                            .getColumnIndex("_id")));
-                    allItems.setStart(c1.getString(c1
-                            .getColumnIndex("startTime")));
-                    allItems.setEnd(c1.getString(c1
-                            .getColumnIndex("endTime")));
-                    allItems.setTask(c1.getString(c1
-                            .getColumnIndex("taskName")));
-                    allItems.setTotal(c1.getString(c1
-                            .getColumnIndex("total")));
-                    allEntries.add(allItems);
-                } while (c1.moveToNext());
+        //txDate.setText(formatedDate);
+        new showPlannedList().execute(selectedDate);
+    }
+
+    public void showlistToDo() throws ParseException {
+        copyOldToDo();
+        new showToDoList().execute(selectedDate);
+    }
+
+    private class showToDoList extends AsyncTask<String, Object, ArrayList<EntryToDo>> {
+        ArrayList<EntryToDo> allEntries = new ArrayList<EntryToDo>();
+
+        @Override
+        protected ArrayList<EntryToDo> doInBackground(String... params) {
+            DatabaseManagerToDo adapter_ob_ToDo = new DatabaseManagerToDo(MainActivity.this);
+            Cursor c1 = adapter_ob_ToDo.fetchByDate(params[0]);
+            Log.d("date in shwlistTODO", selectedDate);
+            if (c1 != null) {
+                if (c1.moveToFirst()) {
+                    do {
+                        EntryToDo allItems = new EntryToDo();
+                        allItems.setTask(c1.getString(2));
+                        allItems.setStatus(c1.getString(3));
+
+//                        allItems.setTask(c1.getString(c1
+//                                .getColumnIndex("task")));
+//                        allItems.setStatus(c1.getString(c1
+//                                .getColumnIndex("status")));
+                        allEntries.add(allItems);
+                    } while (c1.moveToNext());
+                }
             }
+            c1.close();
+            return allEntries;
         }
-        c1.close();
-        CustomAdapter customAdapter = new CustomAdapter(MainActivity.this, allEntries);
-        scheduleList.setAdapter(customAdapter);
+
+        @Override
+        protected void onPostExecute(ArrayList<EntryToDo> allEntries) {
+            super.onPostExecute(allEntries);
+
+            CustomAdapterToDo customAdapterToDo = new CustomAdapterToDo(MainActivity.this, allEntries);
+            toDoList.setAdapter(customAdapterToDo);
+            toDoList.setSelectionFromTop(toDoListIndex, toDoListTop);
+        }
+    }
+
+    public void showListForActual() {
+        new showActualList().execute(selectedDate);
+    }
+
+    private class showActualList extends AsyncTask<String, Object, ArrayList<Entry>> {
+        ArrayList<Entry> allEntries = new ArrayList<Entry>();
+
+        @Override
+        protected ArrayList<Entry> doInBackground(String... params) {
+            DatabaseManagerForActual manager_ob_actual = new DatabaseManagerForActual(MainActivity.this);
+            Cursor c1 =  manager_ob_actual.fetchByDate(params[0]);
+            if (c1 != null) {
+                if (c1.moveToFirst()) {
+                    do {
+                        Entry allItems = new Entry();
+                        allItems.setID(c1.getInt(0));
+                        allItems.setStart(c1.getString(2));
+                        allItems.setEnd(c1.getString(3));
+                        allItems.setTask(c1.getString(4));
+                        allItems.setTotal(c1.getString(5));
+
+//                        allItems.setID(c1.getInt(c1
+//                                .getColumnIndex("_id")));
+//                        allItems.setStart(c1.getString(c1
+//                                .getColumnIndex("startTime")));
+//                        allItems.setEnd(c1.getString(c1
+//                                .getColumnIndex("endTime")));
+//                        allItems.setTask(c1.getString(c1
+//                                .getColumnIndex("taskName")));
+//                        allItems.setTotal(c1.getString(c1
+//                                .getColumnIndex("total")));
+                        allEntries.add(allItems);
+                    } while (c1.moveToNext());
+                }
+            }
+            c1.close();
+            return allEntries;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<Entry> allEntries) {
+            super.onPostExecute(allEntries);
+
+            CustomAdapterForActual customAdapterForActual = new CustomAdapterForActual(
+                    MainActivity.this, allEntries);
+            actualScheduleList.setAdapter(customAdapterForActual);
+            actualScheduleList.setSelectionFromTop(actualListIndex, actualListTop);
+        }
     }
 
     public void setToOldSchedule(String selectedOldDateStr) {
@@ -1025,6 +1190,7 @@ public class MainActivity extends Activity {
                 adapter_ob.insertDetails(selectedDate, start, end, task, total);
             } while (c1.moveToNext());
         }
+        c1.close();
         showlist();
     }
 }

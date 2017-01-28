@@ -29,6 +29,7 @@ public class DatabaseHelperToDo extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TO_DO_TABLE);
+        db.execSQL("CREATE INDEX date_index ON toDo(date)");
     }
 
     @Override
