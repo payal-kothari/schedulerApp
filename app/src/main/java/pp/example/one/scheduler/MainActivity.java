@@ -15,9 +15,13 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -44,7 +48,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
     DatabaseManager adapter_ob;
     DatabaseManagerForActual manager_ob_actual;
     ListView scheduleList;
@@ -79,7 +83,10 @@ public class MainActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Toast.makeText(MainActivity.this, "on create", Toast.LENGTH_LONG).show();
         setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         mDetector = new GestureDetectorCompat(this, new MyGestureListener());
         scheduleList = (ListView) findViewById(R.id.list_view);
         actualScheduleList = (ListView) findViewById(R.id.list_viewActual);
@@ -112,10 +119,6 @@ public class MainActivity extends Activity {
                 btnIn.setText("OUT");
             }
         }
-
-//        showlist();
-//        showListForActual();
-//        showlistToDo();
 
         toDoList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
             @Override
@@ -371,7 +374,7 @@ public class MainActivity extends Activity {
                         c1.close();
                         String date = currentEntry.getDate();
                         String start = currentEntry.getStartTime();
-                        adapter_ob.insertDetails(date, start, start, "NEW*", "0:0");
+                        adapter_ob.insertDetails(date, start, start, "NEW*", "0:0", "N");
                         copyFromOtherTable();
                         dialog.dismiss();
                     }
@@ -409,7 +412,7 @@ public class MainActivity extends Activity {
                     //Create sequence of items
                     Tasks = allTasks.toArray(new String[allTasks.size()]);
                     final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
-                    dialogBuilder.setTitle("Tasks");
+                    dialogBuilder.setTitle("Check In");
                     selectedText = Tasks[0].toString();
                     dialogBuilder.setSingleChoiceItems(Tasks,0, new DialogInterface.OnClickListener() {
                         @Override
@@ -545,6 +548,7 @@ public class MainActivity extends Activity {
                     btnIn.setText("IN");
                     saveInOutDataInSharedPref("InOutStatus", "showing_IN");
                     showListForActual();
+                    btnIn.performClick();
                     //status = 1;
                 }
             }
@@ -579,7 +583,7 @@ public class MainActivity extends Activity {
                             Log.d("Endtime", formatedEndTime);
                             String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
 
-                            adapter.insertDetails(selectedDate, start, endTime, task, total);
+                            adapter.insertDetails(selectedDate, start, endTime, task, total, "N");
                             c.close();
                             showlist();
                         }else { // when database is empty
@@ -600,62 +604,36 @@ public class MainActivity extends Activity {
                             String total = TimeCalculations.calculateTotal(formattedDateStart, formattedDateEnd);
 
                             Log.d("mainActivity 1", total);
-                            adapter.insertDetails(selectedDate, startWithoutSpace, endTime, task, total);
+                            adapter.insertDetails(selectedDate, startWithoutSpace, endTime, task, total, "N");
                             c.close();
                             showlist();
                         }
-
-
                     }
                 }.execute(selectedDate);
-
-//                Cursor c = adapter.fetchByDate(selectedDate);
-                //int num = c.getCount();
-//                if(c.moveToLast()) {
-//                    //c.moveToLast();
-//                    String start = c.getString(3); // get end time and store as start for next task
-//
-//                    String endTime = TimeCalculations.forwardTimeByGivenHour(start, 1, 0);
-//                    String task = c.getString(4); // get task name
-//
-//                    String formatedStartTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(start);
-//                    String formatedEndTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(endTime);
-//                    Log.d("Endtime", formatedStartTime);
-//                    Log.d("Endtime", formatedEndTime);
-//                    String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
-//
-//                    adapter.insertDetails(selectedDate, start, endTime, task, total);
-//                    showlist();
-//                }else { // when database is empty
-//                    DateFormat time = new SimpleDateFormat("hh:mm a");
-//                    String start = time.format(Calendar.getInstance().getTime());
-//                    String startWithoutSpace = start.replace(" ", "");
-//
-//                    String endTime = TimeCalculations.forwardTimeByGivenHour(startWithoutSpace, 1, 0);
-//                    String task = "None";
-//
-//                    String formattedDateStart = new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime());
-//                    Calendar cal = Calendar.getInstance();
-//                    cal.add(Calendar.HOUR, 1);
-//                    Date d = cal.getTime();
-//                    String formattedDateEnd = new SimpleDateFormat("HH:mm:ss").format(d);
-//                    Log.d("Endtime", formattedDateStart);
-//                    Log.d("Endtime", formattedDateEnd);
-//                    String total = TimeCalculations.calculateTotal(formattedDateStart, formattedDateEnd);
-//
-//                    Log.d("mainActivity 1", total);
-//                    adapter.insertDetails(selectedDate, startWithoutSpace, endTime, task, total);
-//                    showlist();
-//                }
             }
         });
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        Toast.makeText(MainActivity.this, item.getTitle(), Toast.LENGTH_SHORT).show();
+
+
+        return super.onOptionsItemSelected(item);
+    }
+
     public boolean isInOutSharedPrefExist() {
         File f = new File(
-                "/data/data/pp.example.one.scheduler/shared_prefs/IN_OUT_STATUS.xml");
+                "/data/data/pp.example.one.scheduler/shared_prefs/IN_OUT_DATA.xml");
         if (f.exists()){
-            Log.d("TAG", "SharedPreferences Name_of_your_preference : exist");
+            Log.d("TAG", "SharedPreferences inOUT : exist");
             return true;
         }
         else{
@@ -872,7 +850,7 @@ public class MainActivity extends Activity {
                                 .getColumnIndex("total"));
                         adapter_ob = new DatabaseManager(MainActivity.this);
                         Log.d("copying from other: ", start);
-                        adapter_ob.insertDetails(date, start, end, task, total);
+                        adapter_ob.insertDetails(date, start, end, task, total, "N");
                 } while (c1.moveToNext());
             }
         }
@@ -1023,6 +1001,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onResume() {
+        Toast.makeText(MainActivity.this, "in resume", Toast.LENGTH_LONG).show();
         super.onResume();
         showlist();
         showListForActual();
@@ -1187,7 +1166,7 @@ public class MainActivity extends Activity {
                 String end = c1.getString(3);
                 String task = c1.getString(4);
                 String total = c1.getString(5);
-                adapter_ob.insertDetails(selectedDate, start, end, task, total);
+                adapter_ob.insertDetails(selectedDate, start, end, task, total, "N");
             } while (c1.moveToNext());
         }
         c1.close();

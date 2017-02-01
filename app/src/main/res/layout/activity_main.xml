@@ -1,17 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@android:color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-
     android:focusable="true"
     android:focusableInTouchMode="true">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:minHeight="?attr/actionBarSize"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:titleTextColor="@android:color/white"
+        android:background="?attr/colorPrimary">
+    </android.support.v7.widget.Toolbar>
 
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
+        android:layout_marginTop="?attr/actionBarSize"
         android:id="@+id/tx_date"
         android:textColor="@android:color/black"
         android:gravity="center"
@@ -147,6 +158,7 @@
 
     <Button
         android:id="@+id/btn_newTask"
+        android:background="@color/colorAccent"
         android:layout_width="94dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

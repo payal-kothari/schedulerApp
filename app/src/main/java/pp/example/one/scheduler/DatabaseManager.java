@@ -37,13 +37,14 @@ public class DatabaseManager{
         database_ob.close();
     }
 
-    public long insertDetails(String date, String startTime, String endTime, String task, String total) {
+    public long insertDetails(String date, String startTime, String endTime, String task, String total, String fixedTask) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(databaseHelper_ob.DATE, date);
         contentValues.put(databaseHelper_ob.START_TIME, startTime);
         contentValues.put(databaseHelper_ob.END_TIME, endTime);
         contentValues.put(databaseHelper_ob.TASK_NAME, task);
         contentValues.put(databaseHelper_ob.TOTAL, total);
+        contentValues.put(databaseHelper_ob.FIXED_TASK, fixedTask);
         opnToWrite();
         long val = database_ob.insert(databaseHelper_ob.TABLE_NAME, null, contentValues);
         Close();
@@ -137,13 +138,14 @@ public class DatabaseManager{
         return c;
     }
 
-    public long updateldetail(int rowId, String date, String startTime, String endTime, String task, String total) {
+    public long updateldetail(int rowId, String date, String startTime, String endTime, String task, String total, String fixedTask) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(databaseHelper_ob.DATE, date);
         contentValues.put(databaseHelper_ob.START_TIME, startTime);
         contentValues.put(databaseHelper_ob.END_TIME, endTime);
         contentValues.put(databaseHelper_ob.TASK_NAME, task);
         contentValues.put(databaseHelper_ob.TOTAL, total);
+        contentValues.put(databaseHelper_ob.FIXED_TASK, fixedTask);
         opnToWrite();
         long val = database_ob.update(databaseHelper_ob.TABLE_NAME, contentValues, databaseHelper_ob.KEY_ID + "=" + rowId, null);
         Close();

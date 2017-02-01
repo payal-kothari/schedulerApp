@@ -18,11 +18,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TASK_NAME = "taskName";
     public static final String DATE = "date";
     public static final String TOTAL = "total";
+    public static final String FIXED_TASK = "fixedTask";
     public static final String CREATE_SCHEDULE_TABLE = "create table " + TABLE_NAME + "("
             + KEY_ID + " integer primary key autoincrement," + DATE + " text not null," + START_TIME
             + " text not null," + END_TIME + " text not null," + TASK_NAME + " text not null,"
-            + TOTAL + " text not null"
+            + TOTAL + " text not null," + FIXED_TASK + " text not null"
             + ");";
+
+    public static final String CREATE_DATE_INDEX_FOR_SCHEDULE = "create index date_index on " + TABLE_NAME + "(" + DATE + ");";
 
     public DatabaseHelper(Context context, String name, CursorFactory factory, int version) {
         super(context, name, factory, version);
@@ -31,7 +34,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_SCHEDULE_TABLE);
-        db.execSQL("CREATE INDEX date_index ON schedule(date)");
+//        db.execSQL("CREATE INDEX date_index ON schedule(date)");
+        db.execSQL(CREATE_DATE_INDEX_FOR_SCHEDULE);
         System.out.println("indexing");
     }
 
