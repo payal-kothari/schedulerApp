@@ -288,10 +288,8 @@ public class MainActivity extends AppCompatActivity {
                 final Entry currentEntry = allEntries.get((int) id);
                 final int rowID = currentEntry.getID();
                 SharedPreferences pref = MainActivity.this.getSharedPreferences(SHARED_PREF_ALARM_TONES, Context.MODE_PRIVATE);
-//                if(alarmsMap.containsKey(rowID)) {
                 if(pref.contains(String.valueOf(rowID))) {
                     alarm_switch.setChecked(true);
-//                    String tone = alarmsMap.get(rowID);
                     String toneFromSharedPref = getAlarmToneFromSharedPref(rowID, MainActivity.this);
                     if(toneFromSharedPref.equals("beep")){
                         alarmTone_radioGroup.clearCheck();
@@ -709,14 +707,6 @@ public class MainActivity extends AppCompatActivity {
                             dialog.dismiss();
                     }
                 });
-
-
-
-
-
-
-
-
                 dialog.show();
 
                 break;
@@ -817,7 +807,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void cancelAlarm(int rowID, Context context) {
-//        alarmsMap.remove(rowID);
         removeAlarmToneForRowFromSharedPref(rowID, context);
         Intent notificationIntent = new Intent(context, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context,
@@ -854,7 +843,6 @@ public class MainActivity extends AppCompatActivity {
             }else {
                 hour = 0;
             }
-
         }
         String minute = spaceAddedTimeToset.substring(3, 5);
         int min = Integer.parseInt(minute);
@@ -909,7 +897,6 @@ public class MainActivity extends AppCompatActivity {
     private String getInOutDataFromSharedPref(String stringName, Context context) {
         SharedPreferences pref = context.getSharedPreferences(SHARED_PREF_IN_OUT_DATA, Context.MODE_PRIVATE);
         String buttonShowing = pref.getString(stringName, null);
-        //String buttonShowing = pref.getString("InOutStatus", null);
         return buttonShowing;
     }
 
@@ -1160,17 +1147,6 @@ public class MainActivity extends AppCompatActivity {
                         allItems.setEnd(c1.getString(3));
                         allItems.setTask(c1.getString(4));
                         allItems.setTotal(c1.getString(5));
-
-//                        allItems.setID(c1.getInt(c1
-//                                .getColumnIndex("_id")));
-//                        allItems.setStart(c1.getString(c1
-//                                .getColumnIndex("startTime")));
-//                        allItems.setEnd(c1.getString(c1
-//                                .getColumnIndex("endTime")));
-//                        allItems.setTask(c1.getString(c1
-//                                .getColumnIndex("taskName")));
-//                        allItems.setTotal(c1.getString(c1
-//                                .getColumnIndex("total")));
                         allEntries.add(allItems);
                         Log.d("work in loadign", "too much");
                     } while (c1.moveToNext());
@@ -1213,12 +1189,6 @@ public class MainActivity extends AppCompatActivity {
                     do {
                         EntryToDo allItems = new EntryToDo();
                         allItems.setTask(c1.getString(2));
-                        allItems.setStatus(c1.getString(3));
-
-//                        allItems.setTask(c1.getString(c1
-//                                .getColumnIndex("task")));
-//                        allItems.setStatus(c1.getString(c1
-//                                .getColumnIndex("status")));
                         allEntries.add(allItems);
                     } while (c1.moveToNext());
                 }
@@ -1257,17 +1227,6 @@ public class MainActivity extends AppCompatActivity {
                         allItems.setEnd(c1.getString(3));
                         allItems.setTask(c1.getString(4));
                         allItems.setTotal(c1.getString(5));
-
-//                        allItems.setID(c1.getInt(c1
-//                                .getColumnIndex("_id")));
-//                        allItems.setStart(c1.getString(c1
-//                                .getColumnIndex("startTime")));
-//                        allItems.setEnd(c1.getString(c1
-//                                .getColumnIndex("endTime")));
-//                        allItems.setTask(c1.getString(c1
-//                                .getColumnIndex("taskName")));
-//                        allItems.setTotal(c1.getString(c1
-//                                .getColumnIndex("total")));
                         allEntries.add(allItems);
                     } while (c1.moveToNext());
                 }
