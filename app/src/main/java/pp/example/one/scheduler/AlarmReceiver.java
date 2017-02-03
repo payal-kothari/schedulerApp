@@ -27,19 +27,19 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         if(tone.equals("ring")){
 //            mainActivity.alarmsMap.remove(id);
-            mainActivity.removeAlarmToneForRowFromSharedPref(id);
+            mainActivity.removeAlarmToneForRowFromSharedPref(id, context);
             mp= MediaPlayer.create(context, R.raw.thuglife);
             mp.start();
             notificationManager.notify(id, notification);
         }else if(tone.equals("beep")){
 //            mainActivity.alarmsMap.remove(id);
-            mainActivity.removeAlarmToneForRowFromSharedPref(id);
+            mainActivity.removeAlarmToneForRowFromSharedPref(id, context);
             mp= MediaPlayer.create(context, R.raw.double_beep);
             mp.start();
             notificationManager.notify(id, notification);
         }else if(tone.equals("vibrate")){
 //            mainActivity.alarmsMap.remove(id);
-            mainActivity.removeAlarmToneForRowFromSharedPref(id);
+            mainActivity.removeAlarmToneForRowFromSharedPref(id, context);
             notificationManager.notify(id, notification);
         }
     }
