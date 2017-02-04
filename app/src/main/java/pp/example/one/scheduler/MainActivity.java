@@ -863,23 +863,25 @@ public class MainActivity extends AppCompatActivity {
         cal.set(Calendar.MINUTE, min);
         cal.set(Calendar.SECOND, 0);
 
-        Notification notification = getNotification( task + " task has started", tone, context);
-        Intent notificationIntent = new Intent(context, AlarmReceiver.class);
-        notificationIntent.putExtra(AlarmReceiver.NOTIFICATION_ID, rowID);
-        notificationIntent.putExtra(AlarmReceiver.NOTIFICATION, notification);
-        notificationIntent.putExtra("Tone", tone);
+        if(cal.getTimeInMillis() > System.currentTimeMillis()){
+            Notification notification = getNotification( task + " task has started", tone, context);
+            Intent notificationIntent = new Intent(context, AlarmReceiver.class);
+            notificationIntent.putExtra(AlarmReceiver.NOTIFICATION_ID, rowID);
+            notificationIntent.putExtra(AlarmReceiver.NOTIFICATION, notification);
+            notificationIntent.putExtra("Tone", tone);
 //        alarmsMap.put(rowID, tone);
-        saveAlarmToneForRowInSharedPref(rowID, tone, context);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context,
-                rowID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        Log.d("hour set: ", String.valueOf(cal.get(Calendar.HOUR_OF_DAY)));
-        Log.d("hour set: ", String.valueOf(cal.get(Calendar.MINUTE)));
-        Log.d("hour set: ", String.valueOf(cal.get(Calendar.SECOND)));
-        Log.d("hour set: ", String.valueOf(cal.getTimeInMillis()));
-        Log.d("date set: ", String.valueOf(date.toString()));
+            saveAlarmToneForRowInSharedPref(rowID, tone, context);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context,
+                    rowID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+            Log.d("hour set: ", String.valueOf(cal.get(Calendar.HOUR_OF_DAY)));
+            Log.d("hour set: ", String.valueOf(cal.get(Calendar.MINUTE)));
+            Log.d("hour set: ", String.valueOf(cal.get(Calendar.SECOND)));
+            Log.d("hour set: ", String.valueOf(cal.getTimeInMillis()));
+            Log.d("date set: ", String.valueOf(date.toString()));
 
-        alarmManager.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent);
+        }
     }
 
     public void saveAlarmToneForRowInSharedPref(int rowID, String tone, Context context) {
