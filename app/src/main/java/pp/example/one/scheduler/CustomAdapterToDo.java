@@ -61,8 +61,7 @@ public class CustomAdapterToDo extends BaseAdapter{
         int index = position;
         String taskNameWithIndex = String.valueOf(++index) + ". "  + list.get(position).task;
         listViewHolder.tx_task.setText(taskNameWithIndex);
-//        Log.d("here",list.get(position).status);
-        if (list.get(position).status.equals("Y"))
+        if (list.get(position).getStatus().equals("Y"))
         {
             listViewHolder.tx_task.setPaintFlags(listViewHolder.tx_task.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         }

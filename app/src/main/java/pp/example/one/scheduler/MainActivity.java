@@ -1,6 +1,5 @@
 package pp.example.one.scheduler;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -44,11 +43,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
+    static final String app_id = "pp.example.one.scheduler1";
     DatabaseManager adapter_ob;
     DatabaseManagerForActual manager_ob_actual;
     ListView scheduleList;
@@ -75,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
     static  int toDoListIndex, toDoListTop, plannedListIndex, plannedListTop, actualListIndex, actualListTop;
     static final String SHARED_PREF_ALARM_TONES = "ALARM_TONES";
     static final String SHARED_PREF_CENTRAL_ALARM_TONES = "CENTRAL_ALARM_TONES";
-    static final String SHARED_PREF_IN_OUT_DATA = "IN_OUT_DATA";
+    static final String SHARED_PREF_IN_OUT_DATA = "IN_OUT_DATA" + app_id;
     GestureDetectorCompat mDetector;
 
     @Override
@@ -98,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
         txDate = (TextView) findViewById(R.id.tx_date);
         toDoList = (ListView) findViewById(R.id.toDo_list);
         btnAddTask = (Button) findViewById(R.id.btn_toDoAdd);
-        ed_Task = (EditText) findViewById(R.id.ed_task);
+        ed_Task = (EditText) findViewById(R.id.ed_taskToDo);
 
         Calendar c = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
@@ -107,10 +106,12 @@ public class MainActivity extends AppCompatActivity {
         txDate.setText(formatedDate);
         boolean InOutExist =  isInOutSharedPrefExist();
         if(!InOutExist){
+            Log.d("in out status: ", "file doesn't exist");
             btnIn.setText("IN");
             saveInOutDataInSharedPref("InOutStatus", "showing_IN", MainActivity.this);
         }else {
             String showing_status = getInOutDataFromSharedPref("InOutStatus", MainActivity.this);
+            Log.d("in out status: ", showing_status);
             if(showing_status.equals("showing_IN")){
                 btnIn.setText("IN");
             }else if(showing_status.equals("showing_OUT")){
@@ -732,8 +733,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean isInOutSharedPrefExist() {
-        File f = new File(
-                "/data/data/pp.example.one.scheduler/shared_prefs/IN_OUT_DATA.xml");
+        String filename = "/data/data/" + app_id + "/shared_prefs/" + SHARED_PREF_IN_OUT_DATA + ".xml";
+        Log.d("filename: ", filename);
+        File f = new File(filename);
         if (f.exists()){
             Log.d("TAG", "SharedPreferences inOUT : exist");
             return true;
@@ -1183,12 +1185,12 @@ public class MainActivity extends AppCompatActivity {
         protected ArrayList<EntryToDo> doInBackground(String... params) {
             DatabaseManagerToDo adapter_ob_ToDo = new DatabaseManagerToDo(MainActivity.this);
             Cursor c1 = adapter_ob_ToDo.fetchByDate(params[0]);
-            Log.d("date in shwlistTODO", selectedDate);
             if (c1 != null) {
                 if (c1.moveToFirst()) {
                     do {
                         EntryToDo allItems = new EntryToDo();
                         allItems.setTask(c1.getString(2));
+                        allItems.setStatus(c1.getString(3));
                         allEntries.add(allItems);
                     } while (c1.moveToNext());
                 }
@@ -1200,10 +1202,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(ArrayList<EntryToDo> allEntries) {
             super.onPostExecute(allEntries);
-
             CustomAdapterToDo customAdapterToDo = new CustomAdapterToDo(MainActivity.this, allEntries);
             toDoList.setAdapter(customAdapterToDo);
-            toDoList.setSelectionFromTop(toDoListIndex, toDoListTop);
         }
     }
 

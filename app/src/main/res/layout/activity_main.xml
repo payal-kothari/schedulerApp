@@ -198,7 +198,7 @@
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/ed_task"
+        android:id="@+id/ed_taskToDo"
         android:hint="Add new task"
         android:layout_toLeftOf="@+id/btn_toDoAdd"
         android:layout_below="@+id/toDo_list"

@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">Schedulerr</string>
-    <string name="ToDo_watermark">To Do</string>
+    <string name="app_name">Scheduler</string>
+    <string name="pkg_name">pp.example.one.scheduler</string>
 </resources>
