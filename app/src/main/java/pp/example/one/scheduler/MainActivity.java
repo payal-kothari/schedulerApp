@@ -75,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
     static final String SHARED_PREF_ALARM_TONES = "ALARM_TONES";
     static final String SHARED_PREF_CENTRAL_ALARM_TONES = "CENTRAL_ALARM_TONES";
     static final String SHARED_PREF_IN_OUT_DATA = "IN_OUT_DATA" + app_id;
+    static final String SHARED_PREF_MISC_DATA = "MISC_DATA";
+    static final String NewTaskBtnVisibility = "NewTaskBtnStatus";
     GestureDetectorCompat mDetector;
 
     @Override
@@ -104,7 +106,8 @@ public class MainActivity extends AppCompatActivity {
         selectedDate = df.format(c.getTime());
         formatedDate = setFormatedDate();
         txDate.setText(formatedDate);
-        boolean InOutExist =  isInOutSharedPrefExist();
+
+        boolean InOutExist =  isSharedPrefExist(SHARED_PREF_IN_OUT_DATA);
         if(!InOutExist){
             Log.d("in out status: ", "file doesn't exist");
             btnIn.setText("IN");
@@ -572,6 +575,7 @@ public class MainActivity extends AppCompatActivity {
                             String start = c.getString(3); // get end time and store as start for next task
 
                             String endTime = TimeCalculations.forwardTimeByGivenHour(start, 1, 0);
+                            Log.d("Endtime from timeCalc", endTime);
                             String task = c.getString(4); // get task name
 
                             String formatedStartTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(start);
@@ -591,14 +595,17 @@ public class MainActivity extends AppCompatActivity {
                             String endTime = TimeCalculations.forwardTimeByGivenHour(startWithoutSpace, 1, 0);
                             String task = "None";
 
-                            String formattedDateStart = new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime());
-                            Calendar cal = Calendar.getInstance();
-                            cal.add(Calendar.HOUR, 1);
-                            Date d = cal.getTime();
-                            String formattedDateEnd = new SimpleDateFormat("HH:mm:ss").format(d);
-                            Log.d("Endtime", formattedDateStart);
-                            Log.d("Endtime", formattedDateEnd);
-                            String total = TimeCalculations.calculateTotal(formattedDateStart, formattedDateEnd);
+//                            String formattedDateStart = new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime());
+//                            Calendar cal = Calendar.getInstance();
+//                            cal.add(Calendar.HOUR, 1);
+//                            Date d = cal.getTime();
+//                            String formattedDateEnd = new SimpleDateFormat("HH:mm:ss").format(d);
+                            String formatedStartTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(startWithoutSpace);
+                            String formatedEndTime = TimeCalculations.convertAmPmToHHmmssTimeFormat(endTime);
+
+                            Log.d("Endtime", formatedStartTime);
+                            Log.d("Endtime", formatedEndTime);
+                            String total = TimeCalculations.calculateTotal(formatedStartTime, formatedEndTime);
 
                             Log.d("mainActivity 1", total);
                             adapter.insertDetails(selectedDate, startWithoutSpace, endTime, task, total, "N");
@@ -732,8 +739,8 @@ public class MainActivity extends AppCompatActivity {
         editor.commit();
     }
 
-    public boolean isInOutSharedPrefExist() {
-        String filename = "/data/data/" + app_id + "/shared_prefs/" + SHARED_PREF_IN_OUT_DATA + ".xml";
+    public boolean isSharedPrefExist(String fileName) {
+        String filename = "/data/data/" + app_id + "/shared_prefs/" + fileName + ".xml";
         Log.d("filename: ", filename);
         File f = new File(filename);
         if (f.exists()){
@@ -904,6 +911,18 @@ public class MainActivity extends AppCompatActivity {
         return buttonShowing;
     }
 
+    public void saveMiscDataInSharedPref(String stringName, String value, Context context) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(SHARED_PREF_MISC_DATA, 0).edit();
+        editor.putString(stringName, value);
+        // editor.putString("InOutStatus", status);
+        editor.commit();
+    }
+
+    private String getMiscDataFromSharedPref(String stringName, Context context) {
+        SharedPreferences pref = context.getSharedPreferences(SHARED_PREF_MISC_DATA, Context.MODE_PRIVATE);
+        String value = pref.getString(stringName, null);
+        return value;
+    }
 
     private String setFormatedDate() {
         Calendar cal = Calendar.getInstance();
@@ -1172,6 +1191,23 @@ public class MainActivity extends AppCompatActivity {
 
     public void showlist() {
         //txDate.setText(formatedDate);
+        adapter_ob  = new DatabaseManager(MainActivity.this);
+        Log.d("selectedDate is ",selectedDate);
+        Cursor c1 =  adapter_ob.fetchByDate(selectedDate);
+        if(c1.moveToLast()){
+            String lastTime = c1.getString(3);
+            Log.d("lastTime is ",lastTime);
+            if(lastTime.equals("11:59PM")){
+                btnNewTask.setEnabled(false);
+            }else {
+                Log.d("lastTime is ","");
+                btnNewTask.setEnabled(true);
+            }
+        }else {
+            Log.d("lastTime is ","");
+            btnNewTask.setEnabled(true);
+        }
+        c1.close();
         new showPlannedList().execute(selectedDate);
     }
 

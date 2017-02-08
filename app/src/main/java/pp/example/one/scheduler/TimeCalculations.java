@@ -1,5 +1,7 @@
 package pp.example.one.scheduler;
 
+import android.util.Log;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -48,12 +50,12 @@ public class TimeCalculations {
         return strb.toString();
     }
 
-    public static String convertAmPmToHHmmssTimeFormat(String resultS) {
+    public static String convertAmPmToHHmmssTimeFormat(String resultSWihtoutSpace) {
 
         SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
         SimpleDateFormat parseFormat1 = new SimpleDateFormat("hh:mm a");
         Date tempDate1 = new Date();
-        String spaceAddedStartTime = resultS.substring(0, 5) + " " + resultS.substring(5, resultS.length());
+        String spaceAddedStartTime = resultSWihtoutSpace.substring(0, 5) + " " + resultSWihtoutSpace.substring(5, resultSWihtoutSpace.length());
         try {
             tempDate1 = parseFormat1.parse(spaceAddedStartTime);
         } catch (ParseException e) {
@@ -81,6 +83,12 @@ public class TimeCalculations {
 
         String forwardedTimeWithoutSpace = forwardedTimeWithSpace.replace(" ", "");
 
+        String timeDiff = calculateTotal(convertAmPmToHHmmssTimeFormat(timeToForward), convertAmPmToHHmmssTimeFormat(forwardedTimeWithoutSpace));
+
+        if(timeDiff.contains("-")){
+            Log.d("negative time", timeDiff);
+            return "11:59PM";
+        }
         return forwardedTimeWithoutSpace;
     }
 

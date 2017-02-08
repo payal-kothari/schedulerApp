@@ -146,6 +146,7 @@ public class CustomAdapter extends BaseAdapter{
                     }
                 }, hour, minute, false);
                 mTimePicker.setTitle("Select Time");
+
                 mTimePicker.show();
             }
         });
@@ -259,7 +260,9 @@ public class CustomAdapter extends BaseAdapter{
 
 
         listViewHolder.tx_s.setText(list.get(position).startTime);
+        Log.d("Start time in milli ", String.valueOf(list.get(position).startTime));
         listViewHolder.tx_e.setText(list.get(position).endTime);
+        Log.d("End time in milli ", String.valueOf(list.get(position).endTime));
         listViewHolder.tx_t.setText(list.get(position).taskName);
         String totalStr = list.get(position).total;
         String totalHr = totalStr.substring(0, totalStr.indexOf(":"));
@@ -303,6 +306,7 @@ public class CustomAdapter extends BaseAdapter{
 
         String newEndTime = TimeCalculations.forwardTimeByGivenHour(endTime, Integer.parseInt(firstHalfDiff), Integer.parseInt(secondHalfDiff));
         newStart = previousEntryEndTime;
+
         newEnd = newEndTime;
 
         return newEnd;
