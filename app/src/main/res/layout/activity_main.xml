@@ -135,6 +135,7 @@
             android:layout_weight="0.5"
             android:longClickable="true"
             android:dividerHeight="1dp"
+            android:fadeScrollbars="false"
             android:background="@android:color/holo_green_light"
             android:divider="@android:color/black"
            >
@@ -147,6 +148,7 @@
             android:layout_toRightOf="@+id/list_view"
             android:layout_weight="0.5"
             android:longClickable="true"
+            android:fadeScrollbars="false"
             android:dividerHeight="1dp"
             android:background="@android:color/holo_orange_light"
             android:divider="@android:color/black"
