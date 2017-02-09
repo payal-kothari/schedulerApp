@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Toast.makeText(MainActivity.this, "on create", Toast.LENGTH_LONG).show();
+        //Toast.makeText(MainActivity.this, "on create", Toast.LENGTH_LONG).show();
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -100,6 +100,8 @@ public class MainActivity extends AppCompatActivity {
         toDoList = (ListView) findViewById(R.id.toDo_list);
         btnAddTask = (Button) findViewById(R.id.btn_toDoAdd);
         ed_Task = (EditText) findViewById(R.id.ed_taskToDo);
+
+
 
         Calendar c = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
@@ -627,7 +629,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        Toast.makeText(MainActivity.this, item.getTitle(), Toast.LENGTH_SHORT).show();
         adapter_ob = new DatabaseManager(this);
 
         switch (item.getItemId()){
@@ -753,15 +754,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event){
-        this.mDetector.onTouchEvent(event);
-        return super.onTouchEvent(event);
-    }
 
     @Override
     public boolean dispatchTouchEvent (MotionEvent ev) {
         // Do your calcluations
+        this.mDetector.onTouchEvent(ev);
         return super.dispatchTouchEvent(ev);
     }
 
@@ -781,26 +778,98 @@ public class MainActivity extends AppCompatActivity {
                     return false;
                 }
                 if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE) {
-                    Toast.makeText(MainActivity.this, "bottomToTop" ,
-                            Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(MainActivity.this, "bottomToTop" , Toast.LENGTH_SHORT).show();
                 } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE) {
-                    Toast.makeText(MainActivity.this,
-                            "topToBottom  " , Toast.LENGTH_SHORT)
-                            .show();
+                   // Toast.makeText(MainActivity.this, "topToBottom  " , Toast.LENGTH_SHORT).show();
                 }
             } else {
                 if (Math.abs(velocityX) < SWIPE_THRESHOLD_VELOCITY) {
                     return false;
                 }
                 if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE) {
-                    Toast.makeText(MainActivity.this,
-                            "swipe RightToLeft " , Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(MainActivity.this, "swipe RightToLeft  <--" , Toast.LENGTH_SHORT).show();
+
+                    String currentDate = selectedDate;
+                    Calendar cal = Calendar.getInstance();
+                    Date date = new Date();
+                    SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+
+                    try {
+                        date = format.parse(currentDate);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    cal.setTime(date);
+                    cal.add(Calendar.DATE, 1);
+                    int year = cal.get(Calendar.YEAR);
+                    int month = cal.get(Calendar.MONTH);
+                    int day = cal.get(Calendar.DAY_OF_MONTH);
+                    selectedDate = formatSelectedDate(year, month, day);
+                    formatedDate = setFormatedDate(year, month, day);
+
+                    txDate.setText(formatedDate);
+                    String todayDate = getTodayDate();
+
+                    if(todayDate.equals(selectedDate)){
+                        try {
+                            copyOldToDo();
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        btnIn.setEnabled(true);
+                    }else {
+                        btnIn.setEnabled(false);
+                    }
+                    try {
+                        showlistToDo();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
                 } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE) {
 
 
-                    Toast.makeText(MainActivity.this,
-                            "swipe LeftToright  " , Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(MainActivity.this, "swipe LeftToright  " , Toast.LENGTH_SHORT).show();
 
+                    String currentDate = selectedDate;
+                    Calendar cal = Calendar.getInstance();
+                    Date date = new Date();
+                    SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+
+                    try {
+                        date = format.parse(currentDate);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    cal.setTime(date);
+                    cal.add(Calendar.DATE, -1);
+
+                    int year = cal.get(Calendar.YEAR);
+                    int month = cal.get(Calendar.MONTH);
+                    int day = cal.get(Calendar.DAY_OF_MONTH);
+                    selectedDate = formatSelectedDate(year, month, day);
+                    formatedDate = setFormatedDate(year, month, day);
+
+                    txDate.setText(formatedDate);
+                    String todayDate = getTodayDate();
+
+                    if(todayDate.equals(selectedDate)){
+                        try {
+                            copyOldToDo();
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        btnIn.setEnabled(true);
+                    }else {
+                        btnIn.setEnabled(false);
+                    }
+                    try {
+                        showlistToDo();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
 
                 }
             }
@@ -940,34 +1009,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void copyOldToDo() throws ParseException {
-        DatabaseManagerToDo manager_ob_to_do = new DatabaseManagerToDo(MainActivity.this);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        Date d =  dateFormat.parse(selectedDate);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(d);
-        calendar.add(Calendar.DATE, -1);
-        String yesterdayAsString = dateFormat.format(calendar.getTime());
-        Cursor c1 = manager_ob_to_do.findOldRecords(yesterdayAsString);
-        Log.d("ToDoAct","now here");
-        if (c1 != null && c1.getCount() != 0) {
-            if (c1.moveToFirst()) {
-                do {
-                    ArrayList<String> tasksByDate = manager_ob_to_do.fetchByDateTasksList(selectedDate);
-                    String date = c1.getString(c1
-                            .getColumnIndex("date"));
-                    String task = c1.getString(c1
-                            .getColumnIndex("task"));
-                    String status = c1.getString(c1
-                            .getColumnIndex("status"));
-                    int statusId = c1.getInt(c1
-                            .getColumnIndex("statusId"));
-                    if(status.equals("N") && !tasksByDate.contains(task)){
-                        manager_ob_to_do.insertDetails(selectedDate, task, status, statusId );
-                    }
-                    Log.d("ToDoAct",date);
-                    Log.d("ToDoAct",task);
-                    Log.d("ToDoAct",status);
-                } while (c1.moveToNext());
+        String todayDate = getTodayDate();
+        if(todayDate.equals(selectedDate)){
+            DatabaseManagerToDo manager_ob_to_do = new DatabaseManagerToDo(MainActivity.this);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            Date d =  dateFormat.parse(selectedDate);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(d);
+            calendar.add(Calendar.DATE, -1);
+            String yesterdayAsString = dateFormat.format(calendar.getTime());
+            Toast.makeText(MainActivity.this, "yeaseter " + yesterdayAsString, Toast.LENGTH_SHORT).show();
+            Cursor c1 = manager_ob_to_do.findOldRecords(yesterdayAsString);
+            Log.d("ToDoAct","now here");
+            if (c1 != null) {
+                if (c1.moveToFirst()) {
+                    do {
+                        ArrayList<String> tasksByDate = manager_ob_to_do.fetchByDateTasksList(selectedDate);
+                        String date = c1.getString(c1
+                                .getColumnIndex("date"));
+                        String task = c1.getString(c1
+                                .getColumnIndex("task"));
+                        String status = c1.getString(c1
+                                .getColumnIndex("status"));
+                        int statusId = c1.getInt(c1
+                                .getColumnIndex("statusId"));
+                        if(status.equals("N") && !tasksByDate.contains(task)){
+                            Log.d("ToDoDate** ",date);
+                            Log.d("ToDoTask** ",task);
+                            Log.d("ToDoStatus** ",status);
+                            Log.d("task present** ", String.valueOf(tasksByDate.contains(task)));
+
+                            manager_ob_to_do.insertDetails(selectedDate, task, status, statusId );
+                        }
+                    } while (c1.moveToNext());
+                }
             }
         }
     }
@@ -1084,7 +1159,6 @@ public class MainActivity extends AppCompatActivity {
         cal.set(year, month, day);
         Date date = cal.getTime();
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-
         return sdf.format(date);
     }
 
@@ -1097,7 +1171,6 @@ public class MainActivity extends AppCompatActivity {
                     // arg1 = year
                     // arg2 = month
                     // arg3 = day
-
 
                     selectedDate = formatSelectedDate(arg1, arg2, arg3);
                     formatedDate = setFormatedDate(arg1, arg2, arg3);
@@ -1142,7 +1215,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        Toast.makeText(MainActivity.this, "in resume", Toast.LENGTH_LONG).show();
+        //Toast.makeText(MainActivity.this, "in resume", Toast.LENGTH_LONG).show();
         super.onResume();
         showlist();
         showListForActual();

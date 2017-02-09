@@ -81,7 +81,6 @@
         android:orientation="horizontal"
         android:id="@+id/title_linearLayout2"
         android:layout_below="@+id/tx_date"
-
         android:layout_toRightOf="@+id/title_linearLayout"
         android:weightSum="1">
 
