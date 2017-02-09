@@ -402,6 +402,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        txDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog(999);
+            }
+        });
+
         btnIn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
