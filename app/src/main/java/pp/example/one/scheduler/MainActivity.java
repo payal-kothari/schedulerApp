@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
-    static final String app_id = "pp.example.one.scheduler1";
+    static final String app_id = "pp.example.one.scheduler2";
     DatabaseManager adapter_ob;
     DatabaseManagerForActual manager_ob_actual;
     ListView scheduleList;
@@ -830,13 +830,13 @@ public class MainActivity extends AppCompatActivity {
                     }
                     try {
                         showlistToDo();
+                        showListForActual();
+                        showlist();
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
 
                 } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE) {
-
-
                     //Toast.makeText(MainActivity.this, "swipe LeftToright  " , Toast.LENGTH_SHORT).show();
 
                     String currentDate = selectedDate;
@@ -874,6 +874,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                     try {
                         showlistToDo();
+                        showlist();
+                        showListForActual();
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
